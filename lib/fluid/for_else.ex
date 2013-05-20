@@ -30,17 +30,21 @@ defmodule Fluid.ForElse do
 
   def render(output, Block[iterator: it]=block, Context[]=context) do
     { list, _ } = Variables.lookup(it.collection, context)
-    list = if it.reversed, do: Enum.reverse(list), else: list
-    each(output, list, block, context)
+    cond do
+      is_list(list) and Enum.count(list) > 0 ->
+        list = if it.reversed, do: Enum.reverse(list), else: list
+        each(output, list, block, context)
+      true -> Render.render(output, block.elselist, context)
+    end
   end
 
   defp each(output, [], Block[], Context[]=context), do: { output, context }
-  defp each(output, [h|t]=list, Block[nodelist: nodelist, iterator: it]=block, Context[assigns: assigns]=context) do
+  defp each(output, [h|t]=list, Block[iterator: it]=block, Context[assigns: assigns]=context) do
     forloop = next_forloop(it, list |> Enum.count)
     block   = block.iterator(forloop |> it.forloop)
     assigns = assigns |> Dict.put(:forloop, forloop)
     assigns = assigns |> Dict.put(it.item, h)
-    { output, _ } = Render.render(output, nodelist, assigns |> context.assigns)
+    { output, _ } = Render.render(output, block.nodelist, assigns |> context.assigns)
     each(output, t, block, context)
   end
 
