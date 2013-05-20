@@ -16,7 +16,7 @@ defmodule Fluid.Filters do
     filters = Enum.filter(filters, fn(x) -> x != "|" end)
     [name|filters] = Enum.map(filters, function(String, :strip, 1))
     filters = Enum.map(filters, fn(markup) ->
-      [[filter]|rest] = Regex.scan(%r/\s*(\w+)/, markup)
+      [[filter]|_] = Regex.scan(%r/\s*(\w+)/, markup)
       args = Fluid.filter_arguments |> Regex.scan(markup) |> List.flatten
       [binary_to_atom(filter, :utf8), args]
     end)

@@ -26,6 +26,15 @@ defmodule Fluid.Templates do
     { :noreply, Dict.put(dict, binary_to_atom(name, :utf8), { module, tag }) }
   end
 
+  def handle_cast(:clear, dict) do
+    spawn fn ->
+      Enum.each dict, fn({ _, { module, _ } }) ->
+        purge_module(module)
+      end
+    end
+    { :noreply, default_tags }
+  end
+
   def handle_call({ :lookup, name }, _from, dict) when is_atom(name) do
     result = Dict.get(dict, name)
     { :reply, result, dict }
@@ -38,15 +47,6 @@ defmodule Fluid.Templates do
 
   def handle_call(:stop, _from, dict) do
     { :stop, :normal, :ok, dict }
-  end
-
-  def handle_cast(:clear, dict) do
-    spawn fn ->
-      Enum.each dict, fn({ _, { module, _ } }) ->
-        purge_module(module)
-      end
-    end
-    { :noreply, default_tags }
   end
 
   defp purge_module(module) do

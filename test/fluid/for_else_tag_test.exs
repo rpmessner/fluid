@@ -81,13 +81,13 @@ defmodule ForElseTagTest do
     assert_result("-",   "{%for item in array%}+{%else%}-{%endfor%}", [array: nil])
   end
 
-  # test :limiting do
-  #   assigns = {'array' => [1,2,3,4,5,6,7,8,9,0]}
-  #   assert_result("12', "{%for i in array limit:2 %}{{ i }}{%endfor%}", assigns)
-  #   assert_result("1234', "{%for i in array limit:4 %}{{ i }}{%endfor%}", assigns)
-  #   assert_result("3456', "{%for i in array limit:4 offset:2 %}{{ i }}{%endfor%}", assigns)
-  #   assert_result("3456', "{%for i in array limit: 4 offset: 2 %}{{ i }}{%endfor%}", assigns)
-  # end
+  test :limiting do
+    assigns = [array: [1,2,3,4,5,6,7,8,9,0]]
+    assert_result("12", "{%for i in array limit:2 %}{{ i }}{%endfor%}", assigns)
+    assert_result("1234", "{%for i in array limit:4 %}{{ i }}{%endfor%}", assigns)
+    assert_result("3456", "{%for i in array limit:4 offset:2 %}{{ i }}{%endfor%}", assigns)
+    assert_result("3456", "{%for i in array limit: 4 offset: 2 %}{{ i }}{%endfor%}", assigns)
+  end
 
   # test :dynamic_variable_limiting do
   #   assigns = {'array' => [1,2,3,4,5,6,7,8,9,0]}
@@ -294,7 +294,7 @@ defmodule ForElseTagTest do
   #   assert_result("", "{% for char in characters %}I WILL NOT BE OUTPUT{% endfor %}", 'characters' => '')
   # end
 
-  defp assert_result(expected, markup, assigns//[]) do
+  defp assert_result(expected, markup, assigns) do
     t = Template.parse(markup)
     { :ok, rendered, _ } = Template.render(t, assigns)
     assert rendered == expected

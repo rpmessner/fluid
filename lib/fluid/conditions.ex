@@ -3,16 +3,14 @@ defmodule Fluid.Conditions do
   alias Fluid.Variables, as: Vars
   alias Fluid.Context, as: Context
 
-  def create([h|t]=list) do
+  def create([h|t]) do
     head = create(h)
     create(head, t)
   end
 
-  def create(condition, []), do: condition
-  def create(condition, [join, right|t]) when join == "and" or join == "or" do
-    right = create(right)
-     join = join |> String.strip |> binary_to_atom(:utf8)
-    join(join, condition, right)
+  def create(<<left::binary>>) do
+    left = Vars.create(left)
+    Cond[left: left]
   end
 
   def create({ left, operator, right }) do
@@ -22,9 +20,11 @@ defmodule Fluid.Conditions do
     Cond[left: left, operator: operator, right: right]
   end
 
-  def create(<<left::binary>>) do
-    left = Vars.create(left)
-    Cond[left: left]
+  def create(condition, []), do: condition
+  def create(condition, [join, right|_]) when join == "and" or join == "or" do
+    right = create(right)
+    join  = join |> String.strip |> binary_to_atom(:utf8)
+    join(join, condition, right)
   end
 
   def join(operator, condition, { _, _, _ }=right), do: join(operator, condition, right |> create)
@@ -32,12 +32,13 @@ defmodule Fluid.Conditions do
     right.child_condition(condition).child_operator(operator)
   end
 
-  def evaluate(Cond[left: left, right: nil]=condition, Context[]=context//Context[]) do
+  def evaluate(Cond[]=condition), do: evaluate(condition, Context[])
+  def evaluate(Cond[left: left, right: nil]=condition, Context[]=context) do
     { current, context } = Vars.lookup(left, context)
     eval_child(!!current, condition.child_operator, condition.child_condition, context)
   end
 
-  def evaluate(Cond[left: left, right: right, operator: operator]=condition, Context[]=context//Context[]) do
+  def evaluate(Cond[left: left, right: right, operator: operator]=condition, Context[]=context) do
     { left, context } = Vars.lookup(left, context)
     { right, context } = Vars.lookup(right, context)
     current = eval_operator(left, operator, right)
@@ -68,8 +69,8 @@ defmodule Fluid.Conditions do
     end
   end
 
-  defp contains(nil, right), do: false
-  defp contains(right, nil), do: false
+  defp contains(nil, _), do: false
+  defp contains(_, nil), do: false
   defp contains(<<left::binary>>, <<right::binary>>), do: contains(left |> binary_to_list, right |> binary_to_list)
   defp contains(left, <<right::binary>>) when is_list(left), do: contains(left, right |> binary_to_list)
   defp contains(<<left::binary>>, right) when is_list(right), do: contains(left |> binary_to_list, right)

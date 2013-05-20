@@ -31,7 +31,7 @@ defmodule Fluid.Variables do
     end
   end
 
-  def lookup(Variable[name: name, filters: filters]=v, Context[]=context) do
+  def lookup(Variable[filters: filters]=v, Context[]=context) do
     { ret, context } = case v do
       Variable[literal: literal, parts: []] ->
         { literal, context }
@@ -65,7 +65,7 @@ defmodule Fluid.Variables do
     resolve(parts, current, context)
   end
 
-  defp resolve(<<name::binary>>, current, Context[]=context) when !is_list(current), do: { nil, context }
+  defp resolve(<<_::binary>>, current, Context[]=context) when !is_list(current), do: { nil, context }
   defp resolve(<<name::binary>>, current, Context[]=context) when is_list(current) do
     key    = binary_to_atom(name, :utf8)
     return = Dict.get(current, key)

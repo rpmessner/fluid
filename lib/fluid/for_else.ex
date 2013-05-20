@@ -5,7 +5,8 @@ defmodule Fluid.ForElse do
   alias Fluid.Variables, as: Variables
   alias Fluid.Context, as: Context
 
-  defrecord Iterator, collection: nil, item: nil, reversed: false, attributes: [], forloop: []
+  defrecord Iterator, collection: nil, item: nil, reversed: false,
+                      limit: nil, offset: nil, forloop: []
 
   def syntax, do: %r/(\w+)\s+in\s+(#{Fluid.quoted_fragment}+)\s*(reversed)?/
 
@@ -23,9 +24,21 @@ defmodule Fluid.ForElse do
     collection = Variables.create(collection)
     reversed   = !(reversed |> Enum.first |> nil?)
     attributes = Fluid.tag_attributes |> Regex.scan(markup)
+    limit      = attributes |> parse_attribute("limit")
+    offset     = attributes |> parse_attribute("offset")
+    offset     = if nil?(offset), do: 0, else: offset
     item       = item |> binary_to_atom(:utf8)
     block.iterator(Iterator[item: item, collection: collection,
-                            attributes: attributes, reversed: reversed])
+                            limit: limit, offset: offset, reversed: reversed])
+  end
+
+  defp parse_attribute(attributes, name) do
+    attributes |> Enum.reduce(nil, fn(x, ret) ->
+      case x do
+        [^name, <<attribute::binary>>] -> attribute |> binary_to_integer
+        [_|_] -> ret
+      end
+    end)
   end
 
   def render(output, Block[iterator: it]=block, Context[]=context) do
@@ -42,13 +55,19 @@ defmodule Fluid.ForElse do
   defp each(output, [h|t]=list, Block[iterator: it]=block, Context[assigns: assigns]=context) do
     forloop = next_forloop(it, list |> Enum.count)
     block   = block.iterator(forloop |> it.forloop)
-    assigns = assigns |> Dict.put(:forloop, forloop)
-    assigns = assigns |> Dict.put(it.item, h)
-    { output, _ } = Render.render(output, block.nodelist, assigns |> context.assigns)
+    assigns = assigns |> Dict.put(:forloop, forloop) |> Dict.put(it.item, h)
+    { output, _ } = cond do
+      !nil?(it.limit) and forloop[:index] <= it.offset ->
+        { output, context }
+      !nil?(it.limit) and forloop[:index] > (it.limit + it.offset) ->
+        { output, context }
+      true ->
+        Render.render(output, block.nodelist, assigns |> context.assigns)
+    end
     each(output, t, block, context)
   end
 
-  defp next_forloop(Iterator[forloop: []]=it, count) do
+  defp next_forloop(Iterator[forloop: []], count) do
     [index:   1,
      index0:  0,
      rindex:  count,
@@ -58,7 +77,7 @@ defmodule Fluid.ForElse do
      last:    count == 1]
   end
 
-  defp next_forloop(Iterator[forloop: loop]=it, count) do
+  defp next_forloop(Iterator[forloop: loop], count) do
     [index:   loop[:index] + 1,
      index0:  loop[:index0] + 1,
      rindex:  loop[:rindex] - 1,

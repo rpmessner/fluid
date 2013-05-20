@@ -27,6 +27,10 @@ defmodule LocalState do
     { :stop, :normal, :ok, state }
   end
 
+  def handle_call(:get, _from, state) do
+    { :reply, state, state }
+  end
+
   def handle_cast(:reset, _) do
     { :noreply, 0 }
   end
@@ -36,7 +40,4 @@ defmodule LocalState do
     { :noreply, state }
   end
 
-  def handle_call(:get, _from, state) do
-    { :reply, state, state }
-  end
 end
