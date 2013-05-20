@@ -1,3 +1,4 @@
+defrecord Fluid.Context, assigns: [], presets: []
 defrecord Fluid.Template, root: nil, presets: []
 defrecord Fluid.Variable, name: nil, literal: nil, filters: [], parts: []
 defrecord Fluid.Tag, name: nil, markup: nil

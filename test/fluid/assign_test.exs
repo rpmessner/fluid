@@ -31,7 +31,7 @@ defmodule Fluid.AssignTest do
 
   defp assert_template_result(expected, markup, assigns) do
     template = Fluid.Templates.parse(markup)
-    { result, _ } = Fluid.Templates.render(template, assigns)
+    { :ok, result, _ } = Fluid.Templates.render(template, assigns)
     assert result == expected
   end
 

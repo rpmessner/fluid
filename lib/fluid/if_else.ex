@@ -15,8 +15,8 @@ defmodule Fluid.IfElse do
     %r/(?:\b(?:\s?and\s?|\s?or\s?)\b|(?:\s*(?!\b(?:\s?and\s?|\s?or\s?)\b)(?:#{Fluid.quoted_fragment}|\S+)\s*)+)/
   end
 
-  def render(output, Fluid.Tag[]=tag, assigns, presets) do
-    { output, assigns }
+  def render(output, Fluid.Tag[]=tag, context) do
+    { output, context }
   end
 
   defp split_conditions(expressions) do
@@ -51,9 +51,9 @@ defmodule Fluid.IfElse do
     end
   end
 
-  def render(output, Fluid.Block[condition: condition, nodelist: nodelist, elselist: elselist]=block, assigns, presets) do
-    evaled = Condition.evaluate(condition, assigns, presets)
+  def render(output, Fluid.Block[condition: condition, nodelist: nodelist, elselist: elselist]=block, context) do
+    evaled = Condition.evaluate(condition, context)
     conditionlist = if evaled, do: nodelist, else: elselist
-    Render.render(output, conditionlist, assigns, presets)
+    Render.render(output, conditionlist, context)
   end
 end

@@ -1,40 +1,45 @@
 defmodule Fluid.Render do
   alias Fluid.Variables, as: Variables
+  alias Fluid.Variable, as: Variable
   alias Fluid.Templates, as: Templates
+  alias Fluid.Template, as: Template
+  alias Fluid.Context, as: Context
+  alias Fluid.Tag, as: Tag
+  alias Fluid.Block, as: Block
 
-  def render(Fluid.Template[root: root, presets: presets], assigns) do
-    { output, assigns } = render([], root, assigns, presets)
-    { Enum.join(output), assigns }
+  def render(Template[root: root], Context[]=context) do
+    { output, context } = render([], root, context)
+    { :ok, Enum.join(output), context }
   end
 
-  def render(output, <<text::binary>>, assigns, presets) do
-    { output ++ [text], assigns }
+  def render(output, <<text::binary>>, Context[]=context) do
+    { output ++ [text], context }
   end
 
-  def render(output, Fluid.Variable[]=v, assigns, presets) do
-    { rendered, assigns } = Variables.lookup(v, assigns, presets)
-    { output ++ [rendered], assigns }
+  def render(output, Variable[]=v, Context[]=context) do
+    { rendered, context } = Variables.lookup(v, context)
+    { output ++ [rendered], context }
   end
 
-  def render(output, Fluid.Tag[name: name]=tag, assigns, presets) do
-    { mod, Fluid.Tag } = Templates.lookup(name)
-    mod.render(output, tag, assigns, presets)
+  def render(output, Tag[name: name]=tag, Context[]=context) do
+    { mod, Tag } = Templates.lookup(name)
+    mod.render(output, tag, context)
   end
 
-  def render(output, Fluid.Block[name: name]=block, assigns, presets) do
+  def render(output, Block[name: name]=block, Context[]=context) do
     case Templates.lookup(name) do
-      { mod, Fluid.Block } ->
-        mod.render(output, block, assigns, presets)
-      nil -> render(output, block.nodelist, assigns, presets)
+      { mod, Block } ->
+        mod.render(output, block, context)
+      nil -> render(output, block.nodelist, context)
     end
   end
 
-  def render(output, [h|t], assigns, presets) do
-    { output, assigns } = render(output, h, assigns, presets)
-    render(output, t, assigns, presets)
+  def render(output, [h|t], Context[]=context) do
+    { output, context } = render(output, h, context)
+    render(output, t, context)
   end
 
-  def render(output, [], assigns, presets) do
-    { output, assigns }
+  def render(output, [], context) do
+    { output, context }
   end
 end

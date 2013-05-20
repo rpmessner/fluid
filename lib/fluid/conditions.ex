@@ -1,6 +1,7 @@
 defmodule Fluid.Conditions do
   alias Fluid.Condition, as: Cond
   alias Fluid.Variables, as: Vars
+  alias Fluid.Context, as: Context
 
   def create([h|t]=list) do
     head = create(h)
@@ -31,26 +32,26 @@ defmodule Fluid.Conditions do
     right.child_condition(condition).child_operator(operator)
   end
 
-  def evaluate(Cond[left: left, right: nil]=c, assigns//[], presets//[]) do
-    { current, assigns } = Vars.lookup(left, assigns, presets)
-    eval_child(!!current, c.child_operator, c.child_condition, assigns, presets)
+  def evaluate(Cond[left: left, right: nil]=condition, Context[]=context//Context[]) do
+    { current, context } = Vars.lookup(left, context)
+    eval_child(!!current, condition.child_operator, condition.child_condition, context)
   end
 
-  def evaluate(Cond[left: left, right: right, operator: operator]=c, assigns//[], presets//[]) do
-    { left, assigns } = Vars.lookup(left, assigns, presets)
-    { right, assigns } = Vars.lookup(right, assigns, presets)
+  def evaluate(Cond[left: left, right: right, operator: operator]=condition, Context[]=context//Context[]) do
+    { left, context } = Vars.lookup(left, context)
+    { right, context } = Vars.lookup(right, context)
     current = eval_operator(left, operator, right)
-    eval_child(!!current, c.child_operator, c.child_condition, assigns, presets)
+    eval_child(!!current, condition.child_operator, condition.child_condition, context)
   end
 
-  defp eval_child(current, nil, nil, _, _), do: current
+  defp eval_child(current, nil, nil, _), do: current
 
-  defp eval_child(current, :and, condition, assigns, presets) do
-    current and evaluate(condition, assigns, presets)
+  defp eval_child(current, :and, condition, context) do
+    current and evaluate(condition, context)
   end
 
-  defp eval_child(current, :or, condition, assigns, presets) do
-    current or evaluate(condition, assigns, presets)
+  defp eval_child(current, :or, condition, context) do
+    current or evaluate(condition, context)
   end
 
   defp eval_operator(left, operator, right) when (nil?(left) xor nil?(right)) and operator in [:>=, :>, :<, :<=], do: false

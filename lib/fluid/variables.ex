@@ -1,5 +1,8 @@
 defmodule Fluid.Variables do
   alias Fluid.Filters, as: Filters
+  alias Fluid.Variable, as: Variable
+  alias Fluid.Variables, as: Variables
+  alias Fluid.Context, as: Context
 
   defp literals, do: [nil: nil, null: nil, "": nil,
                       true: true, false: false,
@@ -28,43 +31,49 @@ defmodule Fluid.Variables do
     end
   end
 
-  def lookup(Fluid.Variable[name: name, filters: filters]=v, assigns, presets) do
-    { ret, assigns } = case v do
+  def lookup(Fluid.Variable[name: name, filters: filters]=v, Context[]=context) do
+    { ret, context } = case v do
       Fluid.Variable[literal: literal, parts: []] ->
-        { literal, assigns }
+        { literal, context }
       Fluid.Variable[literal: nil, parts: parts] ->
-        resolve(parts, assigns, assigns, presets)
+        resolve(parts, context, context)
     end
     ret = Filters.filter(filters, ret)
-    { ret, assigns }
+    { ret, context }
   end
 
-  defp resolve([<<?[,rest::binary>>|parts], current, assigns, presets) when is_list(assigns) do
-    [index, _] = String.split(rest, "]")
-    index = binary_to_integer(index)
-    resolve(parts, current |> Enum.at!(index), assigns, presets)
-  end
-
-  defp resolve([<<name::binary>>|parts], current, assigns, presets) do
-    { into, assigns } = resolve(name, current, assigns, presets)
-    ret = resolve(parts, into, assigns, presets)
-    ret
-  end
-
-  defp resolve([], current, assigns, presets) do
-    { current, assigns }
-  end
-
-  defp resolve(<<name::binary>>, current, assigns, presets) when !is_list(current), do: { nil, assigns }
-  defp resolve(<<name::binary>>, current, assigns, presets) when is_list(current) do
-    key = binary_to_atom(name, :utf8)
-    assign = Dict.get(current, key)
-    preset = Dict.get(presets, key)
+  defp resolve([<<name::binary>>|_]=parts, Context[]=current, Context[]=context) do
+    key = name |> binary_to_atom(:utf8)
     cond do
-      is_function(assign) ->
-        assign = assign.()
-        { assign, Dict.put(assigns, key, assign) }
-      true -> { assign || preset, assigns }
+      current.assigns |> Dict.has_key?(key) ->
+        resolve(parts, current.assigns, context)
+      current.presets |> Dict.has_key?(key) ->
+        resolve(parts, current.presets, context)
+      true -> { nil, context }
+    end
+  end
+
+  defp resolve([], current, Context[]=context), do: { current, context }
+  defp resolve([<<?[,index::binary>>|parts], current, Context[]=context) do
+    [index, _] = String.split(index, "]")
+    index = binary_to_integer(index)
+    resolve(parts, current |> Enum.at!(index), context)
+  end
+
+  defp resolve([<<name::binary>>|parts], current, Context[]=context) do
+    { current, context } = resolve(name, current, context)
+    resolve(parts, current, context)
+  end
+
+  defp resolve(<<name::binary>>, current, Context[]=context) when !is_list(current), do: { nil, context }
+  defp resolve(<<name::binary>>, current, Context[]=context) when is_list(current) do
+    key    = binary_to_atom(name, :utf8)
+    return = Dict.get(current, key)
+    cond do
+      is_function(return) ->
+        return = return.()
+        { return, context.assigns |> Dict.put(key, return) |> context.assigns }
+      true -> { return, context }
     end
   end
 end

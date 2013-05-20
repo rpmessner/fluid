@@ -7,15 +7,15 @@ defmodule Fluid.ForElse do
 
   def parse(Fluid.Block[]=block, presets), do: { block, presets }
 
-  def render(output, Fluid.Block[nodelist: nodelist, markup: markup], assigns, presets) do
+  def render(output, Fluid.Block[nodelist: nodelist, markup: markup], context) do
     # [item|collection] Regex.scan(syntax, markup)
     # collection = Variable.lookup
     # iterator = Iterator
     # { output, _ } =
-    { output, assigns }
+    { output, context }
   end
-  # defp each(output, Iteration[rindex0: 0]=it, nodelist, assigns, presets), do: { ,  }
 
-  #   Render.render(output, nodelist, assigns, presets)
+  # defp each(output, ForLoop[]=it, nodelist, context) do
+  #   Render.render(output, nodelist, context)
   # end
 end

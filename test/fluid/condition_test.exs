@@ -109,14 +109,16 @@ defmodule ConditionTest do
 
   defp assert_evaluates_true(left, op, right, assigns//[]) do
     condition = Conditions.create({left, op, right})
-    evaled = Conditions.evaluate(condition, assigns)
+    context = Fluid.Context[assigns: assigns, presets: []]
+    evaled = Conditions.evaluate(condition, context)
     unless evaled, do: IO.puts("Evaluated false: #{left} #{op} #{right}")
     assert evaled
   end
 
   defp assert_evaluates_false(left, op, right, assigns//[]) do
     condition = Conditions.create({left, op, right})
-    evaled = Conditions.evaluate(condition, assigns)
+    context = Fluid.Context[assigns: assigns, presets: []]
+    evaled = Conditions.evaluate(condition, context)
     unless !evaled, do: IO.puts("Evaluated true: #{left} #{op} #{right}")
     assert !evaled
   end

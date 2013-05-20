@@ -296,7 +296,7 @@ defmodule ForElseTagTest do
 
   defp assert_result(expected, markup, assigns//[]) do
     t = Template.parse(markup)
-    { rendered, _ } = Template.render(t, assigns)
+    { :ok, rendered, _ } = Template.render(t, assigns)
     assert rendered == expected
   end
 end

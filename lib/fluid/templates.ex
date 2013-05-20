@@ -62,24 +62,17 @@ defmodule Fluid.Templates do
     :gen_server.call(__MODULE__, { :lookup, name })
   end
 
-  def render(Fluid.Template[]=t, assigns//[]) do
-    Fluid.Render.render(t, assigns)
+  alias Fluid.Template, as: Template
+  alias Fluid.Render, as: Render
+  alias Fluid.Context, as: Context
+
+  def render(Template[]=t, Context[]=c), do: Render.render(t, t.presets |> c.presets)
+  def render(Template[]=t, assigns//[]) do
+    context = Context[assigns: assigns, presets: t.presets]
+    Render.render(t, context)
   end
 
   def parse(<<markup::binary>>, presets//[]) do
     Fluid.Parse.parse(markup, presets)
   end
 end
-
-
-
-
-
-
-
-
-
-
-
-
-

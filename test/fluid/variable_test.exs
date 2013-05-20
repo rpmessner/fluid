@@ -123,72 +123,60 @@ defmodule VariableResolutionTest do
 
   test :simple_variable do
     template = Template.parse("{{test}}")
-    { rendered, _ } = Template.render(template, test: "worked")
+    { :ok, rendered, _ } = Template.render(template, test: "worked")
     assert "worked" == rendered
-    { rendered, _ } = Template.render(template, test: "worked wonderfully")
+    { :ok, rendered, _ } = Template.render(template, test: "worked wonderfully")
     assert "worked wonderfully" == rendered
   end
 
   test :simple_with_whitespaces do
     template = Template.parse("  {{ test }}  ")
-    { rendered, _ } = Template.render(template, test: "worked")
+    { :ok, rendered, _ } = Template.render(template, test: "worked")
     assert "  worked  " == rendered
-    { rendered, _ } = Template.render(template, test: "worked wonderfully")
+    { :ok, rendered, _ } = Template.render(template, test: "worked wonderfully")
     assert "  worked wonderfully  " == rendered
   end
 
   test :ignore_unknown do
     template = Template.parse("{{ test }}")
-    { rendered, _ } = Template.render(template)
+    { :ok, rendered, _ } = Template.render(template)
     assert "" == rendered
   end
 
   test :hash_scoping do
     template = Template.parse("{{ test.test }}")
-    { rendered, assigns } = Template.render(template, test: [test: "worked"])
+    { :ok, rendered, _ } = Template.render(template, test: [test: "worked"])
     assert "worked" == rendered
   end
 
   test :preset_assigns do
     template = Template.parse("{{ test }}", [test: "worked"])
-    { rendered, _ } = Template.render(template)
+    { :ok, rendered, _ } = Template.render(template)
     assert "worked" == rendered
   end
 
   test :reuse_parsed_template do
     template = Template.parse("{{ greeting }} {{ name }}", greeting: "Goodbye")
     assert [greeting: "Goodbye"] == template.presets
-    { rendered, _ } = Template.render(template, greeting: "Hello", name: "Tobi")
+    { :ok, rendered, _ } = Template.render(template, greeting: "Hello", name: "Tobi")
     assert "Hello Tobi" == rendered
-    { rendered, assigns } = Template.render(template, greeting: "Hello", unknown: "Tobi")
+    { :ok, rendered, _ } = Template.render(template, greeting: "Hello", unknown: "Tobi")
     assert "Hello " == rendered
-    { rendered, _ } = Template.render(template, greeting: "Hello", name: "Brian")
+    { :ok, rendered, _ } = Template.render(template, greeting: "Hello", name: "Brian")
     assert "Hello Brian" == rendered
-    { rendered, _ } = Template.render(template, name: "Brian")
+    { :ok, rendered, _ } = Template.render(template, name: "Brian")
     assert "Goodbye Brian" == rendered
   end
 
   test :assigns_not_polluted_from_template do
     template = Template.parse("{{ test }}{% assign test = 'bar' %}{{ test }}", test: "baz")
-    { rendered, _ } = Template.render(template)
+    { :ok, rendered, _ } = Template.render(template)
     assert "bazbar" == rendered
-    { rendered, _ } = Template.render(template)
+    { :ok, rendered, _ } = Template.render(template)
     assert "bazbar" == rendered
-    { rendered, _ } = Template.render(template, test: "foo")
+    { :ok, rendered, _ } = Template.render(template, test: "foo")
     assert "foobar" == rendered
-    { rendered, _ } = Template.render(template)
+    { :ok, rendered, _ } = Template.render(template)
     assert "bazbar" == rendered
   end
-
-  # test :hash_with_default_proc do
-  #   template = Template.parse(%|Hello {{ test }}|)
-  #   assigns = Hash.new { |h,k| raise "Unknown variable '#{k}'" }
-  #   assigns['test'] = 'Tobi'
-  #   assert_equal 'Hello Tobi', template.render!(assigns)
-  #   assigns.delete('test')
-  #   e = assert_raises(RuntimeError) {
-  #     template.render!(assigns)
-  #   }
-  #   assert_equal "Unknown variable 'test'", e.message
-  # end
 end
