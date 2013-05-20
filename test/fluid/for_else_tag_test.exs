@@ -20,66 +20,66 @@ defmodule ForElseTagTest do
     assert_result("yoyo",             "{%for item in array%}yo{%endfor%}",   [array: [1,2]])
     assert_result(" yo ",             "{%for item in array%} yo {%endfor%}", [array: [1]])
     assert_result("",                 "{%for item in array%}{%endfor%}",     [array: [1,2]])
-#     expected = """
+    expected = """
 
-#   yo
+  yo
 
-#   yo
+  yo
 
-#   yo
+  yo
 
-# """
-#     template = """
-# {%for item in array%}
-#   yo
-# {%endfor%}
-# """
-#     assert_result(expected,template,'array' => [1,2,3])
+"""
+    template = """
+{%for item in array%}
+  yo
+{%endfor%}
+"""
+    assert_result(expected, template, [array: [1, 2, 3]])
   end
 
-  # test :for_reversed do
-  #   assigns = {'array' => [ 1, 2, 3] }
-  #   assert_result("321","{%for item in array reversed %}{{item}}{%endfor%}",assigns)
-  # end
+  test :for_reversed do
+    assigns = [array: [1, 2, 3]]
+    assert_result("321", "{%for item in array reversed %}{{item}}{%endfor%}", assigns)
+  end
 
   # test :for_with_range do
   #   assert_result(" 1  2  3 ","{%for item in (1..3) %} {{item}} {%endfor%}")
   # end
 
-  # test :for_with_variable do
-  #   assert_result(" 1  2  3 ","{%for item in array%} {{item}} {%endfor%}","array' => [1,2,3])
-  #   assert_result("123","{%for item in array%}{{item}}{%endfor%}","array' => [1,2,3])
-  #   assert_result("123","{% for item in array %}{{item}}{% endfor %}","array' => [1,2,3])
-  #   assert_result("abcd","{%for item in array%}{{item}}{%endfor%}","array' => ['a","b","c","d'])
-  #   assert_result("a b c","{%for item in array%}{{item}}{%endfor%}","array' => ['a"," ","b"," ","c'])
-  #   assert_result("abc","{%for item in array%}{{item}}{%endfor%}","array' => ['a","","b","","c'])
-  # end
+  test :for_with_variable do
+    assert_result(" 1  2  3 ", "{%for item in array%} {{item}} {%endfor%}", [array: [1,2,3]])
+    assert_result("123", "{%for item in array%}{{item}}{%endfor%}", [array: [1,2,3]])
+    assert_result("123", "{% for item in array %}{{item}}{% endfor %}", [array: [1,2,3]])
+    assert_result("abcd", "{%for item in array%}{{item}}{%endfor%}", [array: ["a","b","c","d"]])
+    assert_result("a b c", "{%for item in array%}{{item}}{%endfor%}", [array: ["a"," ","b"," ","c"]])
+    assert_result("abc", "{%for item in array%}{{item}}{%endfor%}", [array: ["a","","b","","c"]])
+  end
 
-  # test :for_helpers do
-  #   assigns = {'array' => [1,2,3] }
-  #   assert_result(" 1/3  2/3  3/3 ',
-  #                          "{%for item in array%} {{forloop.index}}/{{forloop.length}} {%endfor%}",
-  #                          assigns)
-  #   assert_result(" 1  2  3 ', "{%for item in array%} {{forloop.index}} {%endfor%}", assigns)
-  #   assert_result(" 0  1  2 ', "{%for item in array%} {{forloop.index0}} {%endfor%}", assigns)
-  #   assert_result(" 2  1  0 ', "{%for item in array%} {{forloop.rindex0}} {%endfor%}", assigns)
-  #   assert_result(" 3  2  1 ', "{%for item in array%} {{forloop.rindex}} {%endfor%}", assigns)
-  #   assert_result(" true  false  false ', "{%for item in array%} {{forloop.first}} {%endfor%}", assigns)
-  #   assert_result(" false  false  true ', "{%for item in array%} {{forloop.last}} {%endfor%}", assigns)
-  # end
+  test :for_helpers do
+    assigns = [array: [1,2,3]]
+    assert_result(" 1/3  2/3  3/3 ",
+                  "{%for item in array%} {{forloop.index}}/{{forloop.length}} {%endfor%}",
+                  assigns)
+    assert_result(" 1  2  3 ", "{%for item in array%} {{forloop.index}} {%endfor%}", assigns)
+    assert_result(" 0  1  2 ", "{%for item in array%} {{forloop.index0}} {%endfor%}", assigns)
+    assert_result(" 2  1  0 ", "{%for item in array%} {{forloop.rindex0}} {%endfor%}", assigns)
+    assert_result(" 3  2  1 ", "{%for item in array%} {{forloop.rindex}} {%endfor%}", assigns)
+    assert_result(" true  false  false ", "{%for item in array%} {{forloop.first}} {%endfor%}", assigns)
+    assert_result(" false  false  true ", "{%for item in array%} {{forloop.last}} {%endfor%}", assigns)
+  end
 
-  # test :for_and_if do
-  #   assigns = {'array' => [1,2,3] }
-  #   assert_result("+--',
-  #                          "{%for item in array%}{% if forloop.first %}+{% else %}-{% endif %}{%endfor%}",
-  #                          assigns)
-  # end
+  test :for_and_if do
+    assigns = [array: [1,2,3]]
+    assert_result("+--",
+                  "{%for item in array%}{% if forloop.first %}+{% else %}-{% endif %}{%endfor%}",
+                  assigns)
+  end
 
-  # test :for_else do
-  #   assert_result("+++', "{%for item in array%}+{%else%}-{%endfor%}", 'array'=>[1,2,3])
-  #   assert_result("-',   "{%for item in array%}+{%else%}-{%endfor%}", 'array'=>[])
-  #   assert_result("-',   "{%for item in array%}+{%else%}-{%endfor%}", 'array'=>nil)
-  # end
+  test :for_else do
+    assert_result("+++", "{%for item in array%}+{%else%}-{%endfor%}", [array: [1,2,3]])
+    assert_result("-",   "{%for item in array%}+{%else%}-{%endfor%}", [array: []])
+    assert_result("-",   "{%for item in array%}+{%else%}-{%endfor%}", [array: nil])
+  end
 
   # test :limiting do
   #   assigns = {'array' => [1,2,3,4,5,6,7,8,9,0]}

@@ -1,8 +1,12 @@
 defrecord Fluid.Context, assigns: [], presets: []
+
 defrecord Fluid.Template, root: nil, presets: []
-defrecord Fluid.Variable, name: nil, literal: nil, filters: [], parts: []
+
 defrecord Fluid.Tag, name: nil, markup: nil
-defrecord Fluid.Block, name: nil, markup: nil, condition: nil, nodelist: [], elselist: []
+defrecord Fluid.Block, name: nil, markup: nil, condition: nil,
+                       iterator: [], nodelist: [], elselist: []
+
+defrecord Fluid.Variable, name: nil, literal: nil, filters: [], parts: []
 defrecord Fluid.Condition, left: nil, operator: nil, right: nil,
                            child_operator: nil, child_condition: nil
 
@@ -24,6 +28,7 @@ defmodule Fluid do
   def quoted_string, do: "\"[^\"]*\"|'[^']*'"
   def quoted_fragment, do: "#{quoted_string}|(?:[^\s,\|'\"]|#{quoted_string})+"
 
+  def tag_attributes, do: %r/(\w+)\s*\:\s*(#{quoted_fragment})/
   def variable_parser, do: %r/\[[^\]]+\]|[\w\-]+/
   def filter_parser, do: %r/(?:\||(?:\s*(?!(?:\|))(?:#{quoted_fragment}|\S+)\s*)+)/
 end

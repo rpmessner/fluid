@@ -31,11 +31,11 @@ defmodule Fluid.Variables do
     end
   end
 
-  def lookup(Fluid.Variable[name: name, filters: filters]=v, Context[]=context) do
+  def lookup(Variable[name: name, filters: filters]=v, Context[]=context) do
     { ret, context } = case v do
-      Fluid.Variable[literal: literal, parts: []] ->
+      Variable[literal: literal, parts: []] ->
         { literal, context }
-      Fluid.Variable[literal: nil, parts: parts] ->
+      Variable[literal: nil, parts: parts] ->
         resolve(parts, context, context)
     end
     ret = Filters.filter(filters, ret)

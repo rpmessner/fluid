@@ -12,6 +12,12 @@ defmodule Fluid.Render do
     { :ok, Enum.join(output), context }
   end
 
+  def render(output, [], Context[]=context), do: { output, context }
+  def render(output, [h|t], Context[]=context) do
+    { output, context } = render(output, h, context)
+    render(output, t, context)
+  end
+
   def render(output, <<text::binary>>, Context[]=context) do
     { output ++ [text], context }
   end
@@ -28,18 +34,8 @@ defmodule Fluid.Render do
 
   def render(output, Block[name: name]=block, Context[]=context) do
     case Templates.lookup(name) do
-      { mod, Block } ->
-        mod.render(output, block, context)
+      { mod, Block } -> mod.render(output, block, context)
       nil -> render(output, block.nodelist, context)
     end
-  end
-
-  def render(output, [h|t], Context[]=context) do
-    { output, context } = render(output, h, context)
-    render(output, t, context)
-  end
-
-  def render(output, [], context) do
-    { output, context }
   end
 end
