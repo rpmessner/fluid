@@ -24,18 +24,18 @@ defmodule Fluid.ForElse do
     collection = Variables.create(collection)
     reversed   = !(reversed |> Enum.first |> nil?)
     attributes = Fluid.tag_attributes |> Regex.scan(markup)
-    limit      = attributes |> parse_attribute("limit")
-    offset     = attributes |> parse_attribute("offset")
-    offset     = if nil?(offset), do: 0, else: offset
+    limit      = attributes |> parse_attribute("limit") |> Variables.create
+    offset     = attributes |> parse_attribute("offset", "0") |> Variables.create
     item       = item |> binary_to_atom(:utf8)
-    block.iterator(Iterator[item: item, collection: collection,
-                            limit: limit, offset: offset, reversed: reversed])
+    it         = Iterator[item: item, collection: collection,
+                          limit: limit, offset: offset, reversed: reversed]
+    block.iterator(it)
   end
 
-  defp parse_attribute(attributes, name) do
-    attributes |> Enum.reduce(nil, fn(x, ret) ->
+  defp parse_attribute(attributes, name, default//"nil") do
+    attributes |> Enum.reduce(default, fn(x, ret) ->
       case x do
-        [^name, <<attribute::binary>>] -> attribute |> binary_to_integer
+        [^name, <<attribute::binary>>] -> attribute
         [_|_] -> ret
       end
     end)
@@ -56,15 +56,23 @@ defmodule Fluid.ForElse do
     forloop = next_forloop(it, list |> Enum.count)
     block   = block.iterator(forloop |> it.forloop)
     assigns = assigns |> Dict.put(:forloop, forloop) |> Dict.put(it.item, h)
-    { output, _ } = cond do
-      !nil?(it.limit) and forloop[:index] <= it.offset ->
-        { output, context }
-      !nil?(it.limit) and forloop[:index] > (it.limit + it.offset) ->
-        { output, context }
-      true ->
-        Render.render(output, block.nodelist, assigns |> context.assigns)
+    { output, _ } = if should_render?(block, forloop, context) do
+      Render.render(output, block.nodelist, assigns |> context.assigns)
+    else
+      { output, context }
     end
     each(output, t, block, context)
+  end
+
+  defp should_render?(Block[iterator: Iterator[limit: limit, offset: offset]], forloop, context) do
+    { limit, _ }  = Variables.lookup(limit, context)
+    { offset, _ } = Variables.lookup(offset, context)
+    cond do
+      limit |> nil?                    -> true
+      forloop[:index] > limit + offset -> false
+      forloop[:index] <= offset        -> false
+      true                             -> true
+    end
   end
 
   defp next_forloop(Iterator[forloop: []], count) do

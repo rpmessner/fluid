@@ -89,13 +89,10 @@ defmodule ForElseTagTest do
     assert_result("3456", "{%for i in array limit: 4 offset: 2 %}{{ i }}{%endfor%}", assigns)
   end
 
-  # test :dynamic_variable_limiting do
-  #   assigns = {'array' => [1,2,3,4,5,6,7,8,9,0]}
-  #   assigns['limit'] = 2
-  #   assigns['offset'] = 2
-
-  #   assert_result("34', "{%for i in array limit: limit offset: offset %}{{ i }}{%endfor%}", assigns)
-  # end
+  test :dynamic_variable_limiting do
+    assigns = [array: [1,2,3,4,5,6,7,8,9,0], limit: 2, offset: 2]
+    assert_result("34", "{%for i in array limit: limit offset: offset %}{{ i }}{%endfor%}", assigns)
+  end
 
   # test :nested_for do
   #   assigns = {'array' => [[1,2],[3,4],[5,6]] }
