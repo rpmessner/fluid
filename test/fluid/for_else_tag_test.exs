@@ -125,59 +125,60 @@ defmodule ForElseTagTest do
     assert_result(expected, markup, assigns)
   end
 
-  # test :pause_resume_limit do
-  #   assigns = {'array' => {'items' => [1,2,3,4,5,6,7,8,9,0]}}
-  #   markup = <<-MKUP
-  #     {%for i in array.items limit:3 %}{{i}}{%endfor%}
-  #     next
-  #     {%for i in array.items offset:continue limit:3 %}{{i}}{%endfor%}
-  #     next
-  #     {%for i in array.items offset:continue limit:1 %}{{i}}{%endfor%}
-  #     MKUP
-  #   expected = <<-XPCTD
-  #     123
-  #     next
-  #     456
-  #     next
-  #     7
-  #     XPCTD
-  #   assert_result(expected,markup,assigns)
-  # end
+  test :pause_resume_limit do
+    assigns = [array: [items: [1,2,3,4,5,6,7,8,9,0]]]
+    markup = """
+      {%for i in array.items limit:3 %}{{i}}{%endfor%}
+      next
+      {%for i in array.items offset:continue limit:3 %}{{i}}{%endfor%}
+      next
+      {%for i in array.items offset:continue limit:1 %}{{i}}{%endfor%}
+      """
+    expected = """
+      123
+      next
+      456
+      next
+      7
+      """
+    assert_result(expected, markup, assigns)
+  end
 
-  # test :pause_resume_BIG_limit do
-  #   assigns = {'array' => {'items' => [1,2,3,4,5,6,7,8,9,0]}}
-  #   markup = <<-MKUP
-  #     {%for i in array.items limit:3 %}{{i}}{%endfor%}
-  #     next
-  #     {%for i in array.items offset:continue limit:3 %}{{i}}{%endfor%}
-  #     next
-  #     {%for i in array.items offset:continue limit:1000 %}{{i}}{%endfor%}
-  #     MKUP
-  #   expected = <<-XPCTD
-  #     123
-  #     next
-  #     456
-  #     next
-  #     7890
-  #     XPCTD
-  #     assert_result(expected,markup,assigns)
-  # end
+  test :pause_resume_BIG_limit do
+    assigns = [array: [items: [1,2,3,4,5,6,7,8,9,0]]]
+    markup = """
+      {%for i in array.items limit:3 %}{{i}}{%endfor%}
+      next
+      {%for i in array.items offset:continue limit:3 %}{{i}}{%endfor%}
+      next
+      {%for i in array.items offset:continue limit:1000 %}{{i}}{%endfor%}
+      """
+    expected = """
+      123
+      next
+      456
+      next
+      7890
+      """
+      assert_result(expected,markup,assigns)
+  end
 
-
-  # test :pause_resume_BIG_offset do
-  #   assigns = {'array' => {'items' => [1,2,3,4,5,6,7,8,9,0]}}
-  #   markup = %q({%for i in array.items limit:3 %}{{i}}{%endfor%}
-  #     next
-  #     {%for i in array.items offset:continue limit:3 %}{{i}}{%endfor%}
-  #     next
-  #     {%for i in array.items offset:continue limit:3 offset:1000 %}{{i}}{%endfor%})
-  #   expected = %q(123
-  #     next
-  #     456
-  #     next
-  #     )
-  #     assert_result(expected,markup,assigns)
-  # end
+  test :pause_resume_BIG_offset do
+    assigns = [array: [items: [1,2,3,4,5,6,7,8,9,0]]]
+    markup = """
+      {%for i in array.items limit:3 %}{{i}}{%endfor%}
+      next
+      {%for i in array.items offset:continue limit:3 %}{{i}}{%endfor%}
+      next{%for i in array.items offset:continue limit:3 offset:1000 %}{{i}}{%endfor%}
+      """
+    expected = """
+      123
+      next
+      456
+      next
+      """
+      assert_result(expected,markup,assigns)
+  end
 
   # test :for_with_break do
   #   assigns = {'array' => {'items' => [1,2,3,4,5,6,7,8,9,10]}}
