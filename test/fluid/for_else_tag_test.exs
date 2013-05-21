@@ -94,34 +94,36 @@ defmodule ForElseTagTest do
     assert_result("34", "{%for i in array limit: limit offset: offset %}{{ i }}{%endfor%}", assigns)
   end
 
-  # test :nested_for do
-  #   assigns = {'array' => [[1,2],[3,4],[5,6]] }
-  #   assert_result("123456', "{%for item in array%}{%for i in item%}{{ i }}{%endfor%}{%endfor%}", assigns)
-  # end
+  test :nested_for do
+    assigns = [array: [[1,2],[3,4],[5,6]]]
+    assert_result("123456",
+                  "{%for item in array%}{%for i in item%}{{ i }}{%endfor%}{%endfor%}",
+                  assigns)
+  end
 
-  # test :offset_only do
-  #   assigns = {'array' => [1,2,3,4,5,6,7,8,9,0]}
-  #   assert_result("890', "{%for i in array offset:7 %}{{ i }}{%endfor%}", assigns)
-  # end
+  test :offset_only do
+    assigns = [array: [1,2,3,4,5,6,7,8,9,0]]
+    assert_result("890", "{%for i in array offset:7 %}{{ i }}{%endfor%}", assigns)
+  end
 
-  # test :pause_resume do
-  #   assigns = {'array' => {'items' => [1,2,3,4,5,6,7,8,9,0]}}
-  #   markup = <<-MKUP
-  #     {%for i in array.items limit: 3 %}{{i}}{%endfor%}
-  #     next
-  #     {%for i in array.items offset:continue limit: 3 %}{{i}}{%endfor%}
-  #     next
-  #     {%for i in array.items offset:continue limit: 3 %}{{i}}{%endfor%}
-  #     MKUP
-  #   expected = <<-XPCTD
-  #     123
-  #     next
-  #     456
-  #     next
-  #     789
-  #     XPCTD
-  #   assert_result(expected,markup,assigns)
-  # end
+  test :pause_resume do
+    assigns = [array: [items: [1,2,3,4,5,6,7,8,9,0]]]
+    markup = """
+      {%for i in array.items limit: 3 %}{{i}}{%endfor%}
+      next
+      {%for i in array.items offset:continue limit: 3 %}{{i}}{%endfor%}
+      next
+      {%for i in array.items offset:continue limit: 3 %}{{i}}{%endfor%}
+      """
+    expected = """
+      123
+      next
+      456
+      next
+      789
+      """
+    assert_result(expected, markup, assigns)
+  end
 
   # test :pause_resume_limit do
   #   assigns = {'array' => {'items' => [1,2,3,4,5,6,7,8,9,0]}}

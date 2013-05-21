@@ -11,7 +11,7 @@ defmodule Fluid.ForElse do
   def syntax, do: %r/(\w+)\s+in\s+(#{Fluid.quoted_fragment}+)\s*(reversed)?/
 
   def parse(Block[]=block, presets) do
-    block = parse_iterator(block)
+    block = parse_iterator(block) |> block.iterator
     case Blocks.split(block) do
       { true_block, [_,false_block] } ->
         { block.nodelist(true_block).elselist(false_block), presets }
@@ -19,7 +19,7 @@ defmodule Fluid.ForElse do
     end
   end
 
-  defp parse_iterator(Block[markup: markup]=block) do
+  defp parse_iterator(Block[markup: markup]) do
     [[item|[collection|reversed]]] = Regex.scan(syntax, markup)
     collection = Variables.create(collection)
     reversed   = !(reversed |> Enum.first |> nil?)
@@ -27,9 +27,8 @@ defmodule Fluid.ForElse do
     limit      = attributes |> parse_attribute("limit") |> Variables.create
     offset     = attributes |> parse_attribute("offset", "0") |> Variables.create
     item       = item |> binary_to_atom(:utf8)
-    it         = Iterator[item: item, collection: collection,
-                          limit: limit, offset: offset, reversed: reversed]
-    block.iterator(it)
+    Iterator[item: item, collection: collection,
+             limit: limit, offset: offset, reversed: reversed]
   end
 
   defp parse_attribute(attributes, name, default//"nil") do
@@ -51,27 +50,48 @@ defmodule Fluid.ForElse do
     end
   end
 
-  defp each(output, [], Block[], Context[]=context), do: { output, context }
+  defp each(output, [], Block[]=block, Context[]=context), do: { output, remember_limit(block, context) }
   defp each(output, [h|t]=list, Block[iterator: it]=block, Context[assigns: assigns]=context) do
     forloop = next_forloop(it, list |> Enum.count)
     block   = block.iterator(forloop |> it.forloop)
     assigns = assigns |> Dict.put(:forloop, forloop) |> Dict.put(it.item, h)
-    { output, _ } = if should_render?(block, forloop, context) do
-      Render.render(output, block.nodelist, assigns |> context.assigns)
-    else
-      { output, context }
+    { render, context } = should_render?(block, forloop, context)
+    { output, _ } = case render do
+      true  -> Render.render(output, block.nodelist, assigns |> context.assigns)
+      false -> { output, context }
     end
     each(output, t, block, context)
   end
 
-  defp should_render?(Block[iterator: Iterator[limit: limit, offset: offset]], forloop, context) do
-    { limit, _ }  = Variables.lookup(limit, context)
-    { offset, _ } = Variables.lookup(offset, context)
+  defp remember_limit(Block[iterator: it], context) do
+    { limit, context } = lookup_limit(it, context)
+    limit      = limit || 0
+    key        = it.collection.name |> binary_to_atom(:utf8)
+    remembered = context.offsets[key] || 0
+    context.offsets |> Dict.put(key, remembered + limit) |> context.offsets
+  end
+
+  defp should_render?(Block[iterator: Iterator[]=it], forloop, context) do
+    { limit, context }  = lookup_limit(it, context)
+    { offset, context } = lookup_offset(it, context)
     cond do
-      limit |> nil?                    -> true
-      forloop[:index] > limit + offset -> false
-      forloop[:index] <= offset        -> false
-      true                             -> true
+      forloop[:index] <= offset        -> { false, context }
+      limit |> nil?                    -> { true,  context }
+      forloop[:index] > limit + offset -> { false, context }
+      true                             -> { true,  context }
+    end
+  end
+
+  defp lookup_limit(Iterator[limit: limit], Context[]=context) do
+    Variables.lookup(limit, context)
+  end
+
+  defp lookup_offset(Iterator[offset: offset]=it, Context[]=context) do
+    case offset.name do
+      "continue" ->
+        offset = context.offsets[it.collection.name |> binary_to_atom(:utf8)]
+        { offset || 0, context }
+      <<_::binary>> -> Variables.lookup(offset, context)
     end
   end
 
@@ -86,9 +106,9 @@ defmodule Fluid.ForElse do
   end
 
   defp next_forloop(Iterator[forloop: loop], count) do
-    [index:   loop[:index] + 1,
+    [index:   loop[:index]  + 1,
      index0:  loop[:index0] + 1,
-     rindex:  loop[:rindex] - 1,
+     rindex:  loop[:rindex]  - 1,
      rindex0: loop[:rindex0] - 1,
      length:  loop[:length],
      first:   false,

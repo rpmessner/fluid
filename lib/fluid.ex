@@ -1,4 +1,5 @@
-defrecord Fluid.Context, assigns: [], presets: []
+defrecord Fluid.Context, assigns: [], presets: [], offsets: [],
+                         continue: false, break: false
 
 defrecord Fluid.Template, root: nil, presets: []
 
