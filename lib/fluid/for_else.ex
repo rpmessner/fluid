@@ -55,12 +55,14 @@ defmodule Fluid.ForElse do
     forloop = next_forloop(it, list |> Enum.count)
     block   = block.iterator(forloop |> it.forloop)
     assigns = assigns |> Dict.put(:forloop, forloop) |> Dict.put(it.item, h)
-    { render, context } = should_render?(block, forloop, context)
-    { output, _ } = case render do
-      true  -> Render.render(output, block.nodelist, assigns |> context.assigns)
-      false -> { output, context }
+    { output, block_context } = if should_render?(block, forloop, context) do
+      Render.render(output, block.nodelist, assigns |> context.assigns)
+      else { output, context }
     end
-    each(output, t, block, context)
+    case block_context do
+      Context[break: true] -> each(output, [], block, context)
+      _ -> each(output, t, block, context)
+    end
   end
 
   defp remember_limit(Block[iterator: it], context) do
@@ -72,13 +74,13 @@ defmodule Fluid.ForElse do
   end
 
   defp should_render?(Block[iterator: Iterator[]=it], forloop, context) do
-    { limit, context }  = lookup_limit(it, context)
-    { offset, context } = lookup_offset(it, context)
+    { limit, _ }  = lookup_limit(it, context)
+    { offset, _ } = lookup_offset(it, context)
     cond do
-      forloop[:index] <= offset        -> { false, context }
-      limit |> nil?                    -> { true,  context }
-      forloop[:index] > limit + offset -> { false, context }
-      true                             -> { true,  context }
+      forloop[:index] <= offset        -> false
+      limit |> nil?                    -> true
+      forloop[:index] > limit + offset -> false
+      true                             -> true
     end
   end
 
@@ -115,4 +117,22 @@ defmodule Fluid.ForElse do
      last:    count == 1]
   end
 
+end
+
+defmodule Fluid.Break do
+  alias Fluid.Tag, as: Tag
+  alias Fluid.Context, as: Context
+
+  def render(output, Tag[], Context[]=context) do
+    { output, context.break(true) }
+  end
+end
+
+defmodule Fluid.Continue do
+  alias Fluid.Tag, as: Tag
+  alias Fluid.Context, as: Context
+
+  def render(output, Tag[], Context[]=context) do
+    { output, context.continue(true) }
+  end
 end

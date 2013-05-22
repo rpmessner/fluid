@@ -6,7 +6,7 @@ defmodule Fluid.Assign do
   def syntax, do: %r/([\w\-]+)\s*=\s*(.*)\s*/
 
   def render(output, Tag[markup: markup], Context[]=context) do
-    [[ to, from ]] = Regex.scan(syntax, markup)
+    [[to, from]] = syntax |> Regex.scan(markup)
     to_atom  = to |> binary_to_atom(:utf8)
     variable = Variables.create(from)
     { from_value, context } = Variables.lookup(variable, context)

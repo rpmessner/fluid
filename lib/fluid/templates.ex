@@ -2,12 +2,14 @@ defmodule Fluid.Templates do
   use GenServer.Behaviour
 
   defp default_tags do
-    [comment: { Fluid.Comment, Fluid.Block },
-     assign:  { Fluid.Assign,  Fluid.Tag },
-     elsif:   { Fluid.ElseIf,  Fluid.Tag },
-     else:    { Fluid.Else,    Fluid.Tag },
-     for:     { Fluid.ForElse, Fluid.Block },
-     if:      { Fluid.IfElse,  Fluid.Block }]
+    [continue: { Fluid.Continue, Fluid.Tag },
+     comment:  { Fluid.Comment,  Fluid.Block },
+     assign:   { Fluid.Assign,   Fluid.Tag },
+     break:    { Fluid.Break,    Fluid.Tag },
+     elsif:    { Fluid.ElseIf,   Fluid.Tag },
+     else:     { Fluid.Else,     Fluid.Tag },
+     for:      { Fluid.ForElse,  Fluid.Block },
+     if:       { Fluid.IfElse,   Fluid.Block }]
   end
 
   def start do

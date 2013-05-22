@@ -15,7 +15,10 @@ defmodule Fluid.Render do
   def render(output, [], Context[]=context), do: { output, context }
   def render(output, [h|t], Context[]=context) do
     { output, context } = render(output, h, context)
-    render(output, t, context)
+    case context do
+      Context[break: false, continue: false] -> render(output, t, context)
+      _ -> render(output, [], context)
+    end
   end
 
   def render(output, <<text::binary>>, Context[]=context) do
