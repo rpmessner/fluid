@@ -6,12 +6,12 @@ defmodule ForElseTagTest do
   alias Fluid.Templates, as: Template
 
   setup_all do
-    Template.start
+    Fluid.start
     :ok
   end
 
   teardown_all do
-    Template.stop
+    Fluid.stop
     :ok
   end
 
@@ -265,30 +265,30 @@ defmodule ForElseTagTest do
   end
 
   # test :for_tag_string do
-  #   assert_result("test string',
+  #   assert_result("test string",
   #               "{%for val in string%}{{val}}{%endfor%}",
-  #               'string' => "test string")
+  #               [string: "test string"])
 
-  #   assert_result("test string',
+  #   assert_result("test string",
   #               "{%for val in string limit:1%}{{val}}{%endfor%}",
-  #               'string' => "test string")
+  #               [string: "test string"])
 
-  #   assert_result("val-string-1-1-0-1-0-true-true-test string',
-  #               "{%for val in string%}" +
-  #               "{{forloop.name}}-' +
-  #               "{{forloop.index}}-' +
-  #               "{{forloop.length}}-' +
-  #               "{{forloop.index0}}-' +
-  #               "{{forloop.rindex}}-' +
-  #               "{{forloop.rindex0}}-' +
-  #               "{{forloop.first}}-' +
-  #               "{{forloop.last}}-' +
+  #   assert_result("val-string-1-1-0-1-0-true-true-test string",
+  #               "{%for val in string%}" <>
+  #               "{{forloop.name}}-" <>
+  #               "{{forloop.index}}-" <>
+  #               "{{forloop.length}}-" <>
+  #               "{{forloop.index0}}-" <>
+  #               "{{forloop.rindex}}-" <>
+  #               "{{forloop.rindex0}}-" <>
+  #               "{{forloop.first}}-" <>
+  #               "{{forloop.last}}-" <>
   #               "{{val}}{%endfor%}",
-  #               'string' => "test string")
+  #               [string: "test string"])
   # end
 
   # test :blank_string_not_iterable do
-  #   assert_result("", "{% for char in characters %}I WILL NOT BE OUTPUT{% endfor %}", 'characters' => '')
+  #   assert_result("", "{% for char in characters %}I WILL NOT BE OUTPUT{% endfor %}", [characters: ""])
   # end
 
   defp assert_result(expected, markup, assigns) do

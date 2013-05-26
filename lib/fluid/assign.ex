@@ -5,6 +5,8 @@ defmodule Fluid.Assign do
 
   def syntax, do: %r/([\w\-]+)\s*=\s*(.*)\s*/
 
+  def parse(Tag[]=tag, presets), do: { tag, presets }
+
   def render(output, Tag[markup: markup], Context[]=context) do
     [[to, from]] = syntax |> Regex.scan(markup)
     to_atom  = to |> binary_to_atom(:utf8)

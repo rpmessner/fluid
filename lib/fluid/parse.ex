@@ -1,6 +1,7 @@
 defmodule Fluid.Parse do
   alias Fluid.Templates, as: Templates
   alias Fluid.Variables, as: Variables
+  alias Fluid.Registers, as: Registers
   alias Fluid.Filters, as: Filters
 
   def tokenize(<<string::binary>>) do
@@ -19,13 +20,16 @@ defmodule Fluid.Parse do
       [tag: "", variable: <<markup::binary>>] -> { Variables.create(markup), rest, presets }
       [tag: <<markup::binary>>, variable: ""] ->
         [name|_] = String.split(markup, " ")
-        case Templates.lookup(name) do
+        case Registers.lookup(name) do
           { mod, Fluid.Block } ->
             block = Fluid.Blocks.create(markup)
             { block, rest, presets } = parse(block, rest, [], presets)
             { block, presets } = mod.parse(block, presets)
             { block, rest, presets }
-          { _, Fluid.Tag } -> { Fluid.Tags.create(markup), rest, presets }
+          { mod, Fluid.Tag } ->
+            tag = Fluid.Tags.create(markup)
+            { tag, presets } = mod.parse(tag, presets)
+            { tag, rest, presets }
           nil -> raise "unregistered tag: #{name}"
         end
       nil -> { name, rest, presets }

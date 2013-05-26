@@ -4,12 +4,12 @@ defmodule Fluid.AssignTest do
   use ExUnit.Case
 
   setup_all do
-    Fluid.Templates.start
+    Fluid.start
     :ok
   end
 
   teardown_all do
-    Fluid.Templates.stop
+    Fluid.stop
     :ok
   end
 

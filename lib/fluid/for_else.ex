@@ -123,6 +123,8 @@ defmodule Fluid.Break do
   alias Fluid.Tag, as: Tag
   alias Fluid.Context, as: Context
 
+  def parse(Tag[]=tag, presets), do: { tag, presets }
+
   def render(output, Tag[], Context[]=context) do
     { output, context.break(true) }
   end
@@ -131,6 +133,8 @@ end
 defmodule Fluid.Continue do
   alias Fluid.Tag, as: Tag
   alias Fluid.Context, as: Context
+
+  def parse(Tag[]=tag, presets), do: { tag, presets }
 
   def render(output, Tag[], Context[]=context) do
     { output, context.continue(true) }

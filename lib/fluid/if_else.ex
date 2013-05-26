@@ -1,10 +1,12 @@
-# defmodule Fluid.ElseIf do
-#   def render(_, _, _, _), do: raise "should never get here"
-# end
+defmodule Fluid.ElseIf do
+  def parse(Fluid.Tag[]=tag, presets), do: { tag, presets }
+  def render(_, _, _, _), do: raise "should never get here"
+end
 
-# defmodule Fluid.Else do
-#   def render(_, _, _, _), do: raise "should never get here"
-# end
+defmodule Fluid.Else do
+  def parse(Fluid.Tag[]=tag, presets), do: { tag, presets }
+  def render(_, _, _, _), do: raise "should never get here"
+end
 
 defmodule Fluid.IfElse do
   alias Fluid.Conditions, as: Condition
@@ -34,8 +36,8 @@ defmodule Fluid.IfElse do
   end
 
   def render(output, Fluid.Block[condition: condition, nodelist: nodelist, elselist: elselist], context) do
-    evaled = Condition.evaluate(condition, context)
-    conditionlist = if evaled, do: nodelist, else: elselist
+    condition = Condition.evaluate(condition, context)
+    conditionlist = if condition, do: nodelist, else: elselist
     Render.render(output, conditionlist, context)
   end
 

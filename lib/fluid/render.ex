@@ -3,6 +3,7 @@ defmodule Fluid.Render do
   alias Fluid.Variable, as: Variable
   alias Fluid.Templates, as: Templates
   alias Fluid.Template, as: Template
+  alias Fluid.Registers, as: Registers
   alias Fluid.Context, as: Context
   alias Fluid.Tag, as: Tag
   alias Fluid.Block, as: Block
@@ -31,12 +32,12 @@ defmodule Fluid.Render do
   end
 
   def render(output, Tag[name: name]=tag, Context[]=context) do
-    { mod, Tag } = Templates.lookup(name)
+    { mod, Tag } = Registers.lookup(name)
     mod.render(output, tag, context)
   end
 
   def render(output, Block[name: name]=block, Context[]=context) do
-    case Templates.lookup(name) do
+    case Registers.lookup(name) do
       { mod, Block } -> mod.render(output, block, context)
       nil -> render(output, block.nodelist, context)
     end

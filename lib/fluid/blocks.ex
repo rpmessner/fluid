@@ -10,7 +10,7 @@ defmodule Fluid.Blocks do
 
   def split(Block[nodelist: nodelist], namelist//[:else]) do
     Enum.split_while(nodelist, fn(x) ->
-      !(is_record(x, Tag) and List.member?(namelist, x.name))
+      !(is_record(x, Tag) and Enum.member?(namelist, x.name))
     end)
   end
 end

@@ -1,9 +1,9 @@
-defrecord Fluid.Context, assigns: [], presets: [], offsets: [],
+defrecord Fluid.Context, assigns: [], presets: [], offsets: [], registers: [],
                          continue: false, break: false
 
 defrecord Fluid.Template, root: nil, presets: []
 
-defrecord Fluid.Tag, name: nil, markup: nil
+defrecord Fluid.Tag, name: nil, markup: nil, parts: [], attributes: []
 defrecord Fluid.Block, name: nil, markup: nil, condition: nil,
                        iterator: [], nodelist: [], elselist: []
 
@@ -12,6 +12,17 @@ defrecord Fluid.Condition, left: nil, operator: nil, right: nil,
                            child_operator: nil, child_condition: nil
 
 defmodule Fluid do
+
+  def start do
+    Fluid.Registers.start
+    Fluid.FileSystem.start
+  end
+
+  def stop do
+    Fluid.Registers.stop
+    Fluid.FileSystem.stop
+  end
+
   def filter_arguments, do: %r/(?::|,)\s*(#{quoted_fragment})/
   def single_quote, do: "'"
   def double_quote, do: "\""

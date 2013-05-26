@@ -57,7 +57,7 @@ defmodule Fluid.Variables do
   defp resolve([<<?[,index::binary>>|parts], current, Context[]=context) do
     [index, _] = String.split(index, "]")
     index = binary_to_integer(index)
-    resolve(parts, current |> Enum.at!(index), context)
+    resolve(parts, current |> Enum.fetch!(index), context)
   end
 
   defp resolve([<<name::binary>>|parts], current, Context[]=context) do

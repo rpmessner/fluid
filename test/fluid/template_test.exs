@@ -8,7 +8,7 @@ defmodule Fluid.TemplateTest do
 
   setup_all do
     LocalState.start
-    Templates.start
+    Fluid.start
     :ok
   end
 
@@ -18,7 +18,7 @@ defmodule Fluid.TemplateTest do
 
   teardown_all do
     LocalState.stop
-    Templates.stop
+    Fluid.stop
     :ok
   end
 

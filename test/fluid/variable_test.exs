@@ -112,12 +112,12 @@ defmodule VariableResolutionTest do
   alias Fluid.Templates, as: Template
 
   setup_all do
-    Template.start
+    Fluid.start
     :ok
   end
 
   teardown_all do
-    Template.stop
+    Fluid.stop
     :ok
   end
 

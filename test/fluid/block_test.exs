@@ -6,16 +6,18 @@ defmodule Fluid.BlockTest do
   defmodule TestBlock do
     def parse(b, p), do: { b, p }
   end
+
   defmodule TestTag do
+    def parse(b, p), do: { b, p }
   end
 
   setup_all do
-    Fluid.Templates.start
+    Fluid.start
     :ok
   end
 
   teardown_all do
-    Fluid.Templates.stop
+    Fluid.stop
     :ok
   end
 
@@ -61,18 +63,18 @@ defmodule Fluid.BlockTest do
   end
 
   test "registering custom tags/blocks" do
-    Fluid.Templates.register("test", TestTag, Fluid.Tag)
-    assert { TestTag, Fluid.Tag } = Fluid.Templates.lookup("test")
+    Fluid.Registers.register("test", TestTag, Fluid.Tag)
+    assert { TestTag, Fluid.Tag } = Fluid.Registers.lookup("test")
   end
 
   test "with custom block" do
-    Fluid.Templates.register("testblock", TestBlock, Fluid.Block)
+    Fluid.Registers.register("testblock", TestBlock, Fluid.Block)
     template = Fluid.Templates.parse( "{% testblock %}{% endtestblock %}")
     assert [Fluid.Block[name: :testblock]] = template.root.nodelist
   end
 
   test "with custom tag" do
-    Fluid.Templates.register("testtag", TestTag, Fluid.Tag)
+    Fluid.Registers.register("testtag", TestTag, Fluid.Tag)
     template = Fluid.Templates.parse( "{% testtag %}")
     assert [Fluid.Tag[name: :testtag]] = template.root.nodelist
   end
