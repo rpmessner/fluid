@@ -9,11 +9,11 @@ defmodule Fluid.Include do
 
   def syntax, do: %r/(#{Fluid.quoted_fragment}+)(\s+(?:with|for)\s+(#{Fluid.quoted_fragment}+))?/
 
-  def parse(Tag[markup: markup]=tag, presets) do
+  def parse(Tag[markup: markup]=tag, Template[]=template) do
     [parts|_]  = syntax |> Regex.scan(markup)
     tag        = parse_tag(tag, parts)
     attributes = parse_attributes(markup)
-    { attributes |> tag.attributes, presets }
+    { attributes |> tag.attributes, template }
   end
 
   defp parse_tag(Tag[]=tag, parts) do
@@ -37,6 +37,7 @@ defmodule Fluid.Include do
     { :ok, source } = file_system.read_template_file(root, name, context)
     presets = build_presets(tag, context)
     t = Templates.parse(source, presets)
+    t = context.template.blocks |> Dict.merge(t.blocks) |> t.blocks
     key = name |> binary_to_atom(:utf8)
     cond do
       !nil?(parts[:variable]) ->
@@ -56,21 +57,23 @@ defmodule Fluid.Include do
     end)
   end
 
-  defp render_list(output, key, [], Template[]=t, context) do
+  defp render_list(output, _, [], _, context) do
     { output, context }
   end
 
-  defp render_list(output, key, [item|rest], Template[]=t, Context[]=c) do
-    { output, context } = render_item(output, key, item, t, c)
-    render_list(output, key, rest, t, c)
+  defp render_list(output, key, [item|rest], template, Context[]=context) do
+    { output, context } = render_item(output, key, item, template, context)
+    render_list(output, key, rest, template, context)
   end
-  defp render_item(output, key, nil, Template[]=t, Context[]=context) do
-    { :ok, rendered, _ } = Templates.render(t, context)
+
+  defp render_item(output, _key, nil, template, Context[]=context) do
+    { :ok, rendered, _ } = Templates.render(template, context)
     { output ++ [rendered], context }
   end
-  defp render_item(output, key, item, Template[]=t, Context[]=context) do
+
+  defp render_item(output, key, item, template, Context[]=context) do
     assigns = context.assigns |> Dict.merge([{ key, item }])
-    { :ok, rendered, _ } = Templates.render(t, assigns |> context.assigns)
+    { :ok, rendered, _ } = Templates.render(template, assigns |> context.assigns)
     { output ++ [rendered], context }
   end
 

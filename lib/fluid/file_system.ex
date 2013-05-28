@@ -37,7 +37,7 @@ defmodule Fluid.FileSystem do
     end
   end
 
-  def read_template_file(path, options) do
+  def read_template_file(path, options//[]) do
     case lookup do
       nil -> { :error, "No file system defined" }
       { mod, root } -> mod.read_template_file(root, path, options)

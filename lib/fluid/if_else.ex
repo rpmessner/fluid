@@ -1,10 +1,10 @@
 defmodule Fluid.ElseIf do
-  def parse(Fluid.Tag[]=tag, presets), do: { tag, presets }
+  def parse(Fluid.Tag[]=tag, Fluid.Template[]=t), do: { tag, t }
   def render(_, _, _, _), do: raise "should never get here"
 end
 
 defmodule Fluid.Else do
-  def parse(Fluid.Tag[]=tag, presets), do: { tag, presets }
+  def parse(Fluid.Tag[]=tag, Fluid.Template[]=t), do: { tag, t }
   def render(_, _, _, _), do: raise "should never get here"
 end
 
@@ -18,16 +18,16 @@ defmodule Fluid.IfElse do
     %r/(?:\b(?:\s?and\s?|\s?or\s?)\b|(?:\s*(?!\b(?:\s?and\s?|\s?or\s?)\b)(?:#{Fluid.quoted_fragment}|\S+)\s*)+)/
   end
 
-  def parse(Fluid.Block[]=block, presets) do
+  def parse(Fluid.Block[]=block, Fluid.Template[]=t) do
     block = parse_conditions(block)
     case Blocks.split(block, [:else, :elsif]) do
       { true_block, [Fluid.Tag[name: :elsif, markup: markup]|elsif_block] } ->
-        { elseif, presets } = Fluid.Block[name: :if, markup: markup, nodelist: elsif_block] |> parse(presets)
-        { block.nodelist(true_block).elselist([elseif]), presets }
+        { elseif, t } = Fluid.Block[name: :if, markup: markup, nodelist: elsif_block] |> parse(t)
+        { block.nodelist(true_block).elselist([elseif]), t }
       { true_block, [Fluid.Tag[name: :else]|false_block] } ->
-        { block.nodelist(true_block).elselist(false_block), presets }
+        { block.nodelist(true_block).elselist(false_block), t }
       { _, [] } ->
-        { block, presets }
+        { block, t }
     end
   end
 

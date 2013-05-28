@@ -5,14 +5,20 @@ defmodule Fluid.Templates do
 
   def render(Template[]=t), do: render(t, [])
   def render(Template[]=t, assigns) when is_list(assigns) do
-    context = Context[assigns: assigns, presets: t.presets]
+    context = Context[template: t,         assigns: assigns,
+                      presets:  t.presets, blocks: t.blocks]
     Render.render(t, context)
   end
 
-  def render(Template[]=t, Context[]=c), do: Render.render(t, t.presets |> c.presets)
+  def render(Template[]=t, Context[]=c) do
+    c = t.blocks |> c.blocks
+    c = t.presets |> c.presets
+    c = t |> c.template
+    Render.render(t, c)
+  end
 
   def parse(<<markup::binary>>, presets//[]) do
-    Fluid.Parse.parse(markup, presets)
+    Fluid.Parse.parse(markup, Template[presets: presets])
   end
 
 end

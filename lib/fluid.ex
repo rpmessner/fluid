@@ -1,18 +1,17 @@
-defrecord Fluid.Context, assigns: [], presets: [], offsets: [], registers: [],
-                         continue: false, break: false
+defrecord Fluid.Context, assigns: [], offsets: [], registers: [], presets: [], blocks: [],
+                         extended: false, continue: false, break: false, template: nil
 
-defrecord Fluid.Template, root: nil, presets: []
+defrecord Fluid.Template, root: nil, presets: [], blocks: []
 
 defrecord Fluid.Tag, name: nil, markup: nil, parts: [], attributes: []
 defrecord Fluid.Block, name: nil, markup: nil, condition: nil,
-                       iterator: [], nodelist: [], elselist: []
+                       parts: [], iterator: [], nodelist: [], elselist: []
 
 defrecord Fluid.Variable, name: nil, literal: nil, filters: [], parts: []
 defrecord Fluid.Condition, left: nil, operator: nil, right: nil,
                            child_operator: nil, child_condition: nil
 
 defmodule Fluid do
-
   def start do
     Fluid.Registers.start
     Fluid.FileSystem.start

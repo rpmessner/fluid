@@ -5,8 +5,8 @@ defmodule Fluid.Render do
   alias Fluid.Template, as: Template
   alias Fluid.Registers, as: Registers
   alias Fluid.Context, as: Context
-  alias Fluid.Tag, as: Tag
   alias Fluid.Block, as: Block
+  alias Fluid.Tag, as: Tag
 
   def render(Template[root: root], Context[]=context) do
     { output, context } = render([], root, context)
@@ -17,7 +17,7 @@ defmodule Fluid.Render do
   def render(output, [h|t], Context[]=context) do
     { output, context } = render(output, h, context)
     case context do
-      Context[break: false, continue: false] -> render(output, t, context)
+      Context[extended: false, break: false, continue: false] -> render(output, t, context)
       _ -> render(output, [], context)
     end
   end
@@ -42,4 +42,5 @@ defmodule Fluid.Render do
       nil -> render(output, block.nodelist, context)
     end
   end
+
 end

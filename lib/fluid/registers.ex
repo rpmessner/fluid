@@ -2,15 +2,19 @@ defmodule Fluid.Registers do
   use GenServer.Behaviour
 
   defp default_tags do
-    [continue: { Fluid.Continue, Fluid.Tag },
-     comment:  { Fluid.Comment,  Fluid.Block },
-     include:  { Fluid.Include,  Fluid.Tag },
-     assign:   { Fluid.Assign,   Fluid.Tag },
-     break:    { Fluid.Break,    Fluid.Tag },
-     elsif:    { Fluid.ElseIf,   Fluid.Tag },
-     else:     { Fluid.Else,     Fluid.Tag },
-     for:      { Fluid.ForElse,  Fluid.Block },
-     if:       { Fluid.IfElse,   Fluid.Block }]
+    [defaultcontent: { Fluid.Default,  Fluid.Tag },
+     continue:       { Fluid.Continue, Fluid.Tag },
+     extended:       { Fluid.Extends,  Fluid.Block },
+     comment:        { Fluid.Comment,  Fluid.Block },
+     include:        { Fluid.Include,  Fluid.Tag },
+     extends:        { Fluid.Extends,  Fluid.Tag },
+     assign:         { Fluid.Assign,   Fluid.Tag },
+     block:          { Fluid.Inherit,  Fluid.Block },
+     break:          { Fluid.Break,    Fluid.Tag },
+     elsif:          { Fluid.ElseIf,   Fluid.Tag },
+     else:           { Fluid.Else,     Fluid.Tag },
+     for:            { Fluid.ForElse,  Fluid.Block },
+     if:             { Fluid.IfElse,   Fluid.Block }]
   end
 
   def handle_cast({ :register, <<name::binary>>, module, tag }, dict) do

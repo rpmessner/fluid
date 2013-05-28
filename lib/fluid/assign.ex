@@ -5,7 +5,7 @@ defmodule Fluid.Assign do
 
   def syntax, do: %r/([\w\-]+)\s*=\s*(.*)\s*/
 
-  def parse(Tag[]=tag, presets), do: { tag, presets }
+  def parse(Tag[]=tag, Fluid.Template[]=template), do: { tag, template }
 
   def render(output, Tag[markup: markup], Context[]=context) do
     [[to, from]] = syntax |> Regex.scan(markup)

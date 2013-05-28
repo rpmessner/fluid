@@ -10,12 +10,12 @@ defmodule Fluid.ForElse do
 
   def syntax, do: %r/(\w+)\s+in\s+(#{Fluid.quoted_fragment}+)\s*(reversed)?/
 
-  def parse(Block[]=block, presets) do
+  def parse(Block[]=block, Fluid.Template[]=t) do
     block = parse_iterator(block) |> block.iterator
     case Blocks.split(block) do
       { true_block, [_,false_block] } ->
-        { block.nodelist(true_block).elselist(false_block), presets }
-      { _, [] } -> { block, presets }
+        { block.nodelist(true_block).elselist(false_block), t }
+      { _, [] } -> { block, t }
     end
   end
 
@@ -122,8 +122,9 @@ end
 defmodule Fluid.Break do
   alias Fluid.Tag, as: Tag
   alias Fluid.Context, as: Context
+  alias Fluid.Template, as: Template
 
-  def parse(Tag[]=tag, presets), do: { tag, presets }
+  def parse(Tag[]=tag, Template[]=template), do: { tag, template }
 
   def render(output, Tag[], Context[]=context) do
     { output, context.break(true) }
@@ -134,7 +135,7 @@ defmodule Fluid.Continue do
   alias Fluid.Tag, as: Tag
   alias Fluid.Context, as: Context
 
-  def parse(Tag[]=tag, presets), do: { tag, presets }
+  def parse(Tag[]=tag, template), do: { tag, template }
 
   def render(output, Tag[], Context[]=context) do
     { output, context.continue(true) }

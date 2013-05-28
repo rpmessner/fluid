@@ -1,4 +1,5 @@
 defmodule Fluid.Parse do
+  alias Fluid.Template, as: Template
   alias Fluid.Templates, as: Templates
   alias Fluid.Variables, as: Variables
   alias Fluid.Registers, as: Registers
@@ -9,51 +10,51 @@ defmodule Fluid.Parse do
     Enum.filter(toks, fn(x) -> x != "" end)
   end
 
-  def parse(<<string::binary>>, presets) do
+  def parse(<<string::binary>>, Template[]=template) do
     tokens = tokenize(string)
-    { root, presets } = parse(Fluid.Block[name: :document], tokens, [], presets)
-    Fluid.Template[root: root, presets: presets]
+    { root, template } = parse(Fluid.Block[name: :document], tokens, [], template)
+    template.root(root)
   end
 
-  defp parse_node(<<name::binary>>, rest, presets) do
+  defp parse_node(<<name::binary>>, rest, Template[]=template) do
     case Regex.captures(Fluid.parser, name) do
-      [tag: "", variable: <<markup::binary>>] -> { Variables.create(markup), rest, presets }
+      [tag: "", variable: <<markup::binary>>] -> { Variables.create(markup), rest, template }
       [tag: <<markup::binary>>, variable: ""] ->
         [name|_] = String.split(markup, " ")
         case Registers.lookup(name) do
           { mod, Fluid.Block } ->
             block = Fluid.Blocks.create(markup)
-            { block, rest, presets } = parse(block, rest, [], presets)
-            { block, presets } = mod.parse(block, presets)
-            { block, rest, presets }
+            { block, rest, template } = parse(block, rest, [], template)
+            { block, template } = mod.parse(block, template)
+            { block, rest, template }
           { mod, Fluid.Tag } ->
             tag = Fluid.Tags.create(markup)
-            { tag, presets } = mod.parse(tag, presets)
-            { tag, rest, presets }
+            { tag, template } = mod.parse(tag, template)
+            { tag, rest, template }
           nil -> raise "unregistered tag: #{name}"
         end
-      nil -> { name, rest, presets }
+      nil -> { name, rest, template }
     end
   end
 
-  def parse(Fluid.Block[name: :document], [], accum, presets) do
-    { Fluid.Block[name: :document, nodelist: accum], presets }
+  def parse(Fluid.Block[name: :document]=block, [], accum, Template[]=template) do
+    { block.nodelist(accum), template }
   end
 
   def parse(Fluid.Block[name: name], [], _, _) do
     raise "No matching end for block {% #{atom_to_binary(name, :utf8)} %}"
   end
 
-  def parse(Fluid.Block[name: name]=block, [h|t], accum, presets) do
+  def parse(Fluid.Block[name: name]=block, [h|t], accum, Template[]=template) do
     endblock = "end" <> atom_to_binary(name, :utf8)
     cond do
       Regex.match?(%r/{%\s*#{endblock}\s*%}/, h) ->
-        { block.nodelist(accum), t, presets }
+        { block.nodelist(accum), t, template }
       Regex.match?(%r/{%\send.*?\s*$}/, h) ->
         raise "Unmatched block close: #{h}"
       true ->
-        { result, rest, presets } = parse_node(h, t, presets)
-        parse(block, rest, accum ++ [result], presets)
+        { result, rest, template } = parse_node(h, t, template)
+        parse(block, rest, accum ++ [result], template)
     end
   end
 end
