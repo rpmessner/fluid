@@ -60,6 +60,10 @@ defmodule Fluid.Variables do
     resolve(parts, current |> Enum.fetch!(index), context)
   end
 
+  defp resolve(["size"|_], current, Context[]=context) when is_list(current) do
+    { current |> Enum.count, context }
+  end
+
   defp resolve([<<name::binary>>|parts], current, Context[]=context) do
     { current, context } = resolve(name, current, context)
     resolve(parts, current, context)

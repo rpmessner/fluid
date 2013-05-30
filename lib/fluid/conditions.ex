@@ -1,7 +1,8 @@
 defmodule Fluid.Conditions do
+  alias Fluid.Context, as: Context
+  alias Fluid.Variable, as: Variable
   alias Fluid.Condition, as: Cond
   alias Fluid.Variables, as: Vars
-  alias Fluid.Context, as: Context
 
   def create([h|t]) do
     head = create(h)
@@ -13,9 +14,19 @@ defmodule Fluid.Conditions do
     Cond[left: left]
   end
 
-  def create({ left, operator, right }) do
-    left = Vars.create(left)
-    right = Vars.create(right)
+  def create({ <<left::binary>>, operator, <<right::binary>> }) do
+    create({ left |> Vars.create, operator, right |> Vars.create})
+  end
+
+  def create({ Variable[]=left, operator, <<right::binary>> }) do
+    create({ left, operator, right |> Vars.create})
+  end
+
+  def create({ <<left::binary>>, operator, Variable[]=right }) do
+    create({ left |> Vars.create, operator, right })
+  end
+
+  def create({ Variable[]=left, operator, Variable[]=right }) do
     operator = binary_to_atom(operator, :utf8)
     Cond[left: left, operator: operator, right: right]
   end

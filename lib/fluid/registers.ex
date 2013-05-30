@@ -13,6 +13,8 @@ defmodule Fluid.Registers do
      break:          { Fluid.Break,    Fluid.Tag },
      elsif:          { Fluid.ElseIf,   Fluid.Tag },
      else:           { Fluid.Else,     Fluid.Tag },
+     case:           { Fluid.Case,     Fluid.Block },
+     when:           { Fluid.When,     Fluid.Tag },
      for:            { Fluid.ForElse,  Fluid.Block },
      if:             { Fluid.IfElse,   Fluid.Block }]
   end
