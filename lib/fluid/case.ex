@@ -26,17 +26,17 @@ defmodule Fluid.Case do
   end
 
   defp parse_condition(Variable[]=v, <<markup::binary>>) do
-    { h, t } = parse_markup(markup)
+    { h, t } = parse_when(markup)
     parse_condition(v, Conditions.create({v, "==", h}), t)
   end
 
   defp parse_condition(Variable[]=_, Condition[]=condition, []), do: condition
   defp parse_condition(Variable[]=v, Condition[]=condition, [<<markup::binary>>]) do
-    { h, t } = parse_markup(markup)
+    { h, t } = parse_when(markup)
     parse_condition(v, Conditions.join(:or, condition, {v, "==", h}), t)
   end
 
-  defp parse_markup(markup) do
+  defp parse_when(markup) do
     [[h|t]|m] = when_syntax |> Regex.scan(markup)
     t = [t|m] |> List.flatten |> Enum.join(" ")
     t = if t == "", do: [], else: [t]
