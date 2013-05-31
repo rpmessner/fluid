@@ -11,7 +11,7 @@ Start the application:
 
 Compile a template from a string:
 
-`template = Fluid.Templates.parse("{assign hello='hello' %}{{ hello }}{{world}}")`
+`template = Fluid.Templates.parse("{% assign hello='hello' %}{{ hello }}{{world}}")`
 
 Render the template with a keyword list representing the local variables:
 
