@@ -6,8 +6,9 @@ defmodule Fluid.Parse do
   alias Fluid.Filters, as: Filters
 
   def tokenize(<<string::binary>>) do
-    toks = Regex.split(Fluid.tokenizer, string)
-    Enum.filter(toks, fn(x) -> x != "" end)
+    Regex.split(Fluid.tokenizer, string)
+      |> List.flatten
+      |> Enum.filter(&1 != "")
   end
 
   def parse(<<string::binary>>, Template[]=template) do

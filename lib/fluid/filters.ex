@@ -12,12 +12,16 @@ defmodule Fluid.Filters do
   alias Fluid.Variables, as: Variables
 
   def parse(<<markup::binary>>) do
-    filters = Regex.scan(Fluid.filter_parser, markup)
-    filters = Enum.filter(filters, fn(x) -> x != "|" end)
-    [name|filters] = Enum.map(filters, function(String, :strip, 1))
+    [name|filters] = Regex.scan(Fluid.filter_parser, markup)
+      |> List.flatten
+      |> Enum.filter(&1 != "|")
+      |> Enum.map(&String.strip/1)
     filters = Enum.map(filters, fn(markup) ->
-      [[filter]|_] = Regex.scan(%r/\s*(\w+)/, markup)
-      args = Fluid.filter_arguments |> Regex.scan(markup) |> List.flatten
+      [[_, filter]|_] = Regex.scan(%r/\s*(\w+)/, markup)
+      args = Fluid.filter_arguments
+        |> Regex.scan(markup)
+        |> List.flatten
+        |> Fluid.List.even_elements
       [binary_to_atom(filter, :utf8), args]
     end)
     [name|filters]
@@ -32,4 +36,5 @@ defmodule Fluid.Filters do
     ret  = apply(Functions, name, [value|args])
     filter(rest, ret)
   end
+
 end

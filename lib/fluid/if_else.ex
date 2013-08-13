@@ -42,10 +42,10 @@ defmodule Fluid.IfElse do
   end
 
   defp split_conditions(expressions) do
-    expressions |> Enum.map(function(String, :strip, 1)) |> Enum.map(fn(x) ->
+    expressions |> List.flatten |> Enum.map(&String.strip/1) |> Enum.map(fn(x) ->
       case syntax |> Regex.scan(x) do
-        [[left, operator, right]] -> { left, operator, right }
-        [[x]] -> x
+        [[_, left, operator, right]] -> { left, operator, right }
+        [[_, x]] -> x
       end
     end)
   end

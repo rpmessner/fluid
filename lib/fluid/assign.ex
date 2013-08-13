@@ -8,7 +8,7 @@ defmodule Fluid.Assign do
   def parse(Tag[]=tag, Fluid.Template[]=template), do: { tag, template }
 
   def render(output, Tag[markup: markup], Context[]=context) do
-    [[to, from]] = syntax |> Regex.scan(markup)
+    [[_, to, from]] = syntax |> Regex.scan(markup)
     to_atom  = to |> binary_to_atom(:utf8)
     variable = Variables.create(from)
     { from_value, context } = Variables.lookup(variable, context)

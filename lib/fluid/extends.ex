@@ -10,7 +10,7 @@ defmodule Fluid.Extends do
   def syntax, do: %r/(#{Fluid.quoted_fragment}+)/
 
   def parse(Tag[markup: markup], Template[]=template) do
-    [[extended]] = syntax |> Regex.scan(markup)
+    [[_, extended]] = syntax |> Regex.scan(markup)
     { :ok, extended } = extended |> FileSystem.read_template_file
     extended = extended |> Templates.parse
     template = extended.blocks |> Dict.merge(template.blocks) |> template.blocks
@@ -33,7 +33,7 @@ defmodule Fluid.Inherit do
   def syntax, do: %r/(#{Fluid.quoted_fragment}+)/
 
   def parse(Block[markup: markup]=block, Template[]=template) do
-    [[name]] = syntax |> Regex.scan(markup)
+    [[_,name]] = syntax |> Regex.scan(markup)
     name     = Fluid.quote_matcher |> Regex.replace(name, "") |> binary_to_atom(:utf8)
     blocks   = template.blocks |> Dict.put(name, block.nodelist)
     block    = if template.blocks[name] |> nil?, do: block, else: block.nodelist([])

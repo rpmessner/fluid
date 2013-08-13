@@ -26,7 +26,7 @@ defmodule Fluid.Variables do
       quoted_string |> Regex.match?(name) -> Fluid.quote_matcher |> Regex.replace(name, "") |> variable.literal
       true ->
         [name|_] = String.split(name, " ")
-        parts = Regex.scan(Fluid.variable_parser, name)
+        parts = Regex.scan(Fluid.variable_parser, name) |> List.flatten
         variable.parts(parts)
     end
   end

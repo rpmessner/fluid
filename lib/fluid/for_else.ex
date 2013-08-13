@@ -20,7 +20,7 @@ defmodule Fluid.ForElse do
   end
 
   defp parse_iterator(Block[markup: markup]) do
-    [[item|[collection|reversed]]] = Regex.scan(syntax, markup)
+    [[_,item|[collection|reversed]]] = Regex.scan(syntax, markup)
     collection = Variables.create(collection)
     reversed   = !(reversed |> Enum.first |> nil?)
     attributes = Fluid.tag_attributes |> Regex.scan(markup)
@@ -34,7 +34,7 @@ defmodule Fluid.ForElse do
   defp parse_attribute(attributes, name, default//"nil") do
     attributes |> Enum.reduce(default, fn(x, ret) ->
       case x do
-        [^name, <<attribute::binary>>] -> attribute
+        [_, ^name, <<attribute::binary>>] -> attribute
         [_|_] -> ret
       end
     end)

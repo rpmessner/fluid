@@ -18,15 +18,15 @@ defmodule Fluid.Include do
 
   defp parse_tag(Tag[]=tag, parts) do
     case parts do
-      [name] -> tag.parts(name: name |> Variables.create)
-      [name," with "<>_,v] -> tag.parts(name: name |> Variables.create, variable: v |> Variables.create)
-      [name," for "<>_,v] ->
+      [_, name] -> tag.parts(name: name |> Variables.create)
+      [_, name," with "<>_,v] -> tag.parts(name: name |> Variables.create, variable: v |> Variables.create)
+      [_, name," for "<>_,v] ->
         tag.parts(name: name |> Variables.create, foreach: v |> Variables.create)
     end
   end
 
   defp parse_attributes(markup) do
-    Fluid.tag_attributes |> Regex.scan(markup) |> Enum.reduce([], fn ([key, val], coll) ->
+    Fluid.tag_attributes |> Regex.scan(markup) |> Enum.reduce([], fn ([_, key, val], coll) ->
       Dict.put(coll, key |> binary_to_atom(:utf8), val |> Variables.create)
     end)
   end

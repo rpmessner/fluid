@@ -11,6 +11,7 @@ defmodule Fluid.CaseTest do
   teardown_all do
     Fluid.stop
     :ok
+
   end
 
   test "render first block with a matching {% when %} argument" do

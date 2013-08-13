@@ -40,12 +40,12 @@ defmodule Fluid.RegexTest do
   end
 
   def assert_quoted_fragment(expected, markup) do
-    tokens = Regex.scan(%r/#{Fluid.quoted_fragment}/, markup)
+    tokens = Regex.scan(%r/#{Fluid.quoted_fragment}/, markup) |> List.flatten
     assert expected == tokens
   end
 
   def assert_variable(expected, markup) do
-    tokens = Regex.scan(Fluid.variable_parser, markup)
+    tokens = Regex.scan(Fluid.variable_parser, markup) |> List.flatten
     assert expected == tokens
   end
 end

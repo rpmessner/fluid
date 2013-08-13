@@ -42,4 +42,13 @@ defmodule Fluid do
   def tag_attributes, do: %r/(\w+)\s*\:\s*(#{quoted_fragment})/
   def variable_parser, do: %r/\[[^\]]+\]|[\w\-]+/
   def filter_parser, do: %r/(?:\||(?:\s*(?!(?:\|))(?:#{quoted_fragment}|\S+)\s*)+)/
+
+  defmodule List do
+    def even_elements([_,h|t]) do
+      [h] ++ even_elements(t)
+    end
+    def even_elements([_,h]), do: [h]
+    def even_elements([_]), do: []
+    def even_elements([]), do: []
+  end
 end
