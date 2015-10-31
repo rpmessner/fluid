@@ -8,16 +8,16 @@ defmodule Fluid.Parse do
   def tokenize(<<string::binary>>) do
     Regex.split(Fluid.tokenizer, string)
       |> List.flatten
-      |> Enum.filter(&1 != "")
+      |> Enum.filter(&(&1 != ""))
   end
 
-  def parse(<<string::binary>>, Template[]=template) do
+  def parse(<<string::binary>>, %Template{}=template) do
     tokens = tokenize(string)
     { root, template } = parse(Fluid.Block[name: :document], tokens, [], template)
     template.root(root)
   end
 
-  defp parse_node(<<name::binary>>, rest, Template[]=template) do
+  defp parse_node(<<name::binary>>, rest, %Template{}=template) do
     case Regex.captures(Fluid.parser, name) do
       [tag: "", variable: <<markup::binary>>] -> { Variables.create(markup), rest, template }
       [tag: <<markup::binary>>, variable: ""] ->
@@ -38,7 +38,7 @@ defmodule Fluid.Parse do
     end
   end
 
-  def parse(Fluid.Block[name: :document]=block, [], accum, Template[]=template) do
+  def parse(Fluid.Block[name: :document]=block, [], accum, %Template{}=template) do
     { block.nodelist(accum), template }
   end
 
@@ -46,7 +46,7 @@ defmodule Fluid.Parse do
     raise "No matching end for block {% #{atom_to_binary(name, :utf8)} %}"
   end
 
-  def parse(Fluid.Block[name: name]=block, [h|t], accum, Template[]=template) do
+  def parse(Fluid.Block[name: name]=block, [h|t], accum, %Template{}=template) do
     endblock = "end" <> atom_to_binary(name, :utf8)
     cond do
       Regex.match?(~r/{%\s*#{endblock}\s*%}/, h) ->

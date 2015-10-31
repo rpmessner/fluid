@@ -8,7 +8,7 @@ defmodule Fluid.Render do
   alias Fluid.Block, as: Block
   alias Fluid.Tag, as: Tag
 
-  def render(Template[root: root], %Context{}=context) do
+  def render(%Template{root: root}, %Context{}=context) do
     { output, context } = render([], root, context)
     { :ok, Enum.join(output), context }
   end

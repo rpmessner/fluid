@@ -14,7 +14,7 @@ defmodule Fluid.Filters do
   def parse(<<markup::binary>>) do
     [name|filters] = Regex.scan(Fluid.filter_parser, markup)
       |> List.flatten
-      |> Enum.filter(&1 != "|")
+      |> Enum.filter(&(&1 != "|"))
       |> Enum.map(&String.strip/1)
     filters = Enum.map(filters, fn(markup) ->
       [[_, filter]|_] = Regex.scan(~r/\s*(\w+)/, markup)
@@ -22,7 +22,7 @@ defmodule Fluid.Filters do
         |> Regex.scan(markup)
         |> List.flatten
         |> Fluid.List.even_elements
-      [binary_to_atom(filter, :utf8), args]
+      [filter.to_atom(:utf8), args]
     end)
     [name|filters]
   end

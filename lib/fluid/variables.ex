@@ -33,7 +33,7 @@ defmodule Fluid.Variables do
     end
   end
 
-  def lookup(Variable[filters: filters]=v, %Context{}=context) do
+  def lookup(%Variable{filters: filters}=v, %Context{}=context) do
     { ret, context } = case v do
       Variable[literal: literal, parts: []] ->
         { literal, context }
