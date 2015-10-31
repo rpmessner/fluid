@@ -106,8 +106,8 @@ defmodule ExtendsTagTest do
   #     "{% extends base2 %}{% block content/tagline %}(new tagline){% endblock %}"
   # end
 
-  defp assert_result(expected, markup), do: assert_result(expected, markup, Fluid.Context[])
-  defp assert_result(expected, markup, Fluid.Context[]=context) do
+  defp assert_result(expected, markup), do: assert_result(expected, markup, Fluid.%Context{})
+  defp assert_result(expected, markup, Fluid.%Context{}=context) do
     t = Templates.parse(markup)
     { :ok, rendered, _context } = Templates.render(t, context)
     assert expected == rendered

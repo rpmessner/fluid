@@ -1,4 +1,7 @@
 defmodule Fluid.Conditions do
+  defstruct left: nil, operator: nil, right: nil,
+              child_operator: nil, child_condition: nil
+
   alias Fluid.Context, as: Context
   alias Fluid.Variable, as: Variable
   alias Fluid.Condition, as: Cond
@@ -18,15 +21,15 @@ defmodule Fluid.Conditions do
     create({ left |> Vars.create, operator, right |> Vars.create})
   end
 
-  def create({ Variable[]=left, operator, <<right::binary>> }) do
+  def create({ %Variable{}=left, operator, <<right::binary>> }) do
     create({ left, operator, right |> Vars.create})
   end
 
-  def create({ <<left::binary>>, operator, Variable[]=right }) do
+  def create({ <<left::binary>>, operator, %Variable{}=right }) do
     create({ left |> Vars.create, operator, right })
   end
 
-  def create({ Variable[]=left, operator, Variable[]=right }) do
+  def create({ %Variable{}=left, operator, %Variable{}=right }) do
     operator = binary_to_atom(operator, :utf8)
     Cond[left: left, operator: operator, right: right]
   end
@@ -39,17 +42,17 @@ defmodule Fluid.Conditions do
   end
 
   def join(operator, condition, { _, _, _ }=right), do: join(operator, condition, right |> create)
-  def join(operator, condition, Cond[]=right) do
+  def join(operator, condition, %Cond{}=right) do
     right.child_condition(condition).child_operator(operator)
   end
 
-  def evaluate(Cond[]=condition), do: evaluate(condition, Context[])
-  def evaluate(Cond[left: left, right: nil]=condition, Context[]=context) do
+  def evaluate(%Cond{}=condition), do: evaluate(condition, %Context{})
+  def evaluate(%Cond{left: left, right: nil}=condition, %Context{}=context) do
     { current, context } = Vars.lookup(left, context)
     eval_child(!!current, condition.child_operator, condition.child_condition, context)
   end
 
-  def evaluate(Cond[left: left, right: right, operator: operator]=condition, Context[]=context) do
+  def evaluate(%Cond{left: left, right: right, operator: operator}=condition, %Context{}=context) do
     { left, context } = Vars.lookup(left, context)
     { right, context } = Vars.lookup(right, context)
     current = eval_operator(left, operator, right)
@@ -66,7 +69,7 @@ defmodule Fluid.Conditions do
     current or evaluate(condition, context)
   end
 
-  defp eval_operator(left, operator, right) when (nil?(left) xor nil?(right)) and operator in [:>=, :>, :<, :<=], do: false
+  defp eval_operator(left, operator, right) when (nil?(left) or nil?(right)) and !(nil?(left) and nil?(right)) and operator in [:>=, :>, :<, :<=], do: false
   defp eval_operator(left, operator, right) do
     case operator do
       :== -> left == right

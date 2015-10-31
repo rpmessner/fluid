@@ -1,4 +1,6 @@
 defmodule Fluid.Variables do
+  defstruct name: nil, literal: nil, filters: [], parts: []
+
   alias Fluid.Filters, as: Filters
   alias Fluid.Variable, as: Variable
   alias Fluid.Variables, as: Variables
@@ -8,9 +10,9 @@ defmodule Fluid.Variables do
                       true: true, false: false,
                       blank: :blank?, empty: :empty?]
 
-  def integer, do: %r/^(-?\d+)$/
-  def float, do: %r/^(-?\d[\d\.]+)$/
-  def quoted_string, do: %r/#{Fluid.quoted_string}/
+  def integer, do: ~r/^(-?\d+)$/
+  def float, do: ~r/^(-?\d[\d\.]+)$/
+  def quoted_string, do: ~r/#{Fluid.quoted_string}/
 
   @doc """
     matches for [] access
@@ -31,7 +33,7 @@ defmodule Fluid.Variables do
     end
   end
 
-  def lookup(Variable[filters: filters]=v, Context[]=context) do
+  def lookup(Variable[filters: filters]=v, %Context{}=context) do
     { ret, context } = case v do
       Variable[literal: literal, parts: []] ->
         { literal, context }
@@ -42,7 +44,7 @@ defmodule Fluid.Variables do
     { ret, context }
   end
 
-  defp resolve([<<name::binary>>|_]=parts, Context[]=current, Context[]=context) do
+  defp resolve([<<name::binary>>|_]=parts, %Context{}=current, %Context{}=context) do
     key = name |> binary_to_atom(:utf8)
     cond do
       current.assigns |> Dict.has_key?(key) ->
@@ -53,24 +55,24 @@ defmodule Fluid.Variables do
     end
   end
 
-  defp resolve([], current, Context[]=context), do: { current, context }
-  defp resolve([<<?[,index::binary>>|parts], current, Context[]=context) do
+  defp resolve([], current, %Context{}=context), do: { current, context }
+  defp resolve([<<?[,index::binary>>|parts], current, %Context{}=context) do
     [index, _] = String.split(index, "]")
     index = binary_to_integer(index)
     resolve(parts, current |> Enum.fetch!(index), context)
   end
 
-  defp resolve(["size"|_], current, Context[]=context) when is_list(current) do
+  defp resolve(["size"|_], current, %Context{}=context) when is_list(current) do
     { current |> Enum.count, context }
   end
 
-  defp resolve([<<name::binary>>|parts], current, Context[]=context) do
+  defp resolve([<<name::binary>>|parts], current, %Context{}=context) do
     { current, context } = resolve(name, current, context)
     resolve(parts, current, context)
   end
 
-  defp resolve(<<_::binary>>, current, Context[]=context) when !is_list(current), do: { nil, context }
-  defp resolve(<<name::binary>>, current, Context[]=context) when is_list(current) do
+  defp resolve(<<_::binary>>, current, %Context{}=context) when !is_list(current), do: { nil, context }
+  defp resolve(<<name::binary>>, current, %Context{}=context) when is_list(current) do
     key    = binary_to_atom(name, :utf8)
     return = Dict.get(current, key)
     cond do

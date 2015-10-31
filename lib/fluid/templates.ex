@@ -1,4 +1,6 @@
 defmodule Fluid.Templates do
+  defstruct root: nil, presets: [], blocks: []
+
   alias Fluid.Template, as: Template
   alias Fluid.Render, as: Render
   alias Fluid.Context, as: Context
@@ -10,7 +12,7 @@ defmodule Fluid.Templates do
     Render.render(t, context)
   end
 
-  def render(Template[]=t, Context[]=c) do
+  def render(Template[]=t, %Context{}=c) do
     c = t.blocks |> c.blocks
     c = t.presets |> c.presets
     c = t |> c.template

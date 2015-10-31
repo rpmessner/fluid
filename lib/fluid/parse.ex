@@ -49,9 +49,9 @@ defmodule Fluid.Parse do
   def parse(Fluid.Block[name: name]=block, [h|t], accum, Template[]=template) do
     endblock = "end" <> atom_to_binary(name, :utf8)
     cond do
-      Regex.match?(%r/{%\s*#{endblock}\s*%}/, h) ->
+      Regex.match?(~r/{%\s*#{endblock}\s*%}/, h) ->
         { block.nodelist(accum), t, template }
-      Regex.match?(%r/{%\send.*?\s*$}/, h) ->
+      Regex.match?(~r/{%\send.*?\s*$}/, h) ->
         raise "Unmatched block close: #{h}"
       true ->
         { result, rest, template } = parse_node(h, t, template)

@@ -4,13 +4,15 @@ defmodule Fluid.ForElse do
   alias Fluid.Blocks, as: Blocks
   alias Fluid.Variables, as: Variables
   alias Fluid.Context, as: Context
+  defmodule Iterator do
+    defstruct collection: nil, item: nil, reversed: false,
+                        limit: nil, offset: nil, forloop: []
+  end
 
-  defrecord Iterator, collection: nil, item: nil, reversed: false,
-                      limit: nil, offset: nil, forloop: []
 
-  def syntax, do: %r/(\w+)\s+in\s+(#{Fluid.quoted_fragment}+)\s*(reversed)?/
+  def syntax, do: ~r/(\w+)\s+in\s+(#{Fluid.quoted_fragment}+)\s*(reversed)?/
 
-  def parse(Block[]=block, Fluid.Template[]=t) do
+  def parse(%Block{}=block, %Fluid.Template{}=t) do
     block = parse_iterator(block) |> block.iterator
     case Blocks.split(block) do
       { true_block, [_,false_block] } ->
@@ -19,7 +21,7 @@ defmodule Fluid.ForElse do
     end
   end
 
-  defp parse_iterator(Block[markup: markup]) do
+  defp parse_iterator(%Block{markup: markup}) do
     [[_,item|[collection|reversed]]] = Regex.scan(syntax, markup)
     collection = Variables.create(collection)
     reversed   = !(reversed |> Enum.first |> nil?)
@@ -40,7 +42,7 @@ defmodule Fluid.ForElse do
     end)
   end
 
-  def render(output, Block[iterator: it]=block, Context[]=context) do
+  def render(output, %Block{iterator: it}=block, %Context{}=context) do
     { list, _ } = Variables.lookup(it.collection, context)
     cond do
       is_list(list) and Enum.count(list) > 0 ->
@@ -50,7 +52,7 @@ defmodule Fluid.ForElse do
     end
   end
 
-  defp each(output, [], Block[]=block, Context[]=context), do: { output, remember_limit(block, context) }
+  defp each(output, [], %Block{}=block, %Context{}=context), do: { output, remember_limit(block, context) }
   defp each(output, [h|t]=list, Block[iterator: it]=block, Context[assigns: assigns]=context) do
     forloop = next_forloop(it, list |> Enum.count)
     block   = block.iterator(forloop |> it.forloop)
@@ -65,7 +67,7 @@ defmodule Fluid.ForElse do
     end
   end
 
-  defp remember_limit(Block[iterator: it], context) do
+  defp remember_limit(%Block{iterator: it}, context) do
     { limit, context } = lookup_limit(it, context)
     limit      = limit || 0
     key        = it.collection.name |> binary_to_atom(:utf8)
@@ -73,7 +75,7 @@ defmodule Fluid.ForElse do
     context.offsets |> Dict.put(key, remembered + limit) |> context.offsets
   end
 
-  defp should_render?(Block[iterator: Iterator[]=it], forloop, context) do
+  defp should_render?(%Block{iterator: %Iterator{}=it}, forloop, context) do
     { limit, _ }  = lookup_limit(it, context)
     { offset, _ } = lookup_offset(it, context)
     cond do
@@ -84,11 +86,11 @@ defmodule Fluid.ForElse do
     end
   end
 
-  defp lookup_limit(Iterator[limit: limit], Context[]=context) do
+  defp lookup_limit(%Iterator{limit: limit}, %Context{}=context) do
     Variables.lookup(limit, context)
   end
 
-  defp lookup_offset(Iterator[offset: offset]=it, Context[]=context) do
+  defp lookup_offset(%Iterator{offset: offset}=it, %Context{}=context) do
     case offset.name do
       "continue" ->
         offset = context.offsets[it.collection.name |> binary_to_atom(:utf8)]
@@ -97,7 +99,7 @@ defmodule Fluid.ForElse do
     end
   end
 
-  defp next_forloop(Iterator[forloop: []], count) do
+  defp next_forloop(%Iterator{forloop: []}, count) do
     [index:   1,
      index0:  0,
      rindex:  count,
@@ -107,7 +109,7 @@ defmodule Fluid.ForElse do
      last:    count == 1]
   end
 
-  defp next_forloop(Iterator[forloop: loop], count) do
+  defp next_forloop(%Iterator{forloop: loop}, count) do
     [index:   loop[:index]  + 1,
      index0:  loop[:index0] + 1,
      rindex:  loop[:rindex]  - 1,
@@ -124,9 +126,9 @@ defmodule Fluid.Break do
   alias Fluid.Context, as: Context
   alias Fluid.Template, as: Template
 
-  def parse(Tag[]=tag, Template[]=template), do: { tag, template }
+  def parse(%Tag{}=tag, %Template{}=template), do: { tag, template }
 
-  def render(output, Tag[], Context[]=context) do
+  def render(output, %Tag{}, %Context{}=context) do
     { output, context.break(true) }
   end
 end
@@ -135,9 +137,9 @@ defmodule Fluid.Continue do
   alias Fluid.Tag, as: Tag
   alias Fluid.Context, as: Context
 
-  def parse(Tag[]=tag, template), do: { tag, template }
+  def parse(%Tag{}=tag, template), do: { tag, template }
 
-  def render(output, Tag[], Context[]=context) do
+  def render(output, %Tag{}, %Context{}=context) do
     { output, context.continue(true) }
   end
 end

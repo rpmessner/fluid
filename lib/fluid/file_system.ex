@@ -11,16 +11,16 @@ defmodule Fluid.LocalFileSystem do
 
   def full_path(root, template_path) do
     full_path = cond do
-      Regex.match?(%r/\//, template_path) ->
+      Regex.match?(~r/\//, template_path) ->
         root |> Path.join(template_path |> Path.dirname)
              |> Path.join("_#{template_path |> Path.basename}.fluid")
       true ->
         root |> Path.join("_#{template_path}.fluid")
     end
     cond do
-      !Regex.match?(%r/^[^.\/][a-zA-Z0-9_\/]+$/, template_path) ->
+      !Regex.match?(~r/^[^.\/][a-zA-Z0-9_\/]+$/, template_path) ->
         { :error, "Illegal template name '#{template_path}'" }
-      !Regex.match?(%r/^#{Path.expand(root)}/, Path.expand(full_path)) ->
+      !Regex.match?(~r/^#{Path.expand(root)}/, Path.expand(full_path)) ->
         { :error, "Illegal template path '#{Path.expand(full_path)}'" }
       true -> { :ok, full_path }
     end

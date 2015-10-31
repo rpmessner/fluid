@@ -1,10 +1,10 @@
 defmodule Fluid.ElseIf do
-  def parse(Fluid.Tag[]=tag, Fluid.Template[]=t), do: { tag, t }
+  def parse(%Fluid.Tag{}=tag, %Fluid.Template{}=t), do: { tag, t }
   def render(_, _, _, _), do: raise "should never get here"
 end
 
 defmodule Fluid.Else do
-  def parse(Fluid.Tag[]=tag, Fluid.Template[]=t), do: { tag, t }
+  def parse(%Fluid.Tag{}=tag, %Fluid.Template{}=t), do: { tag, t }
   def render(_, _, _, _), do: raise "should never get here"
 end
 
@@ -13,12 +13,12 @@ defmodule Fluid.IfElse do
   alias Fluid.Render, as: Render
   alias Fluid.Blocks, as: Blocks
 
-  def syntax, do: %r/(#{Fluid.quoted_fragment})\s*([=!<>a-z_]+)?\s*(#{Fluid.quoted_fragment})?/
+  def syntax, do: ~r/(#{Fluid.quoted_fragment})\s*([=!<>a-z_]+)?\s*(#{Fluid.quoted_fragment})?/
   def expressions_and_operators do
-    %r/(?:\b(?:\s?and\s?|\s?or\s?)\b|(?:\s*(?!\b(?:\s?and\s?|\s?or\s?)\b)(?:#{Fluid.quoted_fragment}|\S+)\s*)+)/
+    ~r/(?:\b(?:\s?and\s?|\s?or\s?)\b|(?:\s*(?!\b(?:\s?and\s?|\s?or\s?)\b)(?:#{Fluid.quoted_fragment}|\S+)\s*)+)/
   end
 
-  def parse(Fluid.Block[]=block, Fluid.Template[]=t) do
+  def parse(%Fluid.Block{}=block, %Fluid.Template{}=t) do
     block = parse_conditions(block)
     case Blocks.split(block, [:else, :elsif]) do
       { true_block, [Fluid.Tag[name: :elsif, markup: markup]|elsif_block] } ->
@@ -31,7 +31,7 @@ defmodule Fluid.IfElse do
     end
   end
 
-  def render(output, Fluid.Tag[], context) do
+  def render(output, %Fluid.Tag{}, context) do
     { output, context }
   end
 

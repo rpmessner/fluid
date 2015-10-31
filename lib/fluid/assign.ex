@@ -3,11 +3,11 @@ defmodule Fluid.Assign do
   alias Fluid.Tag, as: Tag
   alias Fluid.Context, as: Context
 
-  def syntax, do: %r/([\w\-]+)\s*=\s*(.*)\s*/
+  def syntax, do: ~r/([\w\-]+)\s*=\s*(.*)\s*/
 
-  def parse(Tag[]=tag, Fluid.Template[]=template), do: { tag, template }
+  def parse(%Tag{}=tag, %Fluid.Template{}=template), do: { tag, template }
 
-  def render(output, Tag[markup: markup], Context[]=context) do
+  def render(output, %Tag{markup: markup}, %Context{}=context) do
     [[_, to, from]] = syntax |> Regex.scan(markup)
     to_atom  = to |> binary_to_atom(:utf8)
     variable = Variables.create(from)

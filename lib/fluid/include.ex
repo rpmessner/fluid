@@ -7,16 +7,16 @@ defmodule Fluid.Include do
   alias Fluid.Variables, as: Variables
   alias Fluid.FileSystem, as: FileSystem
 
-  def syntax, do: %r/(#{Fluid.quoted_fragment}+)(\s+(?:with|for)\s+(#{Fluid.quoted_fragment}+))?/
+  def syntax, do: ~r/(#{Fluid.quoted_fragment}+)(\s+(?:with|for)\s+(#{Fluid.quoted_fragment}+))?/
 
-  def parse(Tag[markup: markup]=tag, Template[]=template) do
+  def parse(%Tag{markup: markup}=tag, %Template{}=template) do
     [parts|_]  = syntax |> Regex.scan(markup)
     tag        = parse_tag(tag, parts)
     attributes = parse_attributes(markup)
     { attributes |> tag.attributes, template }
   end
 
-  defp parse_tag(Tag[]=tag, parts) do
+  defp parse_tag(%Tag{}=tag, parts) do
     case parts do
       [_, name] -> tag.parts(name: name |> Variables.create)
       [_, name," with "<>_,v] -> tag.parts(name: name |> Variables.create, variable: v |> Variables.create)
@@ -31,7 +31,7 @@ defmodule Fluid.Include do
     end)
   end
 
-  def render(output, Tag[parts: parts]=tag, Context[]=context) do
+  def render(output, %Tag{parts: parts}=tag, %Context{}=context) do
     { file_system, root } = context |> Contexts.registers(:file_system) || FileSystem.lookup
     { name, context } = parts[:name] |> Variables.lookup(context)
     { :ok, source } = file_system.read_template_file(root, name, context)
@@ -50,7 +50,7 @@ defmodule Fluid.Include do
     end
   end
 
-  defp build_presets(Tag[]=tag, context) do
+  defp build_presets(%Tag{}=tag, context) do
     tag.attributes |> Enum.reduce([], fn({key, value}, coll) ->
       { value, _ } = Variables.lookup(value, context)
       Dict.put(coll, key, value)
@@ -61,17 +61,17 @@ defmodule Fluid.Include do
     { output, context }
   end
 
-  defp render_list(output, key, [item|rest], template, Context[]=context) do
+  defp render_list(output, key, [item|rest], template, %Context{}=context) do
     { output, context } = render_item(output, key, item, template, context)
     render_list(output, key, rest, template, context)
   end
 
-  defp render_item(output, _key, nil, template, Context[]=context) do
+  defp render_item(output, _key, nil, template, %Context{}=context) do
     { :ok, rendered, _ } = Templates.render(template, context)
     { output ++ [rendered], context }
   end
 
-  defp render_item(output, key, item, template, Context[]=context) do
+  defp render_item(output, key, item, template, %Context{}=context) do
     assigns = context.assigns |> Dict.merge([{ key, item }])
     { :ok, rendered, _ } = Templates.render(template, assigns |> context.assigns)
     { output ++ [rendered], context }

@@ -17,7 +17,7 @@ defmodule Fluid.Filters do
       |> Enum.filter(&1 != "|")
       |> Enum.map(&String.strip/1)
     filters = Enum.map(filters, fn(markup) ->
-      [[_, filter]|_] = Regex.scan(%r/\s*(\w+)/, markup)
+      [[_, filter]|_] = Regex.scan(~r/\s*(\w+)/, markup)
       args = Fluid.filter_arguments
         |> Regex.scan(markup)
         |> List.flatten

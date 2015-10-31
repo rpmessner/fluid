@@ -51,9 +51,9 @@ defmodule Fluid.BlockTest do
   test "variable many embedded fragments" do
     template = Fluid.Templates.parse("  {{funk}} {{so}} {{brother}} ")
     assert 7 == Enum.count template.root.nodelist
-    assert [<<_::binary>>, Fluid.Variable[],
-            <<_::binary>>, Fluid.Variable[],
-            <<_::binary>>, Fluid.Variable[], <<_::binary>>] = template.root.nodelist
+    assert [<<_::binary>>, Fluid.%Variable{},
+            <<_::binary>>, Fluid.%Variable{},
+            <<_::binary>>, Fluid.%Variable{}, <<_::binary>>] = template.root.nodelist
   end
 
   test "with block" do
