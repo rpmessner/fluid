@@ -3,6 +3,6 @@ defmodule Fluid.Tags do
 
   def create(markup) do
     [name|rest] = String.split(markup, " ")
-    Fluid.Tag[name: name |> String.to_atom, markup: Enum.join(rest, " ")]
+    Fluid.Tags[name: name |> String.to_atom, markup: Enum.join(rest, " ")]
   end
 end

@@ -56,11 +56,11 @@ defmodule ExtendsTagTest do
   test "include blocks within the parent template" do
     expected = """
     | [Partial Content1]
-    | [Overridden Block]
+    | [Overridden Blocks]
     """
     markup = """
     | {% extends parent-with-include %}
-    | {% block thing %}[Overridden Block]{% endblock %}
+    | {% block thing %}[Overridden Blocks]{% endblock %}
     """
     assert_result expected, markup
 
@@ -106,15 +106,15 @@ defmodule ExtendsTagTest do
   #     "{% extends base2 %}{% block content/tagline %}(new tagline){% endblock %}"
   # end
 
-  defp assert_result(expected, markup), do: assert_result(expected, markup, Fluid.%Context{})
-  defp assert_result(expected, markup, Fluid.%Context{}=context) do
+  defp assert_result(expected, markup), do: assert_result(expected, markup, %Fluid.Contexts{})
+  defp assert_result(expected, markup, %Fluid.Contexts{}=context) do
     t = Templates.parse(markup)
     { :ok, rendered, _context } = Templates.render(t, context)
     assert expected == rendered
   end
 
   defp assert_result(expected, markup, assigns) do
-    context = Fluid.Context[assigns: assigns]
+    context = Fluid.Contexts[assigns: assigns]
     assert_result(expected, markup, context)
   end
 

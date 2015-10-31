@@ -34,7 +34,7 @@ defmodule IncludeTagTest do
   use ExUnit.Case
 
   alias Fluid.Templates, as: Templates
-  alias Fluid.Context, as: Context
+  alias Fluid.Contexts, as: Contexts
 
   setup_all do
     Fluid.start
@@ -50,7 +50,7 @@ defmodule IncludeTagTest do
   test :include_tag_looks_for_file_system_in_registers_first do
     assert_result "from OtherFileSystem",
                   "{% include 'pick_a_source' %}",
-                  Context[registers: [file_system: { OtherFileSystem, "" }]]
+                  Contexts[registers: [file_system: { OtherFileSystem, "" }]]
   end
 
   test :include_tag_with do
@@ -119,8 +119,8 @@ defmodule IncludeTagTest do
   #     end
   #   end
   #   Fluid.FileSystem.register infinite_file_system
-  #   t = Template.parse("{% include 'hi_mom' %}")
-  #   { :ok, _ } = Template.render(t)
+  #   t = Templates.parse("{% include 'hi_mom' %}")
+  #   { :ok, _ } = Templates.render(t)
   # end
 
   # test :dynamically_choosen_template do
@@ -132,15 +132,15 @@ defmodule IncludeTagTest do
   #                 [template: "product", product: [title: "Draft 151cm"]]
   # end
 
-  defp assert_result(expected, markup), do: assert_result(expected, markup, Fluid.%Context{})
-  defp assert_result(expected, markup, Fluid.%Context{}=context) do
+  defp assert_result(expected, markup), do: assert_result(expected, markup, Fluid.%Contexts{})
+  defp assert_result(expected, markup, Fluid.%Contexts{}=context) do
     t = Templates.parse(markup)
     { :ok, rendered, _context } = Templates.render(t, context)
     assert expected == rendered
   end
 
   defp assert_result(expected, markup, assigns) do
-    context = Fluid.Context[assigns: assigns]
+    context = Fluid.Contexts[assigns: assigns]
     assert_result(expected, markup, context)
   end
 

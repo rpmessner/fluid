@@ -1,7 +1,7 @@
 ExUnit.start
 
 defmodule LocalState do
-  use GenServer.Behaviour
+  use GenServer
 
   def start do
     :gen_server.start({:local, __MODULE__}, __MODULE__, 0, [])

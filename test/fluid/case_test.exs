@@ -164,15 +164,15 @@ defmodule Fluid.CaseTest do
       "{% case NULL %}{% when true %}true{% when false %}false{% else %}else{% endcase %}"
   end
 
-  defp assert_result(expected, markup), do: assert_result(expected, markup, Fluid.%Context{})
-  defp assert_result(expected, markup, Fluid.%Context{}=context) do
+  defp assert_result(expected, markup), do: assert_result(expected, markup, %Fluid.Contexts{})
+  defp assert_result(expected, markup, %Fluid.Contexts{}=context) do
     t = Fluid.Templates.parse(markup)
     { :ok, rendered, _context } = Fluid.Templates.render(t, context)
     assert expected == rendered
   end
 
   defp assert_result(expected, markup, assigns) do
-    context = Fluid.Context[assigns: assigns]
+    context = %Fluid.Contexts{assigns: assigns}
     assert_result(expected, markup, context)
   end
 

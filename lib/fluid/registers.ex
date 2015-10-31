@@ -1,26 +1,26 @@
 defmodule Fluid.Registers do
-  use GenServer.Behaviour
+  use GenServer
 
   defp default_tags do
-    [defaultcontent: { Fluid.Default,  Fluid.Tag },
-     continue:       { Fluid.Continue, Fluid.Tag },
-     extended:       { Fluid.Extends,  Fluid.Block },
-     comment:        { Fluid.Comment,  Fluid.Block },
-     include:        { Fluid.Include,  Fluid.Tag },
-     extends:        { Fluid.Extends,  Fluid.Tag },
-     assign:         { Fluid.Assign,   Fluid.Tag },
-     block:          { Fluid.Inherit,  Fluid.Block },
-     break:          { Fluid.Break,    Fluid.Tag },
-     elsif:          { Fluid.ElseIf,   Fluid.Tag },
-     else:           { Fluid.Else,     Fluid.Tag },
-     case:           { Fluid.Case,     Fluid.Block },
-     when:           { Fluid.When,     Fluid.Tag },
-     for:            { Fluid.ForElse,  Fluid.Block },
-     if:             { Fluid.IfElse,   Fluid.Block }]
+    [defaultcontent: { Fluid.Default,  Fluid.Tags },
+     continue:       { Fluid.Continue, Fluid.Tags },
+     extended:       { Fluid.Extends,  Fluid.Blocks },
+     comment:        { Fluid.Comment,  Fluid.Blocks },
+     include:        { Fluid.Include,  Fluid.Tags },
+     extends:        { Fluid.Extends,  Fluid.Tags },
+     assign:         { Fluid.Assign,   Fluid.Tags },
+     block:          { Fluid.Inherit,  Fluid.Blocks },
+     break:          { Fluid.Break,    Fluid.Tags },
+     elsif:          { Fluid.ElseIf,   Fluid.Tags },
+     else:           { Fluid.Else,     Fluid.Tags },
+     case:           { Fluid.Case,     Fluid.Blocks },
+     when:           { Fluid.When,     Fluid.Tags },
+     for:            { Fluid.ForElse,  Fluid.Blocks },
+     if:             { Fluid.IfElse,   Fluid.Blocks }]
   end
 
   def handle_cast({ :register, <<name::binary>>, module, tag }, dict) do
-    { :noreply, dict |> Dict.put(name |> binary_to_atom(:utf8), { module, tag }) }
+    { :noreply, dict |> Dict.put(name |> String.to_atom, { module, tag }) }
   end
 
   def handle_cast(:clear, _dict) do
@@ -33,7 +33,7 @@ defmodule Fluid.Registers do
   end
 
   def handle_call({ :lookup, <<name::binary>> }, _from, dict) do
-    result = Dict.get(dict, name |> binary_to_atom(:utf8))
+    result = Dict.get(dict, name |> String.to_atom)
     { :reply, result, dict }
   end
 

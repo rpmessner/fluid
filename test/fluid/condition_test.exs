@@ -4,7 +4,7 @@ defmodule ConditionTest do
   use ExUnit.Case
 
   alias Fluid.Conditions, as: Conditions
-  alias Fluid.Condition, as: Cond
+  alias Fluid.Conditions, as: Cond
 
   test :basic_condition do
     assert_evaluates_false "1", "==", "2"
@@ -92,13 +92,13 @@ defmodule ConditionTest do
   end
 
   # # test :should_allow_custom_proc_operator do
-  # #   Condition.operators['starts_with'] = Proc.new { |cond, left, right| left =~ ~r{^#{right}} }
+  # #   Conditions.operators['starts_with'] = Proc.new { |cond, left, right| left =~ ~r{^#{right}} }
 
   # #   assert_evaluates_true "'bob'",   'starts_with', "'b'"
   # #   assert_evaluates_false "'bob'",  'starts_with', "'o'"
 
   # #   ensure
-  # #     Condition.operators.delete 'starts_with'
+  # #     Conditions.operators.delete 'starts_with'
   # # end
 
   test :left_or_right_may_contain_operators do
@@ -109,7 +109,7 @@ defmodule ConditionTest do
 
   defp assert_evaluates_true(left, op, right, assigns//[]) do
     condition = Conditions.create({left, op, right})
-    context = Fluid.Context[assigns: assigns, presets: []]
+    context = Fluid.Contexts[assigns: assigns, presets: []]
     evaled = Conditions.evaluate(condition, context)
     unless evaled, do: IO.puts("Evaluated false: #{left} #{op} #{right}")
     assert evaled
@@ -117,7 +117,7 @@ defmodule ConditionTest do
 
   defp assert_evaluates_false(left, op, right, assigns//[]) do
     condition = Conditions.create({left, op, right})
-    context = Fluid.Context[assigns: assigns, presets: []]
+    context = Fluid.Contexts[assigns: assigns, presets: []]
     evaled = Conditions.evaluate(condition, context)
     unless !evaled, do: IO.puts("Evaluated true: #{left} #{op} #{right}")
     assert !evaled

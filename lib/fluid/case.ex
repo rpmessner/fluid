@@ -1,38 +1,38 @@
 defmodule Fluid.Case do
-  alias Fluid.Tag, as: Tag
-  alias Fluid.Block, as: Block
+  alias Fluid.Tags, as: Tags
   alias Fluid.Blocks, as: Blocks
-  alias Fluid.Context, as: Context
-  alias Fluid.Template, as: Template
-  alias Fluid.Variable, as: Variable
+  alias Fluid.Blocks, as: Blocks
+  alias Fluid.Contexts, as: Contexts
+  alias Fluid.Templates, as: Templates
   alias Fluid.Variables, as: Variables
-  alias Fluid.Condition, as: Condition
+  alias Fluid.Variables, as: Variables
+  alias Fluid.Conditions, as: Conditions
   alias Fluid.Conditions, as: Conditions
 
   def syntax, do: ~r/(#{Fluid.quoted_fragment})/
   def when_syntax, do: ~r/(#{Fluid.quoted_fragment})(?:(?:\s+or\s+|\s*\,\s*)(#{Fluid.quoted_fragment}.*))?/g
 
-  def parse(%Block{markup: markup}=b, %Template{}=t) do
+  def parse(%Blocks{markup: markup}=b, %Templates{}=t) do
     [[_, name]] = syntax |> Regex.scan(markup)
     { split(name |> Variables.create, b.nodelist), t }
   end
 
-  defp split(%Variable{}, []), do: []
-  defp split(%Variable{}=v, [<<_::binary>>|t]), do: split(v, t)
-  defp split(%Variable{}=_, [Fluid.Tag[name: :else]|t]), do: t
-  defp split(%Variable{}=v, [Fluid.Tag[name: :when, markup: markup]|t]) do
+  defp split(%Variables{}, []), do: []
+  defp split(%Variables{}=v, [<<_::binary>>|t]), do: split(v, t)
+  defp split(%Variables{}=_, [%Fluid.Tags{name: :else}|t]), do: t
+  defp split(%Variables{}=v, [%Fluid.Tags{name: :when, markup: markup}|t]) do
     { nodelist, t } = Blocks.split(t, [:when, :else])
     condition = parse_condition(v, markup)
-    Block[name: :if, nodelist: nodelist, condition: condition, elselist: split(v, t)]
+    Blocks[name: :if, nodelist: nodelist, condition: condition, elselist: split(v, t)]
   end
 
-  defp parse_condition(%Variable{}=v, <<markup::binary>>) do
+  defp parse_condition(%Variables{}=v, <<markup::binary>>) do
     { h, t } = parse_when(markup)
     parse_condition(v, Conditions.create({v, "==", h}), t)
   end
 
-  defp parse_condition(%Variable{}=_, %Condition{}=condition, []), do: condition
-  defp parse_condition(%Variable{}=v, %Condition{}=condition, [<<markup::binary>>]) do
+  defp parse_condition(%Variables{}=_, %Conditions{}=condition, []), do: condition
+  defp parse_condition(%Variables{}=v, %Conditions{}=condition, [<<markup::binary>>]) do
     { h, t } = parse_when(markup)
     parse_condition(v, Conditions.join(:or, condition, {v, "==", h}), t)
   end
@@ -47,9 +47,9 @@ defmodule Fluid.Case do
 end
 
 defmodule Fluid.When do
-  alias Fluid.Tag, as: Tag
-  alias Fluid.Context, as: Context
-  alias Fluid.Template, as: Template
+  alias Fluid.Tags, as: Tags
+  alias Fluid.Contexts, as: Contexts
+  alias Fluid.Templates, as: Templates
 
-  def parse(%Tag{}=tag, %Template{}=t), do: { tag, t }
+  def parse(%Tags{}=tag, %Templates{}=t), do: { tag, t }
 end

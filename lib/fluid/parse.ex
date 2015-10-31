@@ -1,5 +1,5 @@
 defmodule Fluid.Parse do
-  alias Fluid.Template, as: Template
+  alias Fluid.Templates, as: Templates
   alias Fluid.Templates, as: Templates
   alias Fluid.Variables, as: Variables
   alias Fluid.Registers, as: Registers
@@ -11,24 +11,24 @@ defmodule Fluid.Parse do
       |> Enum.filter(&(&1 != ""))
   end
 
-  def parse(<<string::binary>>, %Template{}=template) do
+  def parse(<<string::binary>>, %Templates{}=template) do
     tokens = tokenize(string)
-    { root, template } = parse(Fluid.Block[name: :document], tokens, [], template)
+    { root, template } = parse(Fluid.Blocks[name: :document], tokens, [], template)
     template.root(root)
   end
 
-  defp parse_node(<<name::binary>>, rest, %Template{}=template) do
+  defp parse_node(<<name::binary>>, rest, %Templates{}=template) do
     case Regex.captures(Fluid.parser, name) do
       [tag: "", variable: <<markup::binary>>] -> { Variables.create(markup), rest, template }
       [tag: <<markup::binary>>, variable: ""] ->
         [name|_] = String.split(markup, " ")
         case Registers.lookup(name) do
-          { mod, Fluid.Block } ->
+          { mod, Fluid.Blocks } ->
             block = Fluid.Blocks.create(markup)
             { block, rest, template } = parse(block, rest, [], template)
             { block, template } = mod.parse(block, template)
             { block, rest, template }
-          { mod, Fluid.Tag } ->
+          { mod, Fluid.Tags } ->
             tag = Fluid.Tags.create(markup)
             { tag, template } = mod.parse(tag, template)
             { tag, rest, template }
@@ -38,16 +38,16 @@ defmodule Fluid.Parse do
     end
   end
 
-  def parse(Fluid.Block[name: :document]=block, [], accum, %Template{}=template) do
+  def parse(%Fluid.Blocks{name: :document}=block, [], accum, %Templates{}=template) do
     { block.nodelist(accum), template }
   end
 
-  def parse(Fluid.Block[name: name], [], _, _) do
-    raise "No matching end for block {% #{atom_to_binary(name, :utf8)} %}"
+  def parse(%Fluid.Blocks{name: name}, [], _, _) do
+    raise "No matching end for block {% #{Atom.to_binary(name)} %}"
   end
 
-  def parse(Fluid.Block[name: name]=block, [h|t], accum, %Template{}=template) do
-    endblock = "end" <> atom_to_binary(name, :utf8)
+  def parse(%Fluid.Blocks{name: name}=block, [h|t], accum, %Templates{}=template) do
+    endblock = "end" <> Atom.to_binary(name)
     cond do
       Regex.match?(~r/{%\s*#{endblock}\s*%}/, h) ->
         { block.nodelist(accum), t, template }

@@ -3,7 +3,7 @@ Code.require_file "../../test_helper.exs", __FILE__
 defmodule ForElseTagTest do
   use ExUnit.Case
 
-  alias Fluid.Templates, as: Template
+  alias Fluid.Templates, as: Templates
 
   setup_all do
     Fluid.start
@@ -292,8 +292,8 @@ defmodule ForElseTagTest do
   # end
 
   defp assert_result(expected, markup, assigns) do
-    t = Template.parse(markup)
-    { :ok, rendered, _ } = Template.render(t, assigns)
+    t = Templates.parse(markup)
+    { :ok, rendered, _ } = Templates.render(t, assigns)
     assert rendered == expected
   end
 end

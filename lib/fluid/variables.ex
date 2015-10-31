@@ -2,9 +2,9 @@ defmodule Fluid.Variables do
   defstruct name: nil, literal: nil, filters: [], parts: []
 
   alias Fluid.Filters, as: Filters
-  alias Fluid.Variable, as: Variable
   alias Fluid.Variables, as: Variables
-  alias Fluid.Context, as: Context
+  alias Fluid.Variables, as: Variables
+  alias Fluid.Contexts, as: Contexts
 
   defp literals, do: [nil: nil, null: nil, "": nil,
                       true: true, false: false,
@@ -19,12 +19,12 @@ defmodule Fluid.Variables do
   """
   def create(<<markup::binary>>) do
     [name|filters] = Filters.parse(markup)
-    key = name |> String.strip |> binary_to_atom(:utf8)
-    variable = Fluid.Variable[name: name, filters: filters]
+    key = name |> String.strip |> String.to_atom
+    variable = Fluid.Variables[name: name, filters: filters]
     cond do
       literals      |> Dict.has_key?(key) -> literals |> Dict.get(key) |> variable.literal
-      integer       |> Regex.match?(name) -> name |> binary_to_integer |> variable.literal
-      float         |> Regex.match?(name) -> name |> binary_to_float |> variable.literal
+      integer       |> Regex.match?(name) -> name |> String.to_integer  |> variable.literal
+      float         |> Regex.match?(name) -> name |> String.to_float |> variable.literal
       quoted_string |> Regex.match?(name) -> Fluid.quote_matcher |> Regex.replace(name, "") |> variable.literal
       true ->
         [name|_] = String.split(name, " ")
@@ -33,19 +33,19 @@ defmodule Fluid.Variables do
     end
   end
 
-  def lookup(%Variable{filters: filters}=v, %Context{}=context) do
+  def lookup(%Variables{filters: filters}=v, %Contexts{}=context) do
     { ret, context } = case v do
-      Variable[literal: literal, parts: []] ->
+      %Variables{literal: literal, parts: []} ->
         { literal, context }
-      Variable[literal: nil, parts: parts] ->
+      %Variables{literal: nil, parts: parts} ->
         resolve(parts, context, context)
     end
     ret = Filters.filter(filters, ret)
     { ret, context }
   end
 
-  defp resolve([<<name::binary>>|_]=parts, %Context{}=current, %Context{}=context) do
-    key = name |> binary_to_atom(:utf8)
+  defp resolve([<<name::binary>>|_]=parts, %Contexts{}=current, %Contexts{}=context) do
+    key = name |> String.to_atom
     cond do
       current.assigns |> Dict.has_key?(key) ->
         resolve(parts, current.assigns, context)
@@ -55,25 +55,25 @@ defmodule Fluid.Variables do
     end
   end
 
-  defp resolve([], current, %Context{}=context), do: { current, context }
-  defp resolve([<<?[,index::binary>>|parts], current, %Context{}=context) do
+  defp resolve([], current, %Contexts{}=context), do: { current, context }
+  defp resolve([<<?[,index::binary>>|parts], current, %Contexts{}=context) do
     [index, _] = String.split(index, "]")
-    index = binary_to_integer(index)
+    index = String.to_integer(index)
     resolve(parts, current |> Enum.fetch!(index), context)
   end
 
-  defp resolve(["size"|_], current, %Context{}=context) when is_list(current) do
+  defp resolve(["size"|_], current, %Contexts{}=context) when is_list(current) do
     { current |> Enum.count, context }
   end
 
-  defp resolve([<<name::binary>>|parts], current, %Context{}=context) do
+  defp resolve([<<name::binary>>|parts], current, %Contexts{}=context) do
     { current, context } = resolve(name, current, context)
     resolve(parts, current, context)
   end
 
-  defp resolve(<<_::binary>>, current, %Context{}=context) when !is_list(current), do: { nil, context }
-  defp resolve(<<name::binary>>, current, %Context{}=context) when is_list(current) do
-    key    = binary_to_atom(name, :utf8)
+  defp resolve(<<_::binary>>, current, %Contexts{}=context) when is_list(current), do: { nil, context } # !is_list(current)
+  defp resolve(<<name::binary>>, current, %Contexts{}=context) when is_list(current) do
+    key    = String.to_atom(name)
     return = Dict.get(current, key)
     cond do
       is_function(return) ->
