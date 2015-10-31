@@ -16,12 +16,17 @@ defmodule Fluid do
 
   def variable_start, do: "{{"
   def variable_end, do: "}}"
+  def variable_incomplete_end, do: "\}\}?"
 
   def tag_start, do: "{%"
   def tag_end, do: "%}"
 
-  def tokenizer, do: ~r/(#{tag_start}.*?#{tag_end})|(#{variable_start}.*?#{variable_end})/
-  def parser, do: ~r/#{tag_start}\s*(?<tag>.*?)\s*#{tag_end}|#{variable_start}\s*(?<variable>.*?)\s*#{variable_end}/g
+  def any_starting_tag, do: "\{\{|\{\%"
+
+  def tokenizer, do: ~r/()#{tag_start}.*?#{tag_end}()|()#{variable_start}.*?#{variable_end}()/
+  def parser, do: ~r/#{tag_start}\s*(?<tag>.*?)\s*#{tag_end}|#{variable_start}\s*(?<variable>.*?)\s*#{variable_end}/m
+  def template_parser, do: ~r/()#{partial_template_parser}()|()#{any_starting_tag}()/m
+  def partial_template_parser, do: "#{tag_start}.*?#{tag_end}|#{variable_start}.*?#{variable_incomplete_end}"
 
   def quoted_string, do: "\"[^\"]*\"|'[^']*'"
   def quoted_fragment, do: "#{quoted_string}|(?:[^\s,\|'\"]|#{quoted_string})+"

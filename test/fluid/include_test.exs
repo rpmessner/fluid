@@ -1,4 +1,4 @@
-Code.require_file "../../test_helper.exs", __FILE__
+Code.require_file "../../test_helper.exs", __ENV__.file
 
 defmodule TestFileSystem do
   def read_template_file(_root, template_path, _context) do
@@ -39,11 +39,7 @@ defmodule IncludeTagTest do
   setup_all do
     Fluid.start
     Fluid.FileSystem.register TestFileSystem
-    :ok
-  end
-
-  teardown_all do
-    Fluid.stop
+    on_exit fn -> Fluid.stop end
     :ok
   end
 
@@ -132,15 +128,15 @@ defmodule IncludeTagTest do
   #                 [template: "product", product: [title: "Draft 151cm"]]
   # end
 
-  defp assert_result(expected, markup), do: assert_result(expected, markup, Fluid.%Contexts{})
-  defp assert_result(expected, markup, Fluid.%Contexts{}=context) do
+  defp assert_result(expected, markup), do: assert_result(expected, markup, %Fluid.Contexts{})
+  defp assert_result(expected, markup, %Fluid.Contexts{}=context) do
     t = Templates.parse(markup)
     { :ok, rendered, _context } = Templates.render(t, context)
     assert expected == rendered
   end
 
   defp assert_result(expected, markup, assigns) do
-    context = Fluid.Contexts[assigns: assigns]
+    context = %Fluid.Contexts{assigns: assigns}
     assert_result(expected, markup, context)
   end
 

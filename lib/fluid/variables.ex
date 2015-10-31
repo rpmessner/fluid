@@ -1,6 +1,6 @@
 defmodule Fluid.Variables do
   defstruct name: nil, literal: nil, filters: [], parts: []
-
+  require IEx
   alias Fluid.Filters, as: Filters
   alias Fluid.Variables, as: Variables
   alias Fluid.Variables, as: Variables
@@ -20,16 +20,19 @@ defmodule Fluid.Variables do
   def create(<<markup::binary>>) do
     [name|filters] = Filters.parse(markup)
     key = name |> String.strip |> String.to_atom
-    variable = Fluid.Variables[name: name, filters: filters]
+    variable = %Fluid.Variables{name: name, filters: filters}
     cond do
       literals      |> Dict.has_key?(key) -> literals |> Dict.get(key) |> variable.literal
       integer       |> Regex.match?(name) -> name |> String.to_integer  |> variable.literal
       float         |> Regex.match?(name) -> name |> String.to_float |> variable.literal
-      quoted_string |> Regex.match?(name) -> Fluid.quote_matcher |> Regex.replace(name, "") |> variable.literal
+      quoted_string |> Regex.match?(name) ->
+        IEx.pry
+        unquoted_name = Fluid.quote_matcher |> Regex.replace(name, "") 
+        %{ variable | literal: unquoted_name }
       true ->
         [name|_] = String.split(name, " ")
         parts = Regex.scan(Fluid.variable_parser, name) |> List.flatten
-        variable.parts(parts)
+        %{variable | parts: variable.parts ++ parts}
     end
   end
 
@@ -71,7 +74,7 @@ defmodule Fluid.Variables do
     resolve(parts, current, context)
   end
 
-  defp resolve(<<_::binary>>, current, %Contexts{}=context) when is_list(current), do: { nil, context } # !is_list(current)
+  defp resolve(<<_::binary>>, current, %Contexts{}=context) when not is_list(current), do: { nil, context } # !is_list(current)
   defp resolve(<<name::binary>>, current, %Contexts{}=context) when is_list(current) do
     key    = String.to_atom(name)
     return = Dict.get(current, key)

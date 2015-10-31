@@ -1,4 +1,4 @@
-Code.require_file "../../test_helper.exs", __FILE__
+Code.require_file "../../test_helper.exs", __ENV__.file
 
 defmodule Fluid.VariableTest do
   use ExUnit.Case
@@ -113,11 +113,7 @@ defmodule VariableResolutionTest do
 
   setup_all do
     Fluid.start
-    :ok
-  end
-
-  teardown_all do
-    Fluid.stop
+    on_exit fn -> Fluid.stop end
     :ok
   end
 

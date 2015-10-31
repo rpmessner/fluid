@@ -2,7 +2,7 @@ defmodule Fluid.Assign do
   alias Fluid.Variables, as: Variables
   alias Fluid.Tags, as: Tags
   alias Fluid.Contexts, as: Contexts
-
+require IEx
   def syntax, do: ~r/([\w\-]+)\s*=\s*(.*)\s*/
 
   def parse(%Tags{}=tag, %Fluid.Templates{}=template), do: { tag, template }
@@ -12,7 +12,8 @@ defmodule Fluid.Assign do
     to_atom  = to |> String.to_atom
     variable = Variables.create(from)
     { from_value, context } = Variables.lookup(variable, context)
-    context = context.assigns |> Dict.put(to_atom, from_value) |> context.assigns
+    result_assign = context.assigns |> Dict.put(to_atom, from_value)
+    context = %{context | assigns: result_assign}
     { output, context }
   end
 end

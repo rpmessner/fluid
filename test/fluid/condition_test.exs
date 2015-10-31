@@ -1,4 +1,4 @@
-Code.require_file "../../test_helper.exs", __FILE__
+Code.require_file "../../test_helper.exs", __ENV__.file
 
 defmodule ConditionTest do
   use ExUnit.Case
@@ -107,17 +107,17 @@ defmodule ConditionTest do
     assert_evaluates_true "one", "==", "another", assigns
   end
 
-  defp assert_evaluates_true(left, op, right, assigns//[]) do
+  defp assert_evaluates_true(left, op, right, assigns \\ []) do
     condition = Conditions.create({left, op, right})
-    context = Fluid.Contexts[assigns: assigns, presets: []]
+    context = %Fluid.Contexts{assigns: assigns, presets: []}
     evaled = Conditions.evaluate(condition, context)
     unless evaled, do: IO.puts("Evaluated false: #{left} #{op} #{right}")
     assert evaled
   end
 
-  defp assert_evaluates_false(left, op, right, assigns//[]) do
+  defp assert_evaluates_false(left, op, right, assigns \\ []) do
     condition = Conditions.create({left, op, right})
-    context = Fluid.Contexts[assigns: assigns, presets: []]
+    context = %Fluid.Contexts{assigns: assigns, presets: []}
     evaled = Conditions.evaluate(condition, context)
     unless !evaled, do: IO.puts("Evaluated true: #{left} #{op} #{right}")
     assert !evaled

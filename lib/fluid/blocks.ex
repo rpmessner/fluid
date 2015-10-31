@@ -1,12 +1,13 @@
 defmodule Fluid.Blocks do
   defstruct name: nil, markup: nil, condition: nil, parts: [], iterator: [], nodelist: [], elselist: []
-
+require IEx
   alias Fluid.Tags, as: Tags
   alias Fluid.Blocks, as: Blocks
 
   def create(markup) do
     [name|rest] = String.split(markup, " ")
     name = String.to_atom(name)
+    IEx.pry
     %Blocks{name: name, markup: Enum.join(rest, " ")}
   end
 

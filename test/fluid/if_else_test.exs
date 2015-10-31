@@ -1,16 +1,13 @@
-Code.require_file "../../test_helper.exs", __FILE__
+Code.require_file "../../test_helper.exs", __ENV__.file
 
 defmodule IfElseTagTest do
   use ExUnit.Case
+  use ExUnit.Callbacks
   alias Fluid.Templates, as: Templates
 
   setup_all do
     Fluid.start
-    :ok
-  end
-
-  teardown_all do
-    Fluid.stop
+    on_exit fn -> Fluid.stop end
     :ok
   end
 
@@ -156,7 +153,7 @@ defmodule IfElseTagTest do
     assert_result("yes", "{% if 'gnomeslab-and-or-liquid' contains 'gnomeslab-and-or-liquid' %}yes{% endif %}")
   end
 
-  defp assert_result(expected, markup, assigns//[]) do
+  defp assert_result(expected, markup, assigns \\ []) do
     t = Templates.parse(markup)
     { :ok, rendered, _ } = Templates.render(t, assigns)
     assert rendered == expected

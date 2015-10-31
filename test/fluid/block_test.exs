@@ -1,4 +1,4 @@
-Code.require_file "../../test_helper.exs", __FILE__
+Code.require_file "../../test_helper.exs", __ENV__.file
 
 defmodule Fluid.BlockTest do
   use ExUnit.Case
@@ -13,11 +13,7 @@ defmodule Fluid.BlockTest do
 
   setup_all do
     Fluid.start
-    :ok
-  end
-
-  teardown_all do
-    Fluid.stop
+    on_exit fn -> Fluid.stop end
     :ok
   end
 
@@ -29,7 +25,7 @@ defmodule Fluid.BlockTest do
   test "variable beginning" do
     template = Fluid.Templates.parse("{{funk}}  ")
     assert 2 == Enum.count template.root.nodelist
-    assert [Fluid.Variables[name: name], <<string::binary>>] = template.root.nodelist
+    assert [%Fluid.Variables{name: name}, <<string::binary>>] = template.root.nodelist
     assert name == "funk"
     assert string == "  "
   end
@@ -76,7 +72,7 @@ defmodule Fluid.BlockTest do
   test "with custom tag" do
     Fluid.Registers.register("testtag", TestTag, Fluid.Tags)
     template = Fluid.Templates.parse( "{% testtag %}")
-    assert [Fluid.Tags[name: :testtag]] = template.root.nodelist
+    assert [%Fluid.Tags{name: :testtag}] = template.root.nodelist
   end
 
 end

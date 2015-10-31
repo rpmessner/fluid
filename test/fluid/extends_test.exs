@@ -1,4 +1,4 @@
-Code.require_file "../../test_helper.exs", __FILE__
+Code.require_file "../../test_helper.exs", __ENV__.file
 
 defmodule ExtendsTagTest do
   defmodule TestFileSystem do
@@ -41,11 +41,7 @@ defmodule ExtendsTagTest do
   setup_all do
     Fluid.start
     Fluid.FileSystem.register TestFileSystem
-    :ok
-  end
-
-  teardown_all do
-    Fluid.stop
+    on_exit fn -> Fluid.stop end
     :ok
   end
 
@@ -114,7 +110,7 @@ defmodule ExtendsTagTest do
   end
 
   defp assert_result(expected, markup, assigns) do
-    context = Fluid.Contexts[assigns: assigns]
+    context = %Fluid.Contexts{assigns: assigns}
     assert_result(expected, markup, context)
   end
 
