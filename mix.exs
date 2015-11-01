@@ -4,7 +4,10 @@ defmodule Fluid.Mixfile do
   def project do
     [ app: :fluid,
       version: "0.0.2",
-      deps: deps ]
+      elixir: "~> 1.0",
+      deps: deps,
+      name: "Fluid",
+      source_url: "https://github.com/nulian/fluid"]
   end
 
   # Configuration for the OTP application

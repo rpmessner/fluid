@@ -68,7 +68,6 @@ defmodule Fluid.TemplateTest do
 
   test :template_assigns_squash_preset_assigns do
     t = Templates.parse("{% assign foo = 'from instance assigns' %}{{ foo }}", [foo: "from preset assigns"])
-
     { :ok, rendered, _ } = Templates.render(t)
     assert "from instance assigns" == rendered
   end
