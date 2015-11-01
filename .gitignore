@@ -1,3 +1,5 @@
 /ebin
 /deps
+/_build
+/.idea
 erl_crash.dump
