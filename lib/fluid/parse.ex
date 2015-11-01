@@ -46,11 +46,10 @@ defmodule Fluid.Parse do
   end
 
   def parse(%Fluid.Blocks{name: name}, [], _, _) do
-    raise "No matching end for block {% #{to_string(name)} %}"
+    raise "No matching end for block {% #{Atom.to_string(name)} %}"
   end
 
   def parse(%Fluid.Blocks{name: name}=block, [h|t], accum, %Templates{}=template) do
-
     endblock = "end" <> to_string(name)
     cond do
       Regex.match?(~r/{%\s*#{endblock}\s*%}/, h) ->

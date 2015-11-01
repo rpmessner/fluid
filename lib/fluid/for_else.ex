@@ -9,11 +9,11 @@ defmodule Fluid.ForElse do
                         limit: nil, offset: nil, forloop: []
   end
 
-
+require IEx
   def syntax, do: ~r/(\w+)\s+in\s+(#{Fluid.quoted_fragment}+)\s*(reversed)?/
 
   def parse(%Blocks{}=block, %Fluid.Templates{}=t) do
-    block = parse_iterator(block) |> block.iterator
+    block = %{block | iterator: parse_iterator(block) }
     case Blocks.split(block) do
       { true_block, [_,false_block] } ->
         { block.nodelist(true_block).elselist(false_block), t }
@@ -24,7 +24,8 @@ defmodule Fluid.ForElse do
   defp parse_iterator(%Blocks{markup: markup}) do
     [[_,item|[collection|reversed]]] = Regex.scan(syntax, markup)
     collection = Variables.create(collection)
-    reversed   = !(reversed |> Enum.first |> is_nil)
+    IEx.pry
+    reversed   = !(reversed |> List.first |> is_nil)
     attributes = Fluid.tag_attributes |> Regex.scan(markup)
     limit      = attributes |> parse_attribute("limit") |> Variables.create
     offset     = attributes |> parse_attribute("offset", "0") |> Variables.create

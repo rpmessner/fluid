@@ -25,6 +25,8 @@ require IEx
 end
 
 defmodule Fluid.Inherit do
+  require IEx
+
   alias Fluid.Blocks, as: Blocks
   alias Fluid.Render, as: Render
   alias Fluid.Contexts, as: Contexts
@@ -38,7 +40,8 @@ defmodule Fluid.Inherit do
     name     = Fluid.quote_matcher |> Regex.replace(name, "") |> String.to_atom()
     blocks   = template.blocks |> Dict.put(name, block.nodelist)
     block    = if template.blocks[name] |> is_nil, do: block, else: block.nodelist([])
-    { [name: name] |> block.parts, blocks |> template.blocks }
+    IEx.pry
+    { [name: name] ++ block.parts, blocks ++ template.blocks }
   end
 
   def render(output, %Blocks{nodelist: []}, context), do: { output, context }
