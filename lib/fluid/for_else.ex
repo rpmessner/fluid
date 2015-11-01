@@ -9,14 +9,13 @@ defmodule Fluid.ForElse do
                         limit: nil, offset: nil, forloop: []
   end
 
-require IEx
   def syntax, do: ~r/(\w+)\s+in\s+(#{Fluid.quoted_fragment}+)\s*(reversed)?/
 
   def parse(%Blocks{}=block, %Fluid.Templates{}=t) do
     block = %{block | iterator: parse_iterator(block) }
     case Blocks.split(block) do
       { true_block, [_,false_block] } ->
-        { block.nodelist(true_block).elselist(false_block), t }
+        { %{block | nodelist: true_block, elselist: false_block}, t }
       { _, [] } -> { block, t }
     end
   end
@@ -24,14 +23,13 @@ require IEx
   defp parse_iterator(%Blocks{markup: markup}) do
     [[_,item|[collection|reversed]]] = Regex.scan(syntax, markup)
     collection = Variables.create(collection)
-    IEx.pry
     reversed   = !(reversed |> List.first |> is_nil)
     attributes = Fluid.tag_attributes |> Regex.scan(markup)
     limit      = attributes |> parse_attribute("limit") |> Variables.create
     offset     = attributes |> parse_attribute("offset", "0") |> Variables.create
     item       = item |> String.to_atom
-    Iterator[item: item, collection: collection,
-             limit: limit, offset: offset, reversed: reversed]
+    %Iterator{item: item, collection: collection,
+             limit: limit, offset: offset, reversed: reversed}
   end
 
   defp parse_attribute(attributes, name, default \\ "nil") do
@@ -56,10 +54,10 @@ require IEx
   defp each(output, [], %Blocks{}=block, %Contexts{}=context), do: { output, remember_limit(block, context) }
   defp each(output, [h|t]=list, %Blocks{iterator: it}=block, %Contexts{assigns: assigns}=context) do
     forloop = next_forloop(it, list |> Enum.count)
-    block   = block.iterator(forloop |> it.forloop)
+    block   = %{ block | iterator: %{it | forloop: forloop }}
     assigns = assigns |> Dict.put(:forloop, forloop) |> Dict.put(it.item, h)
     { output, block_context } = if should_render?(block, forloop, context) do
-      Render.render(output, block.nodelist, assigns |> context.assigns)
+      Render.render(output, block.nodelist, %{context | assigns: assigns})
       else { output, context }
     end
     case block_context do
@@ -73,7 +71,7 @@ require IEx
     limit      = limit || 0
     key        = it.collection.name |> String.to_atom
     remembered = context.offsets[key] || 0
-    context.offsets |> Dict.put(key, remembered + limit) |> context.offsets
+    %{ context | offsets: context.offsets |> Dict.put(key, remembered + limit) }
   end
 
   defp should_render?(%Blocks{iterator: %Iterator{}=it}, forloop, context) do
@@ -130,7 +128,7 @@ defmodule Fluid.Break do
   def parse(%Tags{}=tag, %Templates{}=template), do: { tag, template }
 
   def render(output, %Tags{}, %Contexts{}=context) do
-    { output, context.break(true) }
+    { output, %{context | break: true } }
   end
 end
 
@@ -141,6 +139,6 @@ defmodule Fluid.Continue do
   def parse(%Tags{}=tag, template), do: { tag, template }
 
   def render(output, %Tags{}, %Contexts{}=context) do
-    { output, context.continue(true) }
+    { output, %{context | continue: true } }
   end
 end

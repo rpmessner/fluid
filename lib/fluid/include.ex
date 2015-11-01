@@ -13,15 +13,13 @@ require IEx
     [parts|_]  = syntax |> Regex.scan(markup)
     tag        = parse_tag(tag, parts)
     attributes = parse_attributes(markup)
-    { %{tag | attributes: attributes ++ tag.attributes }, template }
+    { %{tag | attributes: attributes }, template }
   end
 
   defp parse_tag(%Tags{}=tag, parts) do
     case parts do
       [_, name] -> %{tag | parts: [name: name |> Variables.create]}
-      [_, name," with "<>_,v] ->
-        IEx.pry
-        %{tag | parts: [name: name |> Variables.create , variable: v |> Variables.create]}
+      [_, name," with "<>_,v] -> %{tag | parts: [name: name |> Variables.create , variable: v |> Variables.create]}
       [_, name," for "<>_,v] -> %{tag | parts: [name: name |> Variables.create, foreach: v |> Variables.create]}
     end
   end
@@ -38,7 +36,6 @@ require IEx
     { :ok, source } = file_system.read_template_file(root, name, context)
     presets = build_presets(tag, context)
     t = Templates.parse(source, presets)
-    IEx.pry
     t = %{ t | blocks: context.template.blocks |> Dict.merge(t.blocks) }
     key = name |> String.to_atom()
     cond do
@@ -75,8 +72,7 @@ require IEx
 
   defp render_item(output, key, item, template, %Contexts{}=context) do
     assigns = context.assigns |> Dict.merge([{ key, item }])
-    IEx.pry
-    { :ok, rendered, _ } = Templates.render(template, assigns ++ context.assigns)
+    { :ok, rendered, _ } = Templates.render(template, %{context | assigns: assigns })
     { output ++ [rendered], context }
   end
 

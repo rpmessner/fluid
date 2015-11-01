@@ -1,5 +1,4 @@
 defmodule Fluid.Render do
-  require IEx
   alias Fluid.Variables, as: Variables
   alias Fluid.Templates, as: Templates
   alias Fluid.Registers, as: Registers
@@ -16,7 +15,6 @@ defmodule Fluid.Render do
     { output, context }
   end
   def render(output, [h|t], %Contexts{}=context) do
-    IEx.pry
     { output, context } = render(output, h, context)
     case context do
       %Contexts{extended: false, break: false, continue: false} -> render(output, t, context)
@@ -39,7 +37,6 @@ defmodule Fluid.Render do
   end
 
   def render(output, %Blocks{name: name}=block, %Contexts{}=context) do
-    IEx.pry
     case Registers.lookup(name) do
       { mod, Blocks } -> mod.render(output, block, context)
       nil -> render(output, block.nodelist, context)

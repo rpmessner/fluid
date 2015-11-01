@@ -12,7 +12,7 @@ defmodule Fluid.IfElse do
   alias Fluid.Conditions, as: Conditions
   alias Fluid.Render, as: Render
   alias Fluid.Blocks, as: Blocks
-require IEx
+
   def syntax, do: ~r/(#{Fluid.quoted_fragment})\s*([=!<>a-z_]+)?\s*(#{Fluid.quoted_fragment})?/
   def expressions_and_operators do
     ~r/(?:\b(?:\s?and\s?|\s?or\s?)\b|(?:\s*(?!\b(?:\s?and\s?|\s?or\s?)\b)(?:#{Fluid.quoted_fragment}|\S+)\s*)+)/
@@ -23,11 +23,9 @@ require IEx
     case Blocks.split(block, [:else, :elsif]) do
       { true_block, [%Fluid.Tags{name: :elsif, markup: markup}|elsif_block] } ->
         { elseif, t } = %Fluid.Blocks{name: :if, markup: markup, nodelist: elsif_block} |> parse(t)
-        IEx.pry
-        { %{block | nodelist: block.nodelist ++ true_block, elselist: block.elselist ++ [elseif] }, t }
+        { %{block | nodelist: true_block, elselist: [elseif] }, t }
       { true_block, [%Fluid.Tags{name: :else}|false_block] } ->
-        IEx.pry
-        { %{block | nodelist: block.nodelist ++ true_block, elselist: block.elselist ++ false_block}, t }
+        { %{block | nodelist: true_block, elselist: false_block}, t }
       { _, [] } ->
         { block, t }
     end
@@ -40,7 +38,6 @@ require IEx
   def render(output, %Fluid.Blocks{condition: condition, nodelist: nodelist, elselist: elselist}, context) do
     condition = Conditions.evaluate(condition, context)
     conditionlist = if condition, do: nodelist, else: elselist
-    IEx.pry
     Render.render(output, conditionlist, context)
   end
 

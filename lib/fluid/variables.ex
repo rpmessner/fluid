@@ -1,6 +1,5 @@
 defmodule Fluid.Variables do
   defstruct name: nil, literal: nil, filters: [], parts: []
-  require IEx
   alias Fluid.Filters, as: Filters
   alias Fluid.Variables, as: Variables
   alias Fluid.Variables, as: Variables
@@ -37,7 +36,7 @@ defmodule Fluid.Variables do
       true ->
         [name|_] = String.split(name, " ")
         parts = Regex.scan(Fluid.variable_parser, name) |> List.flatten
-        %{variable | parts: variable.parts ++ parts}
+        %{variable | parts: parts}
     end
   end
 
@@ -85,7 +84,6 @@ defmodule Fluid.Variables do
     return = Dict.get(current, key)
     cond do
       is_function(return) ->
-        IEx.pry
         return = return.()
         { return, context.assigns |> Dict.put(key, return) |> context.assigns }
       true -> { return, context }

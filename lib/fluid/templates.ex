@@ -1,6 +1,5 @@
 defmodule Fluid.Templates do
   defstruct root: nil, presets: [], blocks: []
-require IEx
   alias Fluid.Templates, as: Templates
   alias Fluid.Render, as: Render
   alias Fluid.Contexts, as: Contexts
@@ -13,9 +12,8 @@ require IEx
   end
 
   def render(%Templates{}=t, %Contexts{}=c) do
-    c = %{c | blocks: t.blocks ++ c.blocks}
-    c = %{c | presets: t.presets ++ c.presets }
-    IEx.pry
+    c = %{c | blocks: t.blocks }
+    c = %{c | presets: t.presets }
     c = %{c | template: t }
     Render.render(t, c)
   end
