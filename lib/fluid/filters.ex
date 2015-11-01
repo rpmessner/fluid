@@ -10,8 +10,6 @@ defmodule Fluid.Filters do
     end
   end
 
-  alias Fluid.Variables, as: Variables
-
   def parse(<<markup::binary>>) do
     [name|filters] = Regex.scan(Fluid.filter_parser, markup)
       |> List.flatten
