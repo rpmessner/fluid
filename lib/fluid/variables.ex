@@ -82,11 +82,6 @@ defmodule Fluid.Variables do
   defp resolve(<<name::binary>>, current, %Contexts{}=context) when is_list(current) do
     key    = String.to_atom(name)
     return = Dict.get(current, key)
-    cond do
-      is_function(return) ->
-        return = return.()
-        { return, context.assigns |> Dict.put(key, return) |> context.assigns }
-      true -> { return, context }
-    end
+    { return, context }
   end
 end

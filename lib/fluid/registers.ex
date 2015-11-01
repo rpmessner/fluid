@@ -41,6 +41,10 @@ defmodule Fluid.Registers do
     { :stop, :normal, :ok, dict }
   end
 
+  def start_link(opts \\ []) do
+    GenServer.start_link(__MODULE__, :ok, opts)
+  end
+
   def start do
     :gen_server.start({ :local, __MODULE__ }, __MODULE__, default_tags, [])
   end

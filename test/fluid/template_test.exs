@@ -2,14 +2,13 @@ Code.require_file "../../test_helper.exs", __ENV__.file
 
 defmodule Fluid.TemplateTest do
   use ExUnit.Case
-  require IEx
+
   alias Fluid.Templates, as: Templates
   alias Fluid.Parse, as: Parse
 
   setup_all do
-    Fluid.start
-    on_exit fn -> Fluid.stop end
-    :ok
+    {:ok, registry } = Fluid.start
+    {:ok, registry: registry}
   end
 
   test :tokenize_strings do
@@ -70,15 +69,6 @@ defmodule Fluid.TemplateTest do
     t = Templates.parse("{% assign foo = 'from instance assigns' %}{{ foo }}", [foo: "from preset assigns"])
     { :ok, rendered, _ } = Templates.render(t)
     assert "from instance assigns" == rendered
-  end
-
-  test :lambda_is_called_once_assigns_between_renders do
-    t = Templates.parse("{{number}}")
-    assigns = [number: fn -> LocalState.increment; LocalState.get end]
-    { :ok, rendered, context } = Templates.render(t, assigns)
-    assert rendered == "1"
-    { :ok, rendered, _ } = Templates.render(t, context)
-    assert rendered == "1"
   end
 
 end
