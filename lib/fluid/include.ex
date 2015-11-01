@@ -6,22 +6,23 @@ defmodule Fluid.Include do
   alias Fluid.Templates, as: Templates
   alias Fluid.Variables, as: Variables
   alias Fluid.FileSystem, as: FileSystem
-
+require IEx
   def syntax, do: ~r/(#{Fluid.quoted_fragment}+)(\s+(?:with|for)\s+(#{Fluid.quoted_fragment}+))?/
 
   def parse(%Tags{markup: markup}=tag, %Templates{}=template) do
     [parts|_]  = syntax |> Regex.scan(markup)
     tag        = parse_tag(tag, parts)
     attributes = parse_attributes(markup)
-    { attributes |> tag.attributes, template }
+    { %{tag | attributes: attributes ++ tag.attributes }, template }
   end
 
   defp parse_tag(%Tags{}=tag, parts) do
     case parts do
-      [_, name] -> tag.parts(name: name |> Variables.create)
-      [_, name," with "<>_,v] -> tag.parts(name: name |> Variables.create, variable: v |> Variables.create)
-      [_, name," for "<>_,v] ->
-        tag.parts(name: name |> Variables.create, foreach: v |> Variables.create)
+      [_, name] -> %{tag | parts: [name: name |> Variables.create]}
+      [_, name," with "<>_,v] ->
+        IEx.pry
+        %{tag | parts: [name: name |> Variables.create , variable: v |> Variables.create]}
+      [_, name," for "<>_,v] -> %{tag | parts: [name: name |> Variables.create, foreach: v |> Variables.create]}
     end
   end
 
@@ -37,7 +38,8 @@ defmodule Fluid.Include do
     { :ok, source } = file_system.read_template_file(root, name, context)
     presets = build_presets(tag, context)
     t = Templates.parse(source, presets)
-    t = context.template.blocks |> Dict.merge(t.blocks) |> t.blocks
+    IEx.pry
+    t = %{ t | blocks: context.template.blocks |> Dict.merge(t.blocks) }
     key = name |> String.to_atom()
     cond do
       !is_nil(parts[:variable]) ->
@@ -73,7 +75,8 @@ defmodule Fluid.Include do
 
   defp render_item(output, key, item, template, %Contexts{}=context) do
     assigns = context.assigns |> Dict.merge([{ key, item }])
-    { :ok, rendered, _ } = Templates.render(template, assigns |> context.assigns)
+    IEx.pry
+    { :ok, rendered, _ } = Templates.render(template, assigns ++ context.assigns)
     { output ++ [rendered], context }
   end
 

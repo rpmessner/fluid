@@ -54,6 +54,6 @@ defmodule Fluid.IfElse do
     expressions = Regex.scan(expressions_and_operators, markup)
     expressions = expressions |> split_conditions |> Enum.reverse
     condition   = Conditions.create(expressions)
-    block.condition(condition)
+    %{block | condition: condition }
   end
 end

@@ -22,12 +22,17 @@ defmodule Fluid.Variables do
     key = name |> String.strip |> String.to_atom
     variable = %Fluid.Variables{name: name, filters: filters}
     cond do
-      literals      |> Dict.has_key?(key) -> literals |> Dict.get(key) |> variable.literal
-      integer       |> Regex.match?(name) -> name |> String.to_integer  |> variable.literal
-      float         |> Regex.match?(name) -> name |> String.to_float |> variable.literal
+      literals      |> Dict.has_key?(key) ->
+        value = literals |> Dict.get(key)
+        %{variable | literal: value }
+      integer       |> Regex.match?(name) ->
+        value = name |> String.to_integer
+        %{variable | literal: value }
+      float         |> Regex.match?(name) ->
+        value = name |> String.to_float
+        %{variable | literal: value }
       quoted_string |> Regex.match?(name) ->
-        IEx.pry
-        unquoted_name = Fluid.quote_matcher |> Regex.replace(name, "") 
+        unquoted_name = Fluid.quote_matcher |> Regex.replace(name, "")
         %{ variable | literal: unquoted_name }
       true ->
         [name|_] = String.split(name, " ")
@@ -80,6 +85,7 @@ defmodule Fluid.Variables do
     return = Dict.get(current, key)
     cond do
       is_function(return) ->
+        IEx.pry
         return = return.()
         { return, context.assigns |> Dict.put(key, return) |> context.assigns }
       true -> { return, context }

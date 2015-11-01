@@ -1,7 +1,7 @@
 defmodule Fluid.Conditions do
   defstruct left: nil, operator: nil, right: nil,
               child_operator: nil, child_condition: nil
-
+require IEx
   alias Fluid.Contexts, as: Contexts
   alias Fluid.Variables, as: Variables
   alias Fluid.Conditions, as: Cond
@@ -14,7 +14,7 @@ defmodule Fluid.Conditions do
 
   def create(<<left::binary>>) do
     left = Vars.create(left)
-    Cond[left: left]
+    %Cond{left: left}
   end
 
   def create({ <<left::binary>>, operator, <<right::binary>> }) do
@@ -22,6 +22,7 @@ defmodule Fluid.Conditions do
   end
 
   def create({ %Variables{}=left, operator, <<right::binary>> }) do
+
     create({ left, operator, right |> Vars.create})
   end
 
@@ -30,8 +31,9 @@ defmodule Fluid.Conditions do
   end
 
   def create({ %Variables{}=left, operator, %Variables{}=right }) do
+
     operator = String.to_atom(operator)
-    Cond[left: left, operator: operator, right: right]
+    %Cond{left: left, operator: operator, right: right}
   end
 
   def create(condition, []), do: condition
@@ -43,7 +45,7 @@ defmodule Fluid.Conditions do
 
   def join(operator, condition, { _, _, _ }=right), do: join(operator, condition, right |> create)
   def join(operator, condition, %Cond{}=right) do
-    right.child_condition(condition).child_operator(operator)
+    %{right | child_condition: condition, child_operator: operator}
   end
 
   def evaluate(%Cond{}=condition), do: evaluate(condition, %Contexts{})

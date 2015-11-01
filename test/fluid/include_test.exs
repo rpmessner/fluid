@@ -46,7 +46,7 @@ defmodule IncludeTagTest do
   test :include_tag_looks_for_file_system_in_registers_first do
     assert_result "from OtherFileSystem",
                   "{% include 'pick_a_source' %}",
-                  Contexts[registers: [file_system: { OtherFileSystem, "" }]]
+                  %Contexts{registers: [file_system: { OtherFileSystem, "" }]}
   end
 
   test :include_tag_with do

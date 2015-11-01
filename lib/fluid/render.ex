@@ -9,12 +9,10 @@ defmodule Fluid.Render do
 
   def render(%Templates{root: root}, %Contexts{}=context) do
     { output, context } = render([], root, context)
-    IEx.pry
     { :ok, Enum.join(output), context }
   end
 
   def render(output, [], %Contexts{}=context) do
-    IEx.pry
     { output, context }
   end
   def render(output, [h|t], %Contexts{}=context) do
@@ -30,19 +28,16 @@ defmodule Fluid.Render do
   end
 
   def render(output, %Variables{}=v, %Contexts{}=context) do
-    IEx.pry
     { rendered, context } = Variables.lookup(v, context)
     { output ++ [rendered], context }
   end
 
   def render(output, %Tags{name: name}=tag, %Contexts{}=context) do
-    IEx.pry
     { mod, Tags } = Registers.lookup(name)
     mod.render(output, tag, context)
   end
 
   def render(output, %Blocks{name: name}=block, %Contexts{}=context) do
-    IEx.pry
     case Registers.lookup(name) do
       { mod, Blocks } -> mod.render(output, block, context)
       nil -> render(output, block.nodelist, context)

@@ -18,7 +18,7 @@ defmodule Fluid.Parse do
   end
 
   defp parse_node(<<name::binary>>, rest, %Templates{}=template) do
-    IEx.pry
+
     case Regex.named_captures(Fluid.parser, name) do
       %{"tag" => "", "variable" => <<markup::binary>>} ->
         { Variables.create(markup), rest, template }
@@ -31,7 +31,7 @@ defmodule Fluid.Parse do
             { block, template } = mod.parse(block, template)
             { block, rest, template }
           { mod, Fluid.Tags } ->
-            IEx.pry
+
             tag = Fluid.Tags.create(markup)
             { tag, template } = mod.parse(tag, template)
             { tag, rest, template }
@@ -50,7 +50,7 @@ defmodule Fluid.Parse do
   end
 
   def parse(%Fluid.Blocks{name: name}=block, [h|t], accum, %Templates{}=template) do
-    IEx.pry
+
     endblock = "end" <> to_string(name)
     cond do
       Regex.match?(~r/{%\s*#{endblock}\s*%}/, h) ->
@@ -59,7 +59,7 @@ defmodule Fluid.Parse do
         raise "Unmatched block close: #{h}"
       true ->
         { result, rest, template } = parse_node(h, t, template)
-        IEx.pry
+
         parse(block, rest, accum ++ [result], template)
     end
   end

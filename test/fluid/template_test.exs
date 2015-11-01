@@ -51,7 +51,7 @@ defmodule Fluid.TemplateTest do
 
   test :custom_assigns_do_not_persist_on_same_template do
     t = Templates.parse("{{ foo }}")
-    IEx.pry
+
     { :ok, rendered, _ } = Templates.render(t, [foo: "from custom assigns"])
     assert "from custom assigns" == rendered
     { :ok, rendered, _ } = Templates.render(t)
@@ -68,7 +68,7 @@ defmodule Fluid.TemplateTest do
 
   test :template_assigns_squash_preset_assigns do
     t = Templates.parse("{% assign foo = 'from instance assigns' %}{{ foo }}", [foo: "from preset assigns"])
-    IEx.pry
+
     { :ok, rendered, _ } = Templates.render(t)
     assert "from instance assigns" == rendered
   end

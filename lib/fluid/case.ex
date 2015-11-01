@@ -1,4 +1,5 @@
 defmodule Fluid.Case do
+  require IEx
   alias Fluid.Tags, as: Tags
   alias Fluid.Blocks, as: Blocks
   alias Fluid.Blocks, as: Blocks
@@ -10,7 +11,7 @@ defmodule Fluid.Case do
   alias Fluid.Conditions, as: Conditions
 
   def syntax, do: ~r/(#{Fluid.quoted_fragment})/
-  def when_syntax, do: ~r/(#{Fluid.quoted_fragment})(?:(?:\s+or\s+|\s*\,\s*)(#{Fluid.quoted_fragment}.*))?/g
+  def when_syntax, do: ~r/(#{Fluid.quoted_fragment})(?:(?:\s+or\s+|\s*\,\s*)(#{Fluid.quoted_fragment}.*))?/
 
   def parse(%Blocks{markup: markup}=b, %Templates{}=t) do
     [[_, name]] = syntax |> Regex.scan(markup)
@@ -23,11 +24,12 @@ defmodule Fluid.Case do
   defp split(%Variables{}=v, [%Fluid.Tags{name: :when, markup: markup}|t]) do
     { nodelist, t } = Blocks.split(t, [:when, :else])
     condition = parse_condition(v, markup)
-    Blocks[name: :if, nodelist: nodelist, condition: condition, elselist: split(v, t)]
+    %Blocks{name: :if, nodelist: nodelist, condition: condition, elselist: split(v, t)}
   end
 
   defp parse_condition(%Variables{}=v, <<markup::binary>>) do
     { h, t } = parse_when(markup)
+
     parse_condition(v, Conditions.create({v, "==", h}), t)
   end
 

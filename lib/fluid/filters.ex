@@ -1,4 +1,5 @@
 defmodule Fluid.Filters do
+  require IEx
   defmodule Functions do
     def split(<<string::binary>>, <<separator::binary>>) do
       String.split(string, separator)
@@ -22,7 +23,8 @@ defmodule Fluid.Filters do
         |> Regex.scan(markup)
         |> List.flatten
         |> Fluid.List.even_elements
-      [filter.to_atom(:utf8), args]
+
+      [String.to_atom(filter), args]
     end)
     [name|filters]
   end

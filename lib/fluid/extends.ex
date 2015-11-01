@@ -6,20 +6,21 @@ defmodule Fluid.Extends do
   alias Fluid.Templates, as: Templates
   alias Fluid.Templates, as: Templates
   alias Fluid.FileSystem, as: FileSystem
-
+require IEx
   def syntax, do: ~r/(#{Fluid.quoted_fragment}+)/
 
   def parse(%Tags{markup: markup}, %Templates{}=template) do
     [[_, extended]] = syntax |> Regex.scan(markup)
     { :ok, extended } = extended |> FileSystem.read_template_file
     extended = extended |> Templates.parse
-    template = extended.blocks |> Dict.merge(template.blocks) |> template.blocks
-    { :extended |> extended.root.name,  template }
+    %{template | blocks: extended.blocks |> Dict.merge(template.blocks) }
+
+    { %{extended.root | name: :extended },  template }
   end
 
   def render(_output, %Blocks{}=block, %Contexts{}=context) do
     { output, context } = Render.render([], block.nodelist, context)
-    { output, context.extended(true) }
+    { output, %{context | extended: true} }
   end
 end
 
