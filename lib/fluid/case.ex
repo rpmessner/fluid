@@ -6,8 +6,6 @@ defmodule Fluid.Case do
   alias Fluid.Contexts, as: Contexts
   alias Fluid.Templates, as: Templates
   alias Fluid.Variables, as: Variables
-  alias Fluid.Variables, as: Variables
-  alias Fluid.Conditions, as: Conditions
   alias Fluid.Conditions, as: Conditions
 
   def syntax, do: ~r/(#{Fluid.quoted_fragment})/
@@ -50,7 +48,6 @@ end
 
 defmodule Fluid.When do
   alias Fluid.Tags, as: Tags
-  alias Fluid.Contexts, as: Contexts
   alias Fluid.Templates, as: Templates
 
   def parse(%Tags{}=tag, %Templates{}=t), do: { tag, t }
