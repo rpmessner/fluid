@@ -2,7 +2,6 @@ defmodule Fluid.Case do
   require IEx
   alias Fluid.Tags, as: Tags
   alias Fluid.Blocks, as: Blocks
-  alias Fluid.Contexts, as: Contexts
   alias Fluid.Templates, as: Templates
   alias Fluid.Variables, as: Variables
   alias Fluid.Conditions, as: Conditions

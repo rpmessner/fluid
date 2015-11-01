@@ -4,7 +4,6 @@ defmodule ConditionTest do
   use ExUnit.Case
 
   alias Fluid.Conditions, as: Conditions
-  alias Fluid.Conditions, as: Cond
 
   test :basic_condition do
     assert_evaluates_false "1", "==", "2"

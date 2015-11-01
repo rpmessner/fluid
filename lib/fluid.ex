@@ -39,8 +39,6 @@ defmodule Fluid do
     def even_elements([_,h|t]) do
       [h] ++ even_elements(t)
     end
-    def even_elements([_,h]), do: [h]
-    def even_elements([_]), do: []
     def even_elements([]), do: []
   end
 end
