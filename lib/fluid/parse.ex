@@ -2,7 +2,6 @@ defmodule Fluid.Parse do
   alias Fluid.Templates, as: Templates
   alias Fluid.Variables, as: Variables
   alias Fluid.Registers, as: Registers
-  alias Fluid.Filters, as: Filters
 
   def tokenize(<<string::binary>>) do
     Regex.split(Fluid.tokenizer, string, on: :all_but_first, trim: true)
