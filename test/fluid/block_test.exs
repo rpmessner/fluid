@@ -13,7 +13,6 @@ defmodule Fluid.BlockTest do
 
   setup_all do
     Fluid.start
-    on_exit fn -> Fluid.stop end
     :ok
   end
 
