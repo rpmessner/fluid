@@ -16,7 +16,9 @@ defmodule Fluid.Registers do
      case:           { Fluid.Case,     Fluid.Blocks },
      when:           { Fluid.When,     Fluid.Tags },
      for:            { Fluid.ForElse,  Fluid.Blocks },
-     if:             { Fluid.IfElse,   Fluid.Blocks }]
+     if:             { Fluid.IfElse,   Fluid.Blocks },
+     unless:         { Fluid.Unless,   Fluid.Blocks},
+     raw:            { Fluid.Raw,      Fluid.Blocks}]
   end
 
   def handle_cast({ :register, <<name::binary>>, module, tag }, dict) do

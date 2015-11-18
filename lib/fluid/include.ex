@@ -6,7 +6,7 @@ defmodule Fluid.Include do
   alias Fluid.Templates, as: Templates
   alias Fluid.Variables, as: Variables
   alias Fluid.FileSystem, as: FileSystem
-require IEx
+
   def syntax, do: ~r/(#{Fluid.quoted_fragment}+)(\s+(?:with|for)\s+(#{Fluid.quoted_fragment}+))?/
 
   def parse(%Tags{markup: markup}=tag, %Templates{}=template) do

@@ -2,7 +2,7 @@ defmodule Fluid.Assign do
   alias Fluid.Variables, as: Variables
   alias Fluid.Tags, as: Tags
   alias Fluid.Contexts, as: Contexts
-require IEx
+
   def syntax, do: ~r/([\w\-]+)\s*=\s*(.*)\s*/
 
   def parse(%Tags{}=tag, %Fluid.Templates{}=template), do: { tag, template }

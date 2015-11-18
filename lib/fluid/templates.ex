@@ -19,6 +19,7 @@ defmodule Fluid.Templates do
   end
 
   def parse(<<markup::binary>>, presets \\ []) do
+
     Fluid.Parse.parse(markup, %Templates{presets: presets})
   end
 

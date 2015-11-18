@@ -1,5 +1,5 @@
 defmodule Fluid.Case do
-  require IEx
+
   alias Fluid.Tags, as: Tags
   alias Fluid.Blocks, as: Blocks
   alias Fluid.Templates, as: Templates

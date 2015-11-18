@@ -1,5 +1,5 @@
 defmodule Fluid.Filters do
-  require IEx
+
   defmodule Functions do
     def split(<<string::binary>>, <<separator::binary>>) do
       String.split(string, separator)

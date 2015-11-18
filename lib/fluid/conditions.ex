@@ -1,7 +1,7 @@
 defmodule Fluid.Conditions do
   defstruct left: nil, operator: nil, right: nil,
               child_operator: nil, child_condition: nil
-require IEx
+
   alias Fluid.Contexts, as: Contexts
   alias Fluid.Variables, as: Variables
   alias Fluid.Conditions, as: Cond

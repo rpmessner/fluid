@@ -1,6 +1,6 @@
 defmodule Fluid.Blocks do
   defstruct name: nil, markup: nil, condition: nil, parts: [], iterator: [], nodelist: [], elselist: []
-require IEx
+
   alias Fluid.Tags, as: Tags
   alias Fluid.Blocks, as: Blocks
 

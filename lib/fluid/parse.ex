@@ -11,11 +11,27 @@ defmodule Fluid.Parse do
 
   def parse(<<string::binary>>, %Templates{}=template) do
     tokens = tokenize(string)
+    [name|_] = tokens
+    %{ "tag" => tag_name, "variable" => _ } = Regex.named_captures(Fluid.parser, name)
+    tokens = parse_tokens(string, tag_name)
     { root, template } = parse(%Fluid.Blocks{name: :document}, tokens, [], template)
     %{ template | root: root }
   end
 
+  defp parse_tokens(<<string::binary>>, tag_name) do
+    case Registers.lookup(tag_name) do
+      {mod, Fluid.Blocks} ->
+        try do
+          mod.tokenize(string)
+        rescue
+          NoMethodError ->
+        end
+      _ ->
+    end
+  end
+
   defp parse_node(<<name::binary>>, rest, %Templates{}=template) do
+
     case Regex.named_captures(Fluid.parser, name) do
       %{"tag" => "", "variable" => <<markup::binary>>} ->
         { Variables.create(markup), rest, template }
@@ -23,8 +39,14 @@ defmodule Fluid.Parse do
         [name|_] = String.split(markup, " ")
         case Registers.lookup(name) do
           { mod, Fluid.Blocks } ->
+
             block = Fluid.Blocks.create(markup)
-            { block, rest, template } = parse(block, rest, [], template)
+            { block, rest, template } = try do
+                mod.parse(block, rest, [], template)
+              rescue
+                NoMethodError -> parse(block, rest, [], template)
+              end
+
             { block, template } = mod.parse(block, template)
             { block, rest, template }
           { mod, Fluid.Tags } ->
@@ -43,10 +65,11 @@ defmodule Fluid.Parse do
   end
 
   def parse(%Fluid.Blocks{name: name}, [], _, _) do
-    raise "No matching end for block {% #{Atom.to_string(name)} %}"
+    raise "No matching end for block {% #{to_string(name)} %}"
   end
 
   def parse(%Fluid.Blocks{name: name}=block, [h|t], accum, %Templates{}=template) do
+
     endblock = "end" <> to_string(name)
     cond do
       Regex.match?(~r/{%\s*#{endblock}\s*%}/, h) ->
@@ -54,6 +77,7 @@ defmodule Fluid.Parse do
       Regex.match?(~r/{%\send.*?\s*$}/, h) ->
         raise "Unmatched block close: #{h}"
       true ->
+
         { result, rest, template } = parse_node(h, t, template)
 
         parse(block, rest, accum ++ [result], template)
