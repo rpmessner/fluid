@@ -1,11 +1,11 @@
 Code.require_file "../../test_helper.exs", __ENV__.file
 
-defmodule Fluid.UnlessTest do
+defmodule Liquescent.UnlessTest do
   use ExUnit.Case
-  alias Fluid.Templates, as: Templates
+  alias Liquescent.Templates
 
   setup_all do
-    Fluid.start
+    Liquescent.start
     :ok
   end
 
