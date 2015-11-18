@@ -20,10 +20,10 @@ defmodule FileSystemTest do
     FileSystem.register Liquescent.LocalFileSystem, "/some/path"
 
     { :ok, path } = FileSystem.full_path("mypartial")
-    assert "/some/path/_mypartial.liquiscent" == path
+    assert "/some/path/_mypartial.liquescent" == path
 
     { :ok, path } = FileSystem.full_path("dir/mypartial")
-    assert "/some/path/dir/_mypartial.liquiscent" == path
+    assert "/some/path/dir/_mypartial.liquescent" == path
 
     { :error, _reason } = FileSystem.full_path("../dir/mypartial")
 

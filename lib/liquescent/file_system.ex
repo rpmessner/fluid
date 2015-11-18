@@ -13,9 +13,9 @@ defmodule Liquescent.LocalFileSystem do
     full_path = cond do
       Regex.match?(~r/\//, template_path) ->
         root |> Path.join(template_path |> Path.dirname)
-             |> Path.join("_#{template_path |> Path.basename}.liquiscent")
+             |> Path.join("_#{template_path |> Path.basename}.liquescent")
       true ->
-        root |> Path.join("_#{template_path}.liquiscent")
+        root |> Path.join("_#{template_path}.liquescent")
     end
     cond do
       !Regex.match?(~r/^[^.\/][a-zA-Z0-9_\/]+$/, template_path) ->

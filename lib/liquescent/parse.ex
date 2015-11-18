@@ -14,7 +14,7 @@ defmodule Liquescent.Parse do
     tokens = tokenize(string)
     [name|_] = tokens
     %{ "tag" => tag_name, "variable" => _ } = Regex.named_captures(Liquescent.parser, name)
-    tokens = parse_tokens(string, tag_name)
+    tokens = parse_tokens(string, tag_name) || tokens
     { root, template } = parse(%Liquescent.Blocks{name: :document}, tokens, [], template)
     %{ template | root: root }
   end
@@ -32,7 +32,6 @@ defmodule Liquescent.Parse do
   end
 
   defp parse_node(<<name::binary>>, rest, %Templates{}=template) do
-
     case Regex.named_captures(Liquescent.parser, name) do
       %{"tag" => "", "variable" => <<markup::binary>>} ->
         { Variables.create(markup), rest, template }
@@ -45,13 +44,11 @@ defmodule Liquescent.Parse do
             { block, rest, template } = try do
                 mod.parse(block, rest, [], template)
               rescue
-                NoMethodError -> parse(block, rest, [], template)
+                UndefinedFunctionError -> parse(block, rest, [], template)
               end
-
             { block, template } = mod.parse(block, template)
             { block, rest, template }
           { mod, Liquescent.Tags } ->
-
             tag = Liquescent.Tags.create(markup)
             { tag, template } = mod.parse(tag, template)
             { tag, rest, template }
@@ -78,9 +75,7 @@ defmodule Liquescent.Parse do
       Regex.match?(~r/{%\send.*?\s*$}/, h) ->
         raise "Unmatched block close: #{h}"
       true ->
-
         { result, rest, template } = parse_node(h, t, template)
-
         parse(block, rest, accum ++ [result], template)
     end
   end
