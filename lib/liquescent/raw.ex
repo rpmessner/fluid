@@ -4,13 +4,7 @@ defmodule Liquescent.Raw do
   alias Liquescent.Contexts
   alias Liquescent.Render
 
-  def syntax, do: ~r/\A\s*\z/
   def full_token_possibly_invalid, do: ~r/\A(.*)#{Liquescent.tag_start}\s*(\w+)\s*(.*)?#{Liquescent.tag_end}\z/m
-
-  def tokenize(<<string::binary>>) do
-    Regex.split(Liquescent.template_parser, string, on: :all_but_first, trim: true)
-      |> List.flatten
-  end
 
   def parse(%Liquescent.Blocks{name: name}=block, [h|t], accum, %Templates{}=template) do
     if Regex.match?(Liquescent.Raw.full_token_possibly_invalid, h) do
