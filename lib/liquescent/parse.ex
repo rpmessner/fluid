@@ -13,7 +13,7 @@ defmodule Liquescent.Parse do
   def parse(<<string::binary>>, %Templates{}=template) do
     tokens = tokenize(string)
     [name|_] = tokens
-    %{ "tag" => tag_name, "variable" => _ } = Regex.named_captures(Liquescent.parser, name)
+    tag_name = parse_tag_name(name)
     tokens = parse_tokens(string, tag_name) || tokens
     { root, template } = parse(%Liquescent.Blocks{name: :document}, tokens, [], template)
     %{ template | root: root }
@@ -27,6 +27,13 @@ defmodule Liquescent.Parse do
         rescue
           NoMethodError ->
         end
+      _ ->
+    end
+  end
+
+  defp parse_tag_name(name) do
+    case Regex.named_captures(Liquescent.parser, name) do
+      %{"tag" => tag_name, "variable" => _ } -> tag_name
       _ ->
     end
   end
