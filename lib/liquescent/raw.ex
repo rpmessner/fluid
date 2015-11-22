@@ -14,21 +14,20 @@ defmodule Liquescent.Raw do
 
   def parse(%Liquescent.Blocks{name: name}=block, [h|t], accum, %Templates{}=template) do
     if Regex.match?(Liquescent.Raw.full_token_possibly_invalid, h) do
-
+      block_delimiter = "end" <> to_string(name)
       [ extra_data, endblock | _ ] = Regex.scan(Liquescent.Raw.full_token_possibly_invalid, h, capture: :all_but_first)
         |> List.flatten
-      if extra_data != "" do
-
-        block = %{ block | nodelist: accum ++ [extra_data] }
-      end
-      block_delimiter = "end" <> to_string(name)
       if block_delimiter == endblock do
+        block = %{ block | nodelist: (accum ++ [extra_data]) |> Enum.filter(&(&1 != "")) }
         { block, t, template }
       else
-        raise "No matching end for block {% #{to_string(name)} %}"
+        if length(t) > 0 do
+          parse(block, t, accum ++ [h], template)
+        else
+          raise "No matching end for block {% #{to_string(name)} %}"
+        end
       end
     else
-
       parse(block, t, accum ++ [h], template)
     end
   end

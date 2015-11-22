@@ -30,10 +30,6 @@ defmodule Liquescent.RawTest do
     assert_template_result " Foobar {{ invalid 1", "{% raw %} Foobar {{ invalid {% endraw %}{{ 1 }}"
   end
 
-  test :test_raw_more do
-    assert_template_result " Foobar {{ invalid 1", "{% raw %} Foobar {{ invalid {% endraw %}{{ 1 }}"
-  end
-
   # test :test_invalid_raw do
   #   assert_match_syntax_error ~r/tag was never closed/, "{% raw %} foo"
   #   assert_match_syntax_error ~r/Valid syntax/, "{% raw } foo {% endraw %}"
