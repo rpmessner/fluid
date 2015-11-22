@@ -5,7 +5,7 @@ defmodule Liquescent.Parse do
   alias Liquescent.Blocks
 
   def tokenize(<<string::binary>>) do
-    Regex.split(Liquescent.tokenizer, string, on: :all_but_first, trim: true)
+    Regex.split(Liquescent.template_parser, string, on: :all_but_first, trim: true)
       |> List.flatten
       |> Enum.filter(&(&1 != ""))
   end
@@ -25,7 +25,7 @@ defmodule Liquescent.Parse do
         try do
           mod.tokenize(string)
         rescue
-          NoMethodError ->
+          UndefinedFunctionError ->
         end
       _ ->
     end
