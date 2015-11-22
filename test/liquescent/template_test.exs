@@ -7,8 +7,8 @@ defmodule Liquescent.TemplateTest do
   alias Liquescent.Parse, as: Parse
 
   setup_all do
-    {:ok, registry } = Liquescent.start
-    {:ok, registry: registry}
+    Liquescent.start
+    :ok
   end
 
   test :tokenize_strings do
