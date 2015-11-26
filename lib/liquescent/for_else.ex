@@ -1,9 +1,9 @@
 defmodule Liquescent.ForElse do
-  alias Liquescent.Render, as: Render
-  alias Liquescent.Blocks, as: Blocks
-  alias Liquescent.Blocks, as: Blocks
-  alias Liquescent.Variables, as: Variables
-  alias Liquescent.Contexts, as: Contexts
+  alias Liquescent.Render
+  alias Liquescent.Blocks
+  alias Liquescent.Blocks
+  alias Liquescent.Variables
+  alias Liquescent.Contexts
   defmodule Iterator do
     defstruct collection: nil, item: nil, reversed: false,
                         limit: nil, offset: nil, forloop: []
