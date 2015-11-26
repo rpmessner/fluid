@@ -1,6 +1,7 @@
 # Liquescent
 
-It's a templating library for Elixir.  This is my first real project in Elixir (or any BEAM language, for that matter); as such, I did a fairly straight-up port of the locomotive fork of the liquid templating language: [https://github.com/locomotivecms/liquid](https://github.com/locomotivecms/liquid).
+It's a templating library for Elixir.  
+Continuation of the fluid liquid conversion. 
 
 ## Usage
 Add the dependency to your mix file
@@ -27,6 +28,10 @@ Feel free to add a bug report or pull request if you feel that anything is missi
 
 * Add full set of filters
 * Add ability to add custom filters
+* Add ability to add custom tags
+* Implement capture
+* Implement table_row tag
+* Fix empty check on arrays
 
 ## Elsewhere
 
