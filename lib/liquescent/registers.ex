@@ -7,7 +7,6 @@ defmodule Liquescent.Registers do
      extended:       { Liquescent.Extends,  Liquescent.Blocks },
      comment:        { Liquescent.Comment,  Liquescent.Blocks },
      include:        { Liquescent.Include,  Liquescent.Tags },
-     extends:        { Liquescent.Extends,  Liquescent.Tags },
      assign:         { Liquescent.Assign,   Liquescent.Tags },
      block:          { Liquescent.Inherit,  Liquescent.Blocks },
      break:          { Liquescent.Break,    Liquescent.Tags },
@@ -18,7 +17,9 @@ defmodule Liquescent.Registers do
      for:            { Liquescent.ForElse,  Liquescent.Blocks },
      if:             { Liquescent.IfElse,   Liquescent.Blocks },
      unless:         { Liquescent.Unless,   Liquescent.Blocks},
-     raw:            { Liquescent.Raw,      Liquescent.Blocks}]
+     raw:            { Liquescent.Raw,      Liquescent.Blocks},
+     increment:      { Liquescent.Increment, Liquescent.Tags},
+     decrement:      { Liquescent.Decrement, Liquescent.Tags}]
   end
 
   def handle_cast({ :register, <<name::binary>>, module, tag }, dict) do
