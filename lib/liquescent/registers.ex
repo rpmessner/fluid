@@ -4,23 +4,23 @@ defmodule Liquescent.Registers do
   defp default_tags do
     [defaultcontent: { Liquescent.Default,  Liquescent.Tags },
      continue:       { Liquescent.Continue, Liquescent.Tags },
-     extended:       { Liquescent.Extends,  Liquescent.Blocks },
-     comment:        { Liquescent.Comment,  Liquescent.Blocks },
+     extended:       { Liquescent.Extends,  Liquescent.Block },
+     comment:        { Liquescent.Comment,  Liquescent.Block },
      include:        { Liquescent.Include,  Liquescent.Tags },
      assign:         { Liquescent.Assign,   Liquescent.Tags },
-     block:          { Liquescent.Inherit,  Liquescent.Blocks },
+     block:          { Liquescent.Inherit,  Liquescent.Block },
      break:          { Liquescent.Break,    Liquescent.Tags },
      elsif:          { Liquescent.ElseIf,   Liquescent.Tags },
      else:           { Liquescent.Else,     Liquescent.Tags },
-     case:           { Liquescent.Case,     Liquescent.Blocks },
+     case:           { Liquescent.Case,     Liquescent.Block },
      when:           { Liquescent.When,     Liquescent.Tags },
-     for:            { Liquescent.ForElse,  Liquescent.Blocks },
-     if:             { Liquescent.IfElse,   Liquescent.Blocks },
-     unless:         { Liquescent.Unless,   Liquescent.Blocks},
-     raw:            { Liquescent.Raw,      Liquescent.Blocks},
+     for:            { Liquescent.ForElse,  Liquescent.Block },
+     if:             { Liquescent.IfElse,   Liquescent.Block },
+     unless:         { Liquescent.Unless,   Liquescent.Block},
+     raw:            { Liquescent.Raw,      Liquescent.Block},
      increment:      { Liquescent.Increment, Liquescent.Tags},
      decrement:      { Liquescent.Decrement, Liquescent.Tags},
-     capture:        { Liquescent.Capture, Liquescent.Blocks}]
+     capture:        { Liquescent.Capture, Liquescent.Block}]
   end
 
   def handle_cast({ :register, <<name::binary>>, module, tag }, dict) do

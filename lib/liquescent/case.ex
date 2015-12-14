@@ -1,7 +1,7 @@
 defmodule Liquescent.Case do
 
   alias Liquescent.Tags
-  alias Liquescent.Blocks
+  alias Liquescent.Block
   alias Liquescent.Template
   alias Liquescent.Variable
   alias Liquescent.Condition
@@ -9,7 +9,7 @@ defmodule Liquescent.Case do
   def syntax, do: ~r/(#{Liquescent.quoted_fragment})/
   def when_syntax, do: ~r/(#{Liquescent.quoted_fragment})(?:(?:\s+or\s+|\s*\,\s*)(#{Liquescent.quoted_fragment}.*))?/
 
-  def parse(%Blocks{markup: markup}=b, %Template{}=t) do
+  def parse(%Block{markup: markup}=b, %Template{}=t) do
     [[_, name]] = syntax |> Regex.scan(markup)
     { split(name |> Variable.create, b.nodelist), t }
   end
@@ -18,9 +18,9 @@ defmodule Liquescent.Case do
   defp split(%Variable{}=v, [<<_::binary>>|t]), do: split(v, t)
   defp split(%Variable{}=_, [%Liquescent.Tags{name: :else}|t]), do: t
   defp split(%Variable{}=v, [%Liquescent.Tags{name: :when, markup: markup}|t]) do
-    { nodelist, t } = Blocks.split(t, [:when, :else])
+    { nodelist, t } = Block.split(t, [:when, :else])
     condition = parse_condition(v, markup)
-    %Blocks{name: :if, nodelist: nodelist, condition: condition, elselist: split(v, t)}
+    %Block{name: :if, nodelist: nodelist, condition: condition, elselist: split(v, t)}
   end
 
   defp parse_condition(%Variable{}=v, <<markup::binary>>) do

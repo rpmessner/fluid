@@ -11,18 +11,18 @@ end
 defmodule Liquescent.IfElse do
   alias Liquescent.Condition, as: Condition
   alias Liquescent.Render, as: Render
-  alias Liquescent.Blocks, as: Blocks
+  alias Liquescent.Block, as: Block
 
   def syntax, do: ~r/(#{Liquescent.quoted_fragment})\s*([=!<>a-z_]+)?\s*(#{Liquescent.quoted_fragment})?/
   def expressions_and_operators do
     ~r/(?:\b(?:\s?and\s?|\s?or\s?)\b|(?:\s*(?!\b(?:\s?and\s?|\s?or\s?)\b)(?:#{Liquescent.quoted_fragment}|\S+)\s*)+)/
   end
 
-  def parse(%Liquescent.Blocks{}=block, %Liquescent.Template{}=t) do
+  def parse(%Liquescent.Block{}=block, %Liquescent.Template{}=t) do
     block = parse_conditions(block)
-    case Blocks.split(block, [:else, :elsif]) do
+    case Block.split(block, [:else, :elsif]) do
       { true_block, [%Liquescent.Tags{name: :elsif, markup: markup}|elsif_block] } ->
-        { elseif, t } = %Liquescent.Blocks{name: :if, markup: markup, nodelist: elsif_block} |> parse(t)
+        { elseif, t } = %Liquescent.Block{name: :if, markup: markup, nodelist: elsif_block} |> parse(t)
         { %{block | nodelist: true_block, elselist: [elseif] }, t }
       { true_block, [%Liquescent.Tags{name: :else}|false_block] } ->
         { %{block | nodelist: true_block, elselist: false_block}, t }
@@ -35,7 +35,7 @@ defmodule Liquescent.IfElse do
     { output, context }
   end
 
-  def render(output, %Liquescent.Blocks{condition: condition, nodelist: nodelist, elselist: elselist}, context) do
+  def render(output, %Liquescent.Block{condition: condition, nodelist: nodelist, elselist: elselist}, context) do
     condition = Condition.evaluate(condition, context)
     conditionlist = if condition, do: nodelist, else: elselist
     Render.render(output, conditionlist, context)
@@ -50,7 +50,7 @@ defmodule Liquescent.IfElse do
     end)
   end
 
-  defp parse_conditions(%Liquescent.Blocks{markup: markup}=block) do
+  defp parse_conditions(%Liquescent.Block{markup: markup}=block) do
     expressions = Regex.scan(expressions_and_operators, markup)
     expressions = expressions |> split_conditions |> Enum.reverse
     condition   = Condition.create(expressions)

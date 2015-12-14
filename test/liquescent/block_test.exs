@@ -54,7 +54,7 @@ defmodule Liquescent.BlockTest do
   test "with block" do
     template = Liquescent.Template.parse("  {% comment %} {% endcomment %} ")
     assert 3 == Enum.count template.root.nodelist
-    assert [<<_::binary>>, %Liquescent.Blocks{}, <<_::binary>>] = template.root.nodelist
+    assert [<<_::binary>>, %Liquescent.Block{}, <<_::binary>>] = template.root.nodelist
   end
 
   test "registering custom tags/blocks" do
@@ -63,9 +63,9 @@ defmodule Liquescent.BlockTest do
   end
 
   test "with custom block" do
-    Liquescent.Registers.register("testblock", TestBlock, Liquescent.Blocks)
+    Liquescent.Registers.register("testblock", TestBlock, Liquescent.Block)
     template = Liquescent.Template.parse( "{% testblock %}{% endtestblock %}")
-    assert [%Liquescent.Blocks{name: :testblock}] = template.root.nodelist
+    assert [%Liquescent.Block{name: :testblock}] = template.root.nodelist
   end
 
   test "with custom tag" do

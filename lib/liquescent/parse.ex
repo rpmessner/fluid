@@ -2,7 +2,7 @@ defmodule Liquescent.Parse do
   alias Liquescent.Template, as: Template
   alias Liquescent.Variable, as: Variable
   alias Liquescent.Registers, as: Registers
-  alias Liquescent.Blocks
+  alias Liquescent.Block
 
   def tokenize(<<string::binary>>) do
     Regex.split(Liquescent.template_parser, string, on: :all_but_first, trim: true)
@@ -15,13 +15,13 @@ defmodule Liquescent.Parse do
     [name|_] = tokens
     tag_name = parse_tag_name(name)
     tokens = parse_tokens(string, tag_name) || tokens
-    { root, template } = parse(%Liquescent.Blocks{name: :document}, tokens, [], template)
+    { root, template } = parse(%Liquescent.Block{name: :document}, tokens, [], template)
     %{ template | root: root }
   end
 
   defp parse_tokens(<<string::binary>>, tag_name) do
     case Registers.lookup(tag_name) do
-      {mod, Liquescent.Blocks} ->
+      {mod, Liquescent.Block} ->
         try do
           mod.tokenize(string)
         rescue
@@ -45,9 +45,9 @@ defmodule Liquescent.Parse do
       %{"tag" => <<markup::binary>>, "variable" => ""} ->
         [name|_] = String.split(markup, " ")
         case Registers.lookup(name) do
-          { mod, Liquescent.Blocks } ->
+          { mod, Liquescent.Block } ->
 
-            block = Liquescent.Blocks.create(markup)
+            block = Liquescent.Block.create(markup)
             { block, rest, template } = try do
                 mod.parse(block, rest, [], template)
               rescue
@@ -65,15 +65,15 @@ defmodule Liquescent.Parse do
     end
   end
 
-  def parse(%Blocks{name: :document}=block, [], accum, %Template{}=template) do
+  def parse(%Block{name: :document}=block, [], accum, %Template{}=template) do
     { %{ block | nodelist: accum }, template }
   end
 
-  def parse(%Blocks{name: name}, [], _, _) do
+  def parse(%Block{name: name}, [], _, _) do
     raise "No matching end for block {% #{to_string(name)} %}"
   end
 
-  def parse(%Blocks{name: name}=block, [h|t], accum, %Template{}=template) do
+  def parse(%Block{name: name}=block, [h|t], accum, %Template{}=template) do
 
     endblock = "end" <> to_string(name)
     cond do

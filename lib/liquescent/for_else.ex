@@ -1,7 +1,7 @@
 defmodule Liquescent.ForElse do
   alias Liquescent.Render
-  alias Liquescent.Blocks
-  alias Liquescent.Blocks
+  alias Liquescent.Block
+  alias Liquescent.Block
   alias Liquescent.Variable
   alias Liquescent.Context
   defmodule Iterator do
@@ -11,16 +11,16 @@ defmodule Liquescent.ForElse do
 
   def syntax, do: ~r/(\w+)\s+in\s+(#{Liquescent.quoted_fragment}+)\s*(reversed)?/
 
-  def parse(%Blocks{}=block, %Liquescent.Template{}=t) do
+  def parse(%Block{}=block, %Liquescent.Template{}=t) do
     block = %{block | iterator: parse_iterator(block) }
-    case Blocks.split(block) do
+    case Block.split(block) do
       { true_block, [_,false_block] } ->
         { %{block | nodelist: true_block, elselist: false_block}, t }
       { _, [] } -> { block, t }
     end
   end
 
-  defp parse_iterator(%Blocks{markup: markup}) do
+  defp parse_iterator(%Block{markup: markup}) do
     [[_,item|[collection|reversed]]] = Regex.scan(syntax, markup)
     collection = Variable.create(collection)
     reversed   = !(reversed |> List.first |> is_nil)
@@ -41,7 +41,7 @@ defmodule Liquescent.ForElse do
     end)
   end
 
-  def render(output, %Blocks{iterator: it}=block, %Context{}=context) do
+  def render(output, %Block{iterator: it}=block, %Context{}=context) do
     { list, _ } = Variable.lookup(it.collection, context)
     cond do
       is_list(list) and Enum.count(list) > 0 ->
@@ -51,8 +51,8 @@ defmodule Liquescent.ForElse do
     end
   end
 
-  defp each(output, [], %Blocks{}=block, %Context{}=context), do: { output, remember_limit(block, context) }
-  defp each(output, [h|t]=list, %Blocks{iterator: it}=block, %Context{assigns: assigns}=context) do
+  defp each(output, [], %Block{}=block, %Context{}=context), do: { output, remember_limit(block, context) }
+  defp each(output, [h|t]=list, %Block{iterator: it}=block, %Context{assigns: assigns}=context) do
     forloop = next_forloop(it, list |> Enum.count)
     block   = %{ block | iterator: %{it | forloop: forloop }}
     assigns = assigns |> Dict.put(:forloop, forloop) |> Dict.put(it.item, h)
@@ -66,7 +66,7 @@ defmodule Liquescent.ForElse do
     end
   end
 
-  defp remember_limit(%Blocks{iterator: it}, context) do
+  defp remember_limit(%Block{iterator: it}, context) do
     { limit, context } = lookup_limit(it, context)
     limit      = limit || 0
     key        = it.collection.name |> String.to_atom
@@ -74,7 +74,7 @@ defmodule Liquescent.ForElse do
     %{ context | offsets: context.offsets |> Dict.put(key, remembered + limit) }
   end
 
-  defp should_render?(%Blocks{iterator: %Iterator{}=it}, forloop, context) do
+  defp should_render?(%Block{iterator: %Iterator{}=it}, forloop, context) do
     { limit, _ }  = lookup_limit(it, context)
     { offset, _ } = lookup_offset(it, context)
     cond do
