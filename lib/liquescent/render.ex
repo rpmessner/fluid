@@ -1,5 +1,5 @@
 defmodule Liquescent.Render do
-  alias Liquescent.Variables, as: Variables
+  alias Liquescent.Variable, as: Variable
   alias Liquescent.Templates, as: Templates
   alias Liquescent.Registers, as: Registers
   alias Liquescent.Context, as: Context
@@ -26,8 +26,8 @@ defmodule Liquescent.Render do
     { output ++ [text], context }
   end
 
-  def render(output, %Variables{}=v, %Context{}=context) do
-    { rendered, context } = Variables.lookup(v, context)
+  def render(output, %Variable{}=v, %Context{}=context) do
+    { rendered, context } = Variable.lookup(v, context)
     { output ++ [rendered], context }
   end
 

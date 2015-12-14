@@ -3,7 +3,7 @@ Code.require_file "../../test_helper.exs", __ENV__.file
 defmodule Liquescent.VariableTest do
   use ExUnit.Case
 
-  alias Liquescent.Variables, as: Var
+  alias Liquescent.Variable, as: Var
 
   test :variable do
     v = Var.create("hello")

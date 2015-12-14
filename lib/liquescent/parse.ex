@@ -1,6 +1,6 @@
 defmodule Liquescent.Parse do
   alias Liquescent.Templates, as: Templates
-  alias Liquescent.Variables, as: Variables
+  alias Liquescent.Variable, as: Variable
   alias Liquescent.Registers, as: Registers
   alias Liquescent.Blocks
 
@@ -41,7 +41,7 @@ defmodule Liquescent.Parse do
   defp parse_node(<<name::binary>>, rest, %Templates{}=template) do
     case Regex.named_captures(Liquescent.parser, name) do
       %{"tag" => "", "variable" => <<markup::binary>>} ->
-        { Variables.create(markup), rest, template }
+        { Variable.create(markup), rest, template }
       %{"tag" => <<markup::binary>>, "variable" => ""} ->
         [name|_] = String.split(markup, " ")
         case Registers.lookup(name) do

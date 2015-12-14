@@ -3,9 +3,9 @@ defmodule Liquescent.Condition do
               child_operator: nil, child_condition: nil
 
   alias Liquescent.Context, as: Context
-  alias Liquescent.Variables, as: Variables
+  alias Liquescent.Variable, as: Variable
   alias Liquescent.Condition, as: Cond
-  alias Liquescent.Variables, as: Vars
+  alias Liquescent.Variable, as: Vars
 
   def create([h|t]) do
     head = create(h)
@@ -21,16 +21,16 @@ defmodule Liquescent.Condition do
     create({ left |> Vars.create, operator, right |> Vars.create})
   end
 
-  def create({ %Variables{}=left, operator, <<right::binary>> }) do
+  def create({ %Variable{}=left, operator, <<right::binary>> }) do
 
     create({ left, operator, right |> Vars.create})
   end
 
-  def create({ <<left::binary>>, operator, %Variables{}=right }) do
+  def create({ <<left::binary>>, operator, %Variable{}=right }) do
     create({ left |> Vars.create, operator, right })
   end
 
-  def create({ %Variables{}=left, operator, %Variables{}=right }) do
+  def create({ %Variable{}=left, operator, %Variable{}=right }) do
 
     operator = String.to_atom(operator)
     %Cond{left: left, operator: operator, right: right}

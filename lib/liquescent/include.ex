@@ -4,7 +4,7 @@ defmodule Liquescent.Include do
   alias Liquescent.Context, as: Context
   alias Liquescent.Templates, as: Templates
   alias Liquescent.Templates, as: Templates
-  alias Liquescent.Variables, as: Variables
+  alias Liquescent.Variable, as: Variable
   alias Liquescent.FileSystem, as: FileSystem
 
   def syntax, do: ~r/(#{Liquescent.quoted_fragment}+)(\s+(?:with|for)\s+(#{Liquescent.quoted_fragment}+))?/
@@ -18,21 +18,21 @@ defmodule Liquescent.Include do
 
   defp parse_tag(%Tags{}=tag, parts) do
     case parts do
-      [_, name] -> %{tag | parts: [name: name |> Variables.create]}
-      [_, name," with "<>_,v] -> %{tag | parts: [name: name |> Variables.create , variable: v |> Variables.create]}
-      [_, name," for "<>_,v] -> %{tag | parts: [name: name |> Variables.create, foreach: v |> Variables.create]}
+      [_, name] -> %{tag | parts: [name: name |> Variable.create]}
+      [_, name," with "<>_,v] -> %{tag | parts: [name: name |> Variable.create , variable: v |> Variable.create]}
+      [_, name," for "<>_,v] -> %{tag | parts: [name: name |> Variable.create, foreach: v |> Variable.create]}
     end
   end
 
   defp parse_attributes(markup) do
     Liquescent.tag_attributes |> Regex.scan(markup) |> Enum.reduce([], fn ([_, key, val], coll) ->
-      Dict.put(coll, key |> String.to_atom, val |> Variables.create)
+      Dict.put(coll, key |> String.to_atom, val |> Variable.create)
     end)
   end
 
   def render(output, %Tags{parts: parts}=tag, %Context{}=context) do
     { file_system, root } = context |> Context.registers(:file_system) || FileSystem.lookup
-    { name, context } = parts[:name] |> Variables.lookup(context)
+    { name, context } = parts[:name] |> Variable.lookup(context)
     { :ok, source } = file_system.read_template_file(root, name, context)
     presets = build_presets(tag, context)
     t = Templates.parse(source, presets)
@@ -40,10 +40,10 @@ defmodule Liquescent.Include do
     key = name |> String.to_atom()
     cond do
       !is_nil(parts[:variable]) ->
-        { item, _ } = Variables.lookup(parts[:variable], context)
+        { item, _ } = Variable.lookup(parts[:variable], context)
         render_item(output, key, item, t, context)
       !is_nil(parts[:foreach]) ->
-        { items, _ } = Variables.lookup(parts[:foreach], context)
+        { items, _ } = Variable.lookup(parts[:foreach], context)
         render_list(output, key, items, t, context)
       true -> render_item(output, key, nil, t, context)
     end
@@ -51,7 +51,7 @@ defmodule Liquescent.Include do
 
   defp build_presets(%Tags{}=tag, context) do
     tag.attributes |> Enum.reduce([], fn({key, value}, coll) ->
-      { value, _ } = Variables.lookup(value, context)
+      { value, _ } = Variable.lookup(value, context)
       Dict.put(coll, key, value)
     end)
   end

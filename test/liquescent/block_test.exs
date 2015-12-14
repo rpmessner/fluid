@@ -24,7 +24,7 @@ defmodule Liquescent.BlockTest do
   test "variable beginning" do
     template = Liquescent.Templates.parse("{{funk}}  ")
     assert 2 == Enum.count template.root.nodelist
-    assert [%Liquescent.Variables{name: name}, <<string::binary>>] = template.root.nodelist
+    assert [%Liquescent.Variable{name: name}, <<string::binary>>] = template.root.nodelist
     assert name == "funk"
     assert string == "  "
   end
@@ -32,23 +32,23 @@ defmodule Liquescent.BlockTest do
   test "variable end" do
     template = Liquescent.Templates.parse("  {{funk}}")
     assert 2 == Enum.count template.root.nodelist
-    assert [<<_ :: binary>>, %Liquescent.Variables{name: name}] = template.root.nodelist
+    assert [<<_ :: binary>>, %Liquescent.Variable{name: name}] = template.root.nodelist
     assert name == "funk"
   end
 
   test "variable middle" do
     template = Liquescent.Templates.parse("  {{funk}}  ")
     assert 3 == Enum.count template.root.nodelist
-    assert [<<_::binary>>, %Liquescent.Variables{name: name},<<_::binary>>] = template.root.nodelist
+    assert [<<_::binary>>, %Liquescent.Variable{name: name},<<_::binary>>] = template.root.nodelist
     assert name == "funk"
   end
 
   test "variable many embedded fragments" do
     template = Liquescent.Templates.parse("  {{funk}} {{so}} {{brother}} ")
     assert 7 == Enum.count template.root.nodelist
-    assert [<<_::binary>>, %Liquescent.Variables{},
-            <<_::binary>>, %Liquescent.Variables{},
-            <<_::binary>>, %Liquescent.Variables{}, <<_::binary>>] = template.root.nodelist
+    assert [<<_::binary>>, %Liquescent.Variable{},
+            <<_::binary>>, %Liquescent.Variable{},
+            <<_::binary>>, %Liquescent.Variable{}, <<_::binary>>] = template.root.nodelist
   end
 
   test "with block" do

@@ -1,5 +1,5 @@
 defmodule Liquescent.Assign do
-  alias Liquescent.Variables
+  alias Liquescent.Variable
   alias Liquescent.Tags
   alias Liquescent.Context
 
@@ -10,8 +10,8 @@ defmodule Liquescent.Assign do
   def render(output, %Tags{markup: markup}, %Context{}=context) do
     [[_, to, from]] = syntax |> Regex.scan(markup)
     to_atom  = to |> String.to_atom
-    variable = Variables.create(from)
-    { from_value, context } = Variables.lookup(variable, context)
+    variable = Variable.create(from)
+    { from_value, context } = Variable.lookup(variable, context)
     result_assign = context.assigns |> Dict.put(to_atom, from_value)
     context = %{context | assigns: result_assign}
     { output, context }

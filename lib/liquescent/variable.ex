@@ -1,8 +1,8 @@
-defmodule Liquescent.Variables do
+defmodule Liquescent.Variable do
   defstruct name: nil, literal: nil, filters: [], parts: []
   alias Liquescent.Filters, as: Filters
-  alias Liquescent.Variables, as: Variables
-  alias Liquescent.Variables, as: Variables
+  alias Liquescent.Variable, as: Variable
+  alias Liquescent.Variable, as: Variable
   alias Liquescent.Context, as: Context
 
   defp literals, do: [nil: nil, null: nil, "": nil,
@@ -19,7 +19,7 @@ defmodule Liquescent.Variables do
   def create(<<markup::binary>>) do
     [name|filters] = Filters.parse(markup)
     key = name |> String.strip |> String.to_atom
-    variable = %Liquescent.Variables{name: name, filters: filters}
+    variable = %Liquescent.Variable{name: name, filters: filters}
     cond do
       literals      |> Dict.has_key?(key) ->
         value = literals |> Dict.get(key)
@@ -40,11 +40,11 @@ defmodule Liquescent.Variables do
     end
   end
 
-  def lookup(%Variables{filters: filters}=v, %Context{}=context) do
+  def lookup(%Variable{filters: filters}=v, %Context{}=context) do
     { ret, context } = case v do
-      %Variables{literal: literal, parts: []} ->
+      %Variable{literal: literal, parts: []} ->
         { literal, context }
-      %Variables{literal: nil, parts: parts} ->
+      %Variable{literal: nil, parts: parts} ->
         resolve(parts, context, context)
     end
     ret = Filters.filter(filters, ret)

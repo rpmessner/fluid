@@ -2,7 +2,7 @@ defmodule Liquescent.ForElse do
   alias Liquescent.Render
   alias Liquescent.Blocks
   alias Liquescent.Blocks
-  alias Liquescent.Variables
+  alias Liquescent.Variable
   alias Liquescent.Context
   defmodule Iterator do
     defstruct collection: nil, item: nil, reversed: false,
@@ -22,11 +22,11 @@ defmodule Liquescent.ForElse do
 
   defp parse_iterator(%Blocks{markup: markup}) do
     [[_,item|[collection|reversed]]] = Regex.scan(syntax, markup)
-    collection = Variables.create(collection)
+    collection = Variable.create(collection)
     reversed   = !(reversed |> List.first |> is_nil)
     attributes = Liquescent.tag_attributes |> Regex.scan(markup)
-    limit      = attributes |> parse_attribute("limit") |> Variables.create
-    offset     = attributes |> parse_attribute("offset", "0") |> Variables.create
+    limit      = attributes |> parse_attribute("limit") |> Variable.create
+    offset     = attributes |> parse_attribute("offset", "0") |> Variable.create
     item       = item |> String.to_atom
     %Iterator{item: item, collection: collection,
              limit: limit, offset: offset, reversed: reversed}
@@ -42,7 +42,7 @@ defmodule Liquescent.ForElse do
   end
 
   def render(output, %Blocks{iterator: it}=block, %Context{}=context) do
-    { list, _ } = Variables.lookup(it.collection, context)
+    { list, _ } = Variable.lookup(it.collection, context)
     cond do
       is_list(list) and Enum.count(list) > 0 ->
         list = if it.reversed, do: Enum.reverse(list), else: list
@@ -86,7 +86,7 @@ defmodule Liquescent.ForElse do
   end
 
   defp lookup_limit(%Iterator{limit: limit}, %Context{}=context) do
-    Variables.lookup(limit, context)
+    Variable.lookup(limit, context)
   end
 
   defp lookup_offset(%Iterator{offset: offset}=it, %Context{}=context) do
@@ -94,7 +94,7 @@ defmodule Liquescent.ForElse do
       "continue" ->
         offset = context.offsets[it.collection.name |> String.to_atom]
         { offset || 0, context }
-      <<_::binary>> -> Variables.lookup(offset, context)
+      <<_::binary>> -> Variable.lookup(offset, context)
     end
   end
 

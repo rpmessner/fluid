@@ -1,7 +1,7 @@
 defmodule Liquescent.Capture do
   alias Liquescent.Blocks
   alias Liquescent.Context
-  alias Liquescent.Variables
+  alias Liquescent.Variable
   alias Liquescent.Templates
   require IEx
 
@@ -11,7 +11,7 @@ defmodule Liquescent.Capture do
 
   def render(output, %Blocks{markup: markup}, %Context{}=context) do
     to_atom = markup |> String.to_atom
-    variable = Variables.create(markup)
+    variable = Variable.create(markup)
     IEx.pry
   end
 end
