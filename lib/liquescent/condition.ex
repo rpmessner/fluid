@@ -1,10 +1,10 @@
-defmodule Liquescent.Conditions do
+defmodule Liquescent.Condition do
   defstruct left: nil, operator: nil, right: nil,
               child_operator: nil, child_condition: nil
 
   alias Liquescent.Context, as: Context
   alias Liquescent.Variables, as: Variables
-  alias Liquescent.Conditions, as: Cond
+  alias Liquescent.Condition, as: Cond
   alias Liquescent.Variables, as: Vars
 
   def create([h|t]) do

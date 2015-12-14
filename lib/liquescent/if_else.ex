@@ -9,7 +9,7 @@ defmodule Liquescent.Else do
 end
 
 defmodule Liquescent.IfElse do
-  alias Liquescent.Conditions, as: Conditions
+  alias Liquescent.Condition, as: Condition
   alias Liquescent.Render, as: Render
   alias Liquescent.Blocks, as: Blocks
 
@@ -36,7 +36,7 @@ defmodule Liquescent.IfElse do
   end
 
   def render(output, %Liquescent.Blocks{condition: condition, nodelist: nodelist, elselist: elselist}, context) do
-    condition = Conditions.evaluate(condition, context)
+    condition = Condition.evaluate(condition, context)
     conditionlist = if condition, do: nodelist, else: elselist
     Render.render(output, conditionlist, context)
   end
@@ -53,7 +53,7 @@ defmodule Liquescent.IfElse do
   defp parse_conditions(%Liquescent.Blocks{markup: markup}=block) do
     expressions = Regex.scan(expressions_and_operators, markup)
     expressions = expressions |> split_conditions |> Enum.reverse
-    condition   = Conditions.create(expressions)
+    condition   = Condition.create(expressions)
     %{block | condition: condition }
   end
 end

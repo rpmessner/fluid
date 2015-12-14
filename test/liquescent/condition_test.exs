@@ -3,7 +3,7 @@ Code.require_file "../../test_helper.exs", __ENV__.file
 defmodule ConditionTest do
   use ExUnit.Case
 
-  alias Liquescent.Conditions, as: Conditions
+  alias Liquescent.Condition, as: Condition
 
   test :basic_condition do
     assert_evaluates_false "1", "==", "2"
@@ -70,34 +70,34 @@ defmodule ConditionTest do
   end
 
   test :or_condition do
-    condition = Conditions.create({"1", "==", "2"})
-    assert false == Conditions.evaluate(condition)
-    condition = Conditions.join(:or, condition, {"2", "==", "2"})
-    assert true == Conditions.evaluate(condition)
-    condition = Conditions.join(:or, condition, {"2", "==", "1"})
-    assert true == Conditions.evaluate(condition)
+    condition = Condition.create({"1", "==", "2"})
+    assert false == Condition.evaluate(condition)
+    condition = Condition.join(:or, condition, {"2", "==", "2"})
+    assert true == Condition.evaluate(condition)
+    condition = Condition.join(:or, condition, {"2", "==", "1"})
+    assert true == Condition.evaluate(condition)
   end
 
   test :and_condition do
-    condition = Conditions.create({"2", "==", "1"})
-    assert false == Conditions.evaluate(condition)
-    condition = Conditions.join(:and, condition, {"2", "==", "2"})
-    assert false == Conditions.evaluate(condition)
+    condition = Condition.create({"2", "==", "1"})
+    assert false == Condition.evaluate(condition)
+    condition = Condition.join(:and, condition, {"2", "==", "2"})
+    assert false == Condition.evaluate(condition)
 
-    condition = Conditions.create({"2", "==", "2"})
-    assert true == Conditions.evaluate(condition)
-    condition = Conditions.join(:and, condition, {"2", "==", "1"})
-    assert false == Conditions.evaluate(condition)
+    condition = Condition.create({"2", "==", "2"})
+    assert true == Condition.evaluate(condition)
+    condition = Condition.join(:and, condition, {"2", "==", "1"})
+    assert false == Condition.evaluate(condition)
   end
 
   # # test :should_allow_custom_proc_operator do
-  # #   Conditions.operators['starts_with'] = Proc.new { |cond, left, right| left =~ ~r{^#{right}} }
+  # #   Condition.operators['starts_with'] = Proc.new { |cond, left, right| left =~ ~r{^#{right}} }
 
   # #   assert_evaluates_true "'bob'",   'starts_with', "'b'"
   # #   assert_evaluates_false "'bob'",  'starts_with', "'o'"
 
   # #   ensure
-  # #     Conditions.operators.delete 'starts_with'
+  # #     Condition.operators.delete 'starts_with'
   # # end
 
   test :left_or_right_may_contain_operators do
@@ -107,17 +107,17 @@ defmodule ConditionTest do
   end
 
   defp assert_evaluates_true(left, op, right, assigns \\ []) do
-    condition = Conditions.create({left, op, right})
+    condition = Condition.create({left, op, right})
     context = %Liquescent.Context{assigns: assigns, presets: []}
-    evaled = Conditions.evaluate(condition, context)
+    evaled = Condition.evaluate(condition, context)
     unless evaled, do: IO.puts("Evaluated false: #{left} #{op} #{right}")
     assert evaled
   end
 
   defp assert_evaluates_false(left, op, right, assigns \\ []) do
-    condition = Conditions.create({left, op, right})
+    condition = Condition.create({left, op, right})
     context = %Liquescent.Context{assigns: assigns, presets: []}
-    evaled = Conditions.evaluate(condition, context)
+    evaled = Condition.evaluate(condition, context)
     unless !evaled, do: IO.puts("Evaluated true: #{left} #{op} #{right}")
     assert !evaled
   end

@@ -2,7 +2,7 @@ defmodule Liquescent.Unless do
   alias Liquescent.IfElse
   alias Liquescent.Blocks
   alias Liquescent.Templates
-  alias Liquescent.Conditions
+  alias Liquescent.Condition
   alias Liquescent.Tags
   alias Liquescent.Render
 
@@ -15,7 +15,7 @@ defmodule Liquescent.Unless do
   end
 
   def render(output, %Blocks{condition: condition, nodelist: nodelist, elselist: elselist}, context) do
-    condition = Conditions.evaluate(condition, context)
+    condition = Condition.evaluate(condition, context)
     conditionlist = unless condition, do: nodelist, else: elselist
     Render.render(output, conditionlist, context)
   end

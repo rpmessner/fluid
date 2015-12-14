@@ -4,7 +4,7 @@ defmodule Liquescent.Case do
   alias Liquescent.Blocks
   alias Liquescent.Templates
   alias Liquescent.Variables
-  alias Liquescent.Conditions
+  alias Liquescent.Condition
 
   def syntax, do: ~r/(#{Liquescent.quoted_fragment})/
   def when_syntax, do: ~r/(#{Liquescent.quoted_fragment})(?:(?:\s+or\s+|\s*\,\s*)(#{Liquescent.quoted_fragment}.*))?/
@@ -26,13 +26,13 @@ defmodule Liquescent.Case do
   defp parse_condition(%Variables{}=v, <<markup::binary>>) do
     { h, t } = parse_when(markup)
 
-    parse_condition(v, Conditions.create({v, "==", h}), t)
+    parse_condition(v, Condition.create({v, "==", h}), t)
   end
 
-  defp parse_condition(%Variables{}=_, %Conditions{}=condition, []), do: condition
-  defp parse_condition(%Variables{}=v, %Conditions{}=condition, [<<markup::binary>>]) do
+  defp parse_condition(%Variables{}=_, %Condition{}=condition, []), do: condition
+  defp parse_condition(%Variables{}=v, %Condition{}=condition, [<<markup::binary>>]) do
     { h, t } = parse_when(markup)
-    parse_condition(v, Conditions.join(:or, condition, {v, "==", h}), t)
+    parse_condition(v, Condition.join(:or, condition, {v, "==", h}), t)
   end
 
   defp parse_when(markup) do
