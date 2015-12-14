@@ -3,7 +3,7 @@ defmodule Liquescent.Variables do
   alias Liquescent.Filters, as: Filters
   alias Liquescent.Variables, as: Variables
   alias Liquescent.Variables, as: Variables
-  alias Liquescent.Contexts, as: Contexts
+  alias Liquescent.Context, as: Context
 
   defp literals, do: [nil: nil, null: nil, "": nil,
                       true: true, false: false,
@@ -40,7 +40,7 @@ defmodule Liquescent.Variables do
     end
   end
 
-  def lookup(%Variables{filters: filters}=v, %Contexts{}=context) do
+  def lookup(%Variables{filters: filters}=v, %Context{}=context) do
     { ret, context } = case v do
       %Variables{literal: literal, parts: []} ->
         { literal, context }
@@ -51,7 +51,7 @@ defmodule Liquescent.Variables do
     { ret, context }
   end
 
-  defp resolve([<<name::binary>>|_]=parts, %Contexts{}=current, %Contexts{}=context) do
+  defp resolve([<<name::binary>>|_]=parts, %Context{}=current, %Context{}=context) do
     key = name |> String.to_atom
     cond do
       current.assigns |> Dict.has_key?(key) ->
@@ -62,24 +62,24 @@ defmodule Liquescent.Variables do
     end
   end
 
-  defp resolve([], current, %Contexts{}=context), do: { current, context }
-  defp resolve([<<?[,index::binary>>|parts], current, %Contexts{}=context) do
+  defp resolve([], current, %Context{}=context), do: { current, context }
+  defp resolve([<<?[,index::binary>>|parts], current, %Context{}=context) do
     [index, _] = String.split(index, "]")
     index = String.to_integer(index)
     resolve(parts, current |> Enum.fetch!(index), context)
   end
 
-  defp resolve(["size"|_], current, %Contexts{}=context) when is_list(current) do
+  defp resolve(["size"|_], current, %Context{}=context) when is_list(current) do
     { current |> Enum.count, context }
   end
 
-  defp resolve([<<name::binary>>|parts], current, %Contexts{}=context) do
+  defp resolve([<<name::binary>>|parts], current, %Context{}=context) do
     { current, context } = resolve(name, current, context)
     resolve(parts, current, context)
   end
 
-  defp resolve(<<_::binary>>, current, %Contexts{}=context) when not is_list(current), do: { nil, context } # !is_list(current)
-  defp resolve(<<name::binary>>, current, %Contexts{}=context) when is_list(current) do
+  defp resolve(<<_::binary>>, current, %Context{}=context) when not is_list(current), do: { nil, context } # !is_list(current)
+  defp resolve(<<name::binary>>, current, %Context{}=context) when is_list(current) do
     key    = String.to_atom(name)
     return = Dict.get(current, key)
     { return, context }

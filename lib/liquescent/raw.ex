@@ -1,7 +1,7 @@
 defmodule Liquescent.Raw do
   alias Liquescent.Tags
   alias Liquescent.Templates
-  alias Liquescent.Contexts
+  alias Liquescent.Context
   alias Liquescent.Render
 
   def full_token_possibly_invalid, do: ~r/\A(.*)#{Liquescent.tag_start}\s*(\w+)\s*(.*)?#{Liquescent.tag_end}\z/m

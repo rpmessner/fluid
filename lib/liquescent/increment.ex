@@ -1,7 +1,7 @@
 defmodule Liquescent.Increment do
   alias Liquescent.Tags
   alias Liquescent.Templates
-  alias Liquescent.Contexts
+  alias Liquescent.Context
   alias Liquescent.Variables
   require IEx
 
@@ -9,7 +9,7 @@ defmodule Liquescent.Increment do
     {tag, template }
   end
 
-  def render(output, %Tags{markup: markup}, %Contexts{}=context) do
+  def render(output, %Tags{markup: markup}, %Context{}=context) do
     to_atom = markup |> String.to_atom
     variable = Variables.create(markup)
     { value, context } = Variables.lookup(variable, context)

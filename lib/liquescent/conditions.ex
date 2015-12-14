@@ -2,7 +2,7 @@ defmodule Liquescent.Conditions do
   defstruct left: nil, operator: nil, right: nil,
               child_operator: nil, child_condition: nil
 
-  alias Liquescent.Contexts, as: Contexts
+  alias Liquescent.Context, as: Context
   alias Liquescent.Variables, as: Variables
   alias Liquescent.Conditions, as: Cond
   alias Liquescent.Variables, as: Vars
@@ -48,13 +48,13 @@ defmodule Liquescent.Conditions do
     %{right | child_condition: condition, child_operator: operator}
   end
 
-  def evaluate(%Cond{}=condition), do: evaluate(condition, %Contexts{})
-  def evaluate(%Cond{left: left, right: nil}=condition, %Contexts{}=context) do
+  def evaluate(%Cond{}=condition), do: evaluate(condition, %Context{})
+  def evaluate(%Cond{left: left, right: nil}=condition, %Context{}=context) do
     { current, context } = Vars.lookup(left, context)
     eval_child(!!current, condition.child_operator, condition.child_condition, context)
   end
 
-  def evaluate(%Cond{left: left, right: right, operator: operator}=condition, %Contexts{}=context) do
+  def evaluate(%Cond{left: left, right: right, operator: operator}=condition, %Context{}=context) do
     { left, context } = Vars.lookup(left, context)
     { right, context } = Vars.lookup(right, context)
     current = eval_operator(left, operator, right)

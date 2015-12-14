@@ -3,7 +3,7 @@ defmodule Liquescent.ForElse do
   alias Liquescent.Blocks
   alias Liquescent.Blocks
   alias Liquescent.Variables
-  alias Liquescent.Contexts
+  alias Liquescent.Context
   defmodule Iterator do
     defstruct collection: nil, item: nil, reversed: false,
                         limit: nil, offset: nil, forloop: []
@@ -41,7 +41,7 @@ defmodule Liquescent.ForElse do
     end)
   end
 
-  def render(output, %Blocks{iterator: it}=block, %Contexts{}=context) do
+  def render(output, %Blocks{iterator: it}=block, %Context{}=context) do
     { list, _ } = Variables.lookup(it.collection, context)
     cond do
       is_list(list) and Enum.count(list) > 0 ->
@@ -51,8 +51,8 @@ defmodule Liquescent.ForElse do
     end
   end
 
-  defp each(output, [], %Blocks{}=block, %Contexts{}=context), do: { output, remember_limit(block, context) }
-  defp each(output, [h|t]=list, %Blocks{iterator: it}=block, %Contexts{assigns: assigns}=context) do
+  defp each(output, [], %Blocks{}=block, %Context{}=context), do: { output, remember_limit(block, context) }
+  defp each(output, [h|t]=list, %Blocks{iterator: it}=block, %Context{assigns: assigns}=context) do
     forloop = next_forloop(it, list |> Enum.count)
     block   = %{ block | iterator: %{it | forloop: forloop }}
     assigns = assigns |> Dict.put(:forloop, forloop) |> Dict.put(it.item, h)
@@ -61,7 +61,7 @@ defmodule Liquescent.ForElse do
       else { output, context }
     end
     case block_context do
-      %Contexts{break: true} -> each(output, [], block, context)
+      %Context{break: true} -> each(output, [], block, context)
       _ -> each(output, t, block, context)
     end
   end
@@ -85,11 +85,11 @@ defmodule Liquescent.ForElse do
     end
   end
 
-  defp lookup_limit(%Iterator{limit: limit}, %Contexts{}=context) do
+  defp lookup_limit(%Iterator{limit: limit}, %Context{}=context) do
     Variables.lookup(limit, context)
   end
 
-  defp lookup_offset(%Iterator{offset: offset}=it, %Contexts{}=context) do
+  defp lookup_offset(%Iterator{offset: offset}=it, %Context{}=context) do
     case offset.name do
       "continue" ->
         offset = context.offsets[it.collection.name |> String.to_atom]
@@ -122,23 +122,23 @@ end
 
 defmodule Liquescent.Break do
   alias Liquescent.Tags, as: Tags
-  alias Liquescent.Contexts, as: Contexts
+  alias Liquescent.Context, as: Context
   alias Liquescent.Templates, as: Templates
 
   def parse(%Tags{}=tag, %Templates{}=template), do: { tag, template }
 
-  def render(output, %Tags{}, %Contexts{}=context) do
+  def render(output, %Tags{}, %Context{}=context) do
     { output, %{context | break: true } }
   end
 end
 
 defmodule Liquescent.Continue do
   alias Liquescent.Tags, as: Tags
-  alias Liquescent.Contexts, as: Contexts
+  alias Liquescent.Context, as: Context
 
   def parse(%Tags{}=tag, template), do: { tag, template }
 
-  def render(output, %Tags{}, %Contexts{}=context) do
+  def render(output, %Tags{}, %Context{}=context) do
     { output, %{context | continue: true } }
   end
 end

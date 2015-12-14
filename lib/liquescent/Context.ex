@@ -1,4 +1,4 @@
-defmodule Liquescent.Contexts do
+defmodule Liquescent.Context do
   defstruct assigns: [], offsets: [], registers: [], presets: [], blocks: [],
             extended: false, continue: false, break: false, template: nil
 

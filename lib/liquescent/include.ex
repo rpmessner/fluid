@@ -1,7 +1,7 @@
 defmodule Liquescent.Include do
   alias Liquescent.Tags, as: Tags
-  alias Liquescent.Contexts, as: Contexts
-  alias Liquescent.Contexts, as: Contexts
+  alias Liquescent.Context, as: Context
+  alias Liquescent.Context, as: Context
   alias Liquescent.Templates, as: Templates
   alias Liquescent.Templates, as: Templates
   alias Liquescent.Variables, as: Variables
@@ -30,8 +30,8 @@ defmodule Liquescent.Include do
     end)
   end
 
-  def render(output, %Tags{parts: parts}=tag, %Contexts{}=context) do
-    { file_system, root } = context |> Contexts.registers(:file_system) || FileSystem.lookup
+  def render(output, %Tags{parts: parts}=tag, %Context{}=context) do
+    { file_system, root } = context |> Context.registers(:file_system) || FileSystem.lookup
     { name, context } = parts[:name] |> Variables.lookup(context)
     { :ok, source } = file_system.read_template_file(root, name, context)
     presets = build_presets(tag, context)
@@ -60,17 +60,17 @@ defmodule Liquescent.Include do
     { output, context }
   end
 
-  defp render_list(output, key, [item|rest], template, %Contexts{}=context) do
+  defp render_list(output, key, [item|rest], template, %Context{}=context) do
     { output, context } = render_item(output, key, item, template, context)
     render_list(output, key, rest, template, context)
   end
 
-  defp render_item(output, _key, nil, template, %Contexts{}=context) do
+  defp render_item(output, _key, nil, template, %Context{}=context) do
     { :ok, rendered, _ } = Templates.render(template, context)
     { output ++ [rendered], context }
   end
 
-  defp render_item(output, key, item, template, %Contexts{}=context) do
+  defp render_item(output, key, item, template, %Context{}=context) do
     assigns = context.assigns |> Dict.merge([{ key, item }])
     { :ok, rendered, _ } = Templates.render(template, %{context | assigns: assigns })
     { output ++ [rendered], context }

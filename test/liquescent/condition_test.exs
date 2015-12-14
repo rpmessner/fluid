@@ -108,7 +108,7 @@ defmodule ConditionTest do
 
   defp assert_evaluates_true(left, op, right, assigns \\ []) do
     condition = Conditions.create({left, op, right})
-    context = %Liquescent.Contexts{assigns: assigns, presets: []}
+    context = %Liquescent.Context{assigns: assigns, presets: []}
     evaled = Conditions.evaluate(condition, context)
     unless evaled, do: IO.puts("Evaluated false: #{left} #{op} #{right}")
     assert evaled
@@ -116,7 +116,7 @@ defmodule ConditionTest do
 
   defp assert_evaluates_false(left, op, right, assigns \\ []) do
     condition = Conditions.create({left, op, right})
-    context = %Liquescent.Contexts{assigns: assigns, presets: []}
+    context = %Liquescent.Context{assigns: assigns, presets: []}
     evaled = Conditions.evaluate(condition, context)
     unless !evaled, do: IO.puts("Evaluated true: #{left} #{op} #{right}")
     assert !evaled

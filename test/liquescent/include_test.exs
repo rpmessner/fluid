@@ -34,7 +34,7 @@ defmodule IncludeTagTest do
   use ExUnit.Case
 
   alias Liquescent.Templates, as: Templates
-  alias Liquescent.Contexts, as: Contexts
+  alias Liquescent.Context, as: Context
 
   setup_all do
     Liquescent.start
@@ -46,7 +46,7 @@ defmodule IncludeTagTest do
   test :include_tag_looks_for_file_system_in_registers_first do
     assert_result "from OtherFileSystem",
                   "{% include 'pick_a_source' %}",
-                  %Contexts{registers: [file_system: { OtherFileSystem, "" }]}
+                  %Context{registers: [file_system: { OtherFileSystem, "" }]}
   end
 
   test :include_tag_with do
@@ -128,15 +128,15 @@ defmodule IncludeTagTest do
   #                 [template: "product", product: [title: "Draft 151cm"]]
   # end
 
-  defp assert_result(expected, markup), do: assert_result(expected, markup, %Liquescent.Contexts{})
-  defp assert_result(expected, markup, %Liquescent.Contexts{}=context) do
+  defp assert_result(expected, markup), do: assert_result(expected, markup, %Liquescent.Context{})
+  defp assert_result(expected, markup, %Liquescent.Context{}=context) do
     t = Templates.parse(markup)
     { :ok, rendered, _context } = Templates.render(t, context)
     assert expected == rendered
   end
 
   defp assert_result(expected, markup, assigns) do
-    context = %Liquescent.Contexts{assigns: assigns}
+    context = %Liquescent.Context{assigns: assigns}
     assert_result(expected, markup, context)
   end
 

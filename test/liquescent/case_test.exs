@@ -159,15 +159,15 @@ defmodule Liquescent.CaseTest do
       "{% case NULL %}{% when true %}true{% when false %}false{% else %}else{% endcase %}"
   end
 
-  defp assert_result(expected, markup), do: assert_result(expected, markup, %Liquescent.Contexts{})
-  defp assert_result(expected, markup, %Liquescent.Contexts{}=context) do
+  defp assert_result(expected, markup), do: assert_result(expected, markup, %Liquescent.Context{})
+  defp assert_result(expected, markup, %Liquescent.Context{}=context) do
     t = Liquescent.Templates.parse(markup)
     { :ok, rendered, _context } = Liquescent.Templates.render(t, context)
     assert expected == rendered
   end
 
   defp assert_result(expected, markup, assigns) do
-    context = %Liquescent.Contexts{assigns: assigns}
+    context = %Liquescent.Context{assigns: assigns}
     assert_result(expected, markup, context)
   end
 
