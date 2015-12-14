@@ -1,10 +1,10 @@
 defmodule Liquescent.Case do
 
-  alias Liquescent.Tags, as: Tags
-  alias Liquescent.Blocks, as: Blocks
-  alias Liquescent.Templates, as: Templates
-  alias Liquescent.Variables, as: Variables
-  alias Liquescent.Conditions, as: Conditions
+  alias Liquescent.Tags
+  alias Liquescent.Blocks
+  alias Liquescent.Templates
+  alias Liquescent.Variables
+  alias Liquescent.Conditions
 
   def syntax, do: ~r/(#{Liquescent.quoted_fragment})/
   def when_syntax, do: ~r/(#{Liquescent.quoted_fragment})(?:(?:\s+or\s+|\s*\,\s*)(#{Liquescent.quoted_fragment}.*))?/

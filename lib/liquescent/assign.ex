@@ -1,7 +1,7 @@
 defmodule Liquescent.Assign do
-  alias Liquescent.Variables, as: Variables
-  alias Liquescent.Tags, as: Tags
-  alias Liquescent.Contexts, as: Contexts
+  alias Liquescent.Variables
+  alias Liquescent.Tags
+  alias Liquescent.Contexts
 
   def syntax, do: ~r/([\w\-]+)\s*=\s*(.*)\s*/
 

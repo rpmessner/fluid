@@ -19,7 +19,8 @@ defmodule Liquescent.Registers do
      unless:         { Liquescent.Unless,   Liquescent.Blocks},
      raw:            { Liquescent.Raw,      Liquescent.Blocks},
      increment:      { Liquescent.Increment, Liquescent.Tags},
-     decrement:      { Liquescent.Decrement, Liquescent.Tags}]
+     decrement:      { Liquescent.Decrement, Liquescent.Tags},
+     capture:        { Liquescent.Capture, Liquescent.Blocks}]
   end
 
   def handle_cast({ :register, <<name::binary>>, module, tag }, dict) do
