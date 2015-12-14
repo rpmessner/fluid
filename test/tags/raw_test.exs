@@ -3,7 +3,7 @@ Code.require_file "../../test_helper.exs", __ENV__.file
 defmodule Liquescent.RawTest do
   use ExUnit.Case
 
-  alias Liquescent.Templates, as: Templates
+  alias Liquescent.Template, as: Template
 
   setup_all do
     Liquescent.start
@@ -41,9 +41,9 @@ defmodule Liquescent.RawTest do
   end
 
   defp assert_result(expected, markup, assigns) do
-    template = Templates.parse(markup)
+    template = Template.parse(markup)
 
-    { :ok, result, _ } = Templates.render(template, assigns)
+    { :ok, result, _ } = Template.render(template, assigns)
     assert result == expected
   end
 end

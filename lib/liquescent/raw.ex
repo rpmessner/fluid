@@ -1,12 +1,12 @@
 defmodule Liquescent.Raw do
   alias Liquescent.Tags
-  alias Liquescent.Templates
+  alias Liquescent.Template
   alias Liquescent.Context
   alias Liquescent.Render
 
   def full_token_possibly_invalid, do: ~r/\A(.*)#{Liquescent.tag_start}\s*(\w+)\s*(.*)?#{Liquescent.tag_end}\z/m
 
-  def parse(%Liquescent.Blocks{name: name}=block, [h|t], accum, %Templates{}=template) do
+  def parse(%Liquescent.Blocks{name: name}=block, [h|t], accum, %Template{}=template) do
     if Regex.match?(Liquescent.Raw.full_token_possibly_invalid, h) do
       block_delimiter = "end" <> to_string(name)
       [ extra_data, endblock | _ ] = Regex.scan(Liquescent.Raw.full_token_possibly_invalid, h, capture: :all_but_first)
@@ -26,7 +26,7 @@ defmodule Liquescent.Raw do
     end
   end
 
-  def parse(%Liquescent.Blocks{}=block, %Liquescent.Templates{}=t) do
+  def parse(%Liquescent.Blocks{}=block, %Liquescent.Template{}=t) do
     {block, t}
   end
 

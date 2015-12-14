@@ -1,12 +1,12 @@
 defmodule Liquescent.Render do
   alias Liquescent.Variable, as: Variable
-  alias Liquescent.Templates, as: Templates
+  alias Liquescent.Template, as: Template
   alias Liquescent.Registers, as: Registers
   alias Liquescent.Context, as: Context
   alias Liquescent.Blocks, as: Blocks
   alias Liquescent.Tags, as: Tags
 
-  def render(%Templates{root: root}, %Context{}=context) do
+  def render(%Template{root: root}, %Context{}=context) do
     { output, context } = render([], root, context)
     { :ok, Enum.join(output), context }
   end

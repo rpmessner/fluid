@@ -2,14 +2,14 @@ defmodule Liquescent.Include do
   alias Liquescent.Tags, as: Tags
   alias Liquescent.Context, as: Context
   alias Liquescent.Context, as: Context
-  alias Liquescent.Templates, as: Templates
-  alias Liquescent.Templates, as: Templates
+  alias Liquescent.Template, as: Template
+  alias Liquescent.Template, as: Template
   alias Liquescent.Variable, as: Variable
   alias Liquescent.FileSystem, as: FileSystem
 
   def syntax, do: ~r/(#{Liquescent.quoted_fragment}+)(\s+(?:with|for)\s+(#{Liquescent.quoted_fragment}+))?/
 
-  def parse(%Tags{markup: markup}=tag, %Templates{}=template) do
+  def parse(%Tags{markup: markup}=tag, %Template{}=template) do
     [parts|_]  = syntax |> Regex.scan(markup)
     tag        = parse_tag(tag, parts)
     attributes = parse_attributes(markup)
@@ -35,7 +35,7 @@ defmodule Liquescent.Include do
     { name, context } = parts[:name] |> Variable.lookup(context)
     { :ok, source } = file_system.read_template_file(root, name, context)
     presets = build_presets(tag, context)
-    t = Templates.parse(source, presets)
+    t = Template.parse(source, presets)
     t = %{ t | blocks: context.template.blocks |> Dict.merge(t.blocks) }
     key = name |> String.to_atom()
     cond do
@@ -66,13 +66,13 @@ defmodule Liquescent.Include do
   end
 
   defp render_item(output, _key, nil, template, %Context{}=context) do
-    { :ok, rendered, _ } = Templates.render(template, context)
+    { :ok, rendered, _ } = Template.render(template, context)
     { output ++ [rendered], context }
   end
 
   defp render_item(output, key, item, template, %Context{}=context) do
     assigns = context.assigns |> Dict.merge([{ key, item }])
-    { :ok, rendered, _ } = Templates.render(template, %{context | assigns: assigns })
+    { :ok, rendered, _ } = Template.render(template, %{context | assigns: assigns })
     { output ++ [rendered], context }
   end
 

@@ -2,14 +2,14 @@ defmodule Liquescent.Case do
 
   alias Liquescent.Tags
   alias Liquescent.Blocks
-  alias Liquescent.Templates
+  alias Liquescent.Template
   alias Liquescent.Variable
   alias Liquescent.Condition
 
   def syntax, do: ~r/(#{Liquescent.quoted_fragment})/
   def when_syntax, do: ~r/(#{Liquescent.quoted_fragment})(?:(?:\s+or\s+|\s*\,\s*)(#{Liquescent.quoted_fragment}.*))?/
 
-  def parse(%Blocks{markup: markup}=b, %Templates{}=t) do
+  def parse(%Blocks{markup: markup}=b, %Template{}=t) do
     [[_, name]] = syntax |> Regex.scan(markup)
     { split(name |> Variable.create, b.nodelist), t }
   end
@@ -46,7 +46,7 @@ end
 
 defmodule Liquescent.When do
   alias Liquescent.Tags, as: Tags
-  alias Liquescent.Templates, as: Templates
+  alias Liquescent.Template, as: Template
 
-  def parse(%Tags{}=tag, %Templates{}=t), do: { tag, t }
+  def parse(%Tags{}=tag, %Template{}=t), do: { tag, t }
 end

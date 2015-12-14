@@ -12,11 +12,11 @@ Start the application:
 
 Compile a template from a string:
 
-`template = Liquescent.Templates.parse("{% assign hello='hello' %}{{ hello }}{{world}}")`
+`template = Liquescent.Template.parse("{% assign hello='hello' %}{{ hello }}{{world}}")`
 
 Render the template with a keyword list representing the local variables:
 
-`{ :ok, rendered } = Liquescent.Templates.render(template, [world: "world"])`
+`{ :ok, rendered } = Liquescent.Template.render(template, [world: "world"])`
 
 The tests should give a pretty good idea of the features implemented so far.
 

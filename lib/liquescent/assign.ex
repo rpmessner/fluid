@@ -5,7 +5,7 @@ defmodule Liquescent.Assign do
 
   def syntax, do: ~r/([\w\-]+)\s*=\s*(.*)\s*/
 
-  def parse(%Tags{}=tag, %Liquescent.Templates{}=template), do: { tag, template }
+  def parse(%Tags{}=tag, %Liquescent.Template{}=template), do: { tag, template }
 
   def render(output, %Tags{markup: markup}, %Context{}=context) do
     [[_, to, from]] = syntax |> Regex.scan(markup)

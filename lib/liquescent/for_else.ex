@@ -11,7 +11,7 @@ defmodule Liquescent.ForElse do
 
   def syntax, do: ~r/(\w+)\s+in\s+(#{Liquescent.quoted_fragment}+)\s*(reversed)?/
 
-  def parse(%Blocks{}=block, %Liquescent.Templates{}=t) do
+  def parse(%Blocks{}=block, %Liquescent.Template{}=t) do
     block = %{block | iterator: parse_iterator(block) }
     case Blocks.split(block) do
       { true_block, [_,false_block] } ->
@@ -123,9 +123,9 @@ end
 defmodule Liquescent.Break do
   alias Liquescent.Tags, as: Tags
   alias Liquescent.Context, as: Context
-  alias Liquescent.Templates, as: Templates
+  alias Liquescent.Template, as: Template
 
-  def parse(%Tags{}=tag, %Templates{}=template), do: { tag, template }
+  def parse(%Tags{}=tag, %Template{}=template), do: { tag, template }
 
   def render(output, %Tags{}, %Context{}=context) do
     { output, %{context | break: true } }

@@ -107,13 +107,13 @@ defmodule Liquescent.CaseTest do
 
   # test "error on bad syntax" do
   #   # assert_raise Liquescent.SyntaxError fn ->
-  #   {:error, _ } = "{% case false %}{% when %}true{% endcase %}" |> Templates.parse
-  #                                                                |> Templates.render
+  #   {:error, _ } = "{% case false %}{% when %}true{% endcase %}" |> Template.parse
+  #                                                                |> Template.render
   #   # end
 
   #   # expect {
-  #   {:error, _} = "{% case false %}{% huh %}true{% endcase %}" |> Templates.parse
-  #                                                              |> Templates.render
+  #   {:error, _} = "{% case false %}{% huh %}true{% endcase %}" |> Template.parse
+  #                                                              |> Template.render
   #   # }.to raise_error(Liquid::SyntaxError)
   # end
 
@@ -161,8 +161,8 @@ defmodule Liquescent.CaseTest do
 
   defp assert_result(expected, markup), do: assert_result(expected, markup, %Liquescent.Context{})
   defp assert_result(expected, markup, %Liquescent.Context{}=context) do
-    t = Liquescent.Templates.parse(markup)
-    { :ok, rendered, _context } = Liquescent.Templates.render(t, context)
+    t = Liquescent.Template.parse(markup)
+    { :ok, rendered, _context } = Liquescent.Template.render(t, context)
     assert expected == rendered
   end
 

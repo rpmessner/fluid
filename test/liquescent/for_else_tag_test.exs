@@ -3,7 +3,7 @@ Code.require_file "../../test_helper.exs", __ENV__.file
 defmodule ForElseTagTest do
   use ExUnit.Case
 
-  alias Liquescent.Templates, as: Templates
+  alias Liquescent.Template, as: Template
 
   setup_all do
     Liquescent.start
@@ -288,8 +288,8 @@ defmodule ForElseTagTest do
   # end
 
   defp assert_result(expected, markup, assigns) do
-    t = Templates.parse(markup)
-    { :ok, rendered, _ } = Templates.render(t, assigns)
+    t = Template.parse(markup)
+    { :ok, rendered, _ } = Template.render(t, assigns)
     assert rendered == expected
   end
 end

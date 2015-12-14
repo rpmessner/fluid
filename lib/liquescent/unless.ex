@@ -1,12 +1,12 @@
 defmodule Liquescent.Unless do
   alias Liquescent.IfElse
   alias Liquescent.Blocks
-  alias Liquescent.Templates
+  alias Liquescent.Template
   alias Liquescent.Condition
   alias Liquescent.Tags
   alias Liquescent.Render
 
-  def parse(%Blocks{}=block, %Templates{}=t) do
+  def parse(%Blocks{}=block, %Template{}=t) do
     IfElse.parse(block, t)
   end
 

@@ -33,7 +33,7 @@ end
 defmodule IncludeTagTest do
   use ExUnit.Case
 
-  alias Liquescent.Templates, as: Templates
+  alias Liquescent.Template, as: Template
   alias Liquescent.Context, as: Context
 
   setup_all do
@@ -104,8 +104,8 @@ defmodule IncludeTagTest do
   #     end
   #   end
   #   Liquescent.FileSystem.register infinite_file_system
-  #   t = Templates.parse("{% include 'loop' %}")
-  #   { :error, _ } = Templates.render(t)
+  #   t = Template.parse("{% include 'loop' %}")
+  #   { :error, _ } = Template.render(t)
   # end
 
   # test :backwards_compatability_support_for_overridden_read_template_file do
@@ -115,8 +115,8 @@ defmodule IncludeTagTest do
   #     end
   #   end
   #   Liquescent.FileSystem.register infinite_file_system
-  #   t = Templates.parse("{% include 'hi_mom' %}")
-  #   { :ok, _ } = Templates.render(t)
+  #   t = Template.parse("{% include 'hi_mom' %}")
+  #   { :ok, _ } = Template.render(t)
   # end
 
   # test :dynamically_choosen_template do
@@ -130,8 +130,8 @@ defmodule IncludeTagTest do
 
   defp assert_result(expected, markup), do: assert_result(expected, markup, %Liquescent.Context{})
   defp assert_result(expected, markup, %Liquescent.Context{}=context) do
-    t = Templates.parse(markup)
-    { :ok, rendered, _context } = Templates.render(t, context)
+    t = Template.parse(markup)
+    { :ok, rendered, _context } = Template.render(t, context)
     assert expected == rendered
   end
 

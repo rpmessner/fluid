@@ -2,10 +2,10 @@ defmodule Liquescent.Capture do
   alias Liquescent.Blocks
   alias Liquescent.Context
   alias Liquescent.Variable
-  alias Liquescent.Templates
+  alias Liquescent.Template
   require IEx
 
-  def parse(%Blocks{}=block, %Templates{}=template) do
+  def parse(%Blocks{}=block, %Template{}=template) do
     {block, template }
   end
 

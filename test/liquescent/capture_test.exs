@@ -63,8 +63,8 @@ defmodule Liquescent.CaptureTest do
   end
 
   defp assert_result(expected, markup, assigns) do
-    template = Liquescent.Templates.parse(markup)
-    { :ok, result, _ } = Liquescent.Templates.render(template, assigns)
+    template = Liquescent.Template.parse(markup)
+    { :ok, result, _ } = Liquescent.Template.render(template, assigns)
     assert result == expected
   end
 end

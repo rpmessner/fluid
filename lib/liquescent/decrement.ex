@@ -1,10 +1,10 @@
 defmodule Liquescent.Decrement do
   alias Liquescent.Tags
-  alias Liquescent.Templates
+  alias Liquescent.Template
   alias Liquescent.Context
   alias Liquescent.Variable
 
-  def parse(%Tags{}=tag, %Templates{}=template) do
+  def parse(%Tags{}=tag, %Template{}=template) do
     {tag, template }
   end
 

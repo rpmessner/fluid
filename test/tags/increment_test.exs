@@ -2,7 +2,7 @@ Code.require_file "../../test_helper.exs", __ENV__.file
 
 defmodule Liquescent.IncrementTest do
   use ExUnit.Case
-  alias Liquescent.Templates
+  alias Liquescent.Template
 
   setup_all do
     Liquescent.start
@@ -31,8 +31,8 @@ defmodule Liquescent.IncrementTest do
   end
 
   defp assert_result(expected, markup, assigns) do
-    template = Templates.parse(markup)
-    { :ok, result, _ } = Templates.render(template, assigns)
+    template = Template.parse(markup)
+    { :ok, result, _ } = Template.render(template, assigns)
     assert result == expected
   end
 end

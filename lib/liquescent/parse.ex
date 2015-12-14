@@ -1,5 +1,5 @@
 defmodule Liquescent.Parse do
-  alias Liquescent.Templates, as: Templates
+  alias Liquescent.Template, as: Template
   alias Liquescent.Variable, as: Variable
   alias Liquescent.Registers, as: Registers
   alias Liquescent.Blocks
@@ -10,7 +10,7 @@ defmodule Liquescent.Parse do
       |> Enum.filter(&(&1 != ""))
   end
 
-  def parse(<<string::binary>>, %Templates{}=template) do
+  def parse(<<string::binary>>, %Template{}=template) do
     tokens = tokenize(string)
     [name|_] = tokens
     tag_name = parse_tag_name(name)
@@ -38,7 +38,7 @@ defmodule Liquescent.Parse do
     end
   end
 
-  defp parse_node(<<name::binary>>, rest, %Templates{}=template) do
+  defp parse_node(<<name::binary>>, rest, %Template{}=template) do
     case Regex.named_captures(Liquescent.parser, name) do
       %{"tag" => "", "variable" => <<markup::binary>>} ->
         { Variable.create(markup), rest, template }
@@ -65,7 +65,7 @@ defmodule Liquescent.Parse do
     end
   end
 
-  def parse(%Blocks{name: :document}=block, [], accum, %Templates{}=template) do
+  def parse(%Blocks{name: :document}=block, [], accum, %Template{}=template) do
     { %{ block | nodelist: accum }, template }
   end
 
@@ -73,7 +73,7 @@ defmodule Liquescent.Parse do
     raise "No matching end for block {% #{to_string(name)} %}"
   end
 
-  def parse(%Blocks{name: name}=block, [h|t], accum, %Templates{}=template) do
+  def parse(%Blocks{name: name}=block, [h|t], accum, %Template{}=template) do
 
     endblock = "end" <> to_string(name)
     cond do

@@ -109,7 +109,7 @@ end
 defmodule VariableResolutionTest do
   use ExUnit.Case
 
-  alias Liquescent.Templates, as: Templates
+  alias Liquescent.Template, as: Template
 
   setup_all do
     Liquescent.start
@@ -118,61 +118,61 @@ defmodule VariableResolutionTest do
   end
 
   test :simple_variable do
-    template = Templates.parse("{{test}}")
-    { :ok, rendered, _ } = Templates.render(template, test: "worked")
+    template = Template.parse("{{test}}")
+    { :ok, rendered, _ } = Template.render(template, test: "worked")
     assert "worked" == rendered
-    { :ok, rendered, _ } = Templates.render(template, test: "worked wonderfully")
+    { :ok, rendered, _ } = Template.render(template, test: "worked wonderfully")
     assert "worked wonderfully" == rendered
   end
 
   test :simple_with_whitespaces do
-    template = Templates.parse("  {{ test }}  ")
-    { :ok, rendered, _ } = Templates.render(template, test: "worked")
+    template = Template.parse("  {{ test }}  ")
+    { :ok, rendered, _ } = Template.render(template, test: "worked")
     assert "  worked  " == rendered
-    { :ok, rendered, _ } = Templates.render(template, test: "worked wonderfully")
+    { :ok, rendered, _ } = Template.render(template, test: "worked wonderfully")
     assert "  worked wonderfully  " == rendered
   end
 
   test :ignore_unknown do
-    template = Templates.parse("{{ test }}")
-    { :ok, rendered, _ } = Templates.render(template)
+    template = Template.parse("{{ test }}")
+    { :ok, rendered, _ } = Template.render(template)
     assert "" == rendered
   end
 
   test :hash_scoping do
-    template = Templates.parse("{{ test.test }}")
-    { :ok, rendered, _ } = Templates.render(template, test: [test: "worked"])
+    template = Template.parse("{{ test.test }}")
+    { :ok, rendered, _ } = Template.render(template, test: [test: "worked"])
     assert "worked" == rendered
   end
 
   test :preset_assigns do
-    template = Templates.parse("{{ test }}", [test: "worked"])
-    { :ok, rendered, _ } = Templates.render(template)
+    template = Template.parse("{{ test }}", [test: "worked"])
+    { :ok, rendered, _ } = Template.render(template)
     assert "worked" == rendered
   end
 
   test :reuse_parsed_template do
-    template = Templates.parse("{{ greeting }} {{ name }}", greeting: "Goodbye")
+    template = Template.parse("{{ greeting }} {{ name }}", greeting: "Goodbye")
     assert [greeting: "Goodbye"] == template.presets
-    { :ok, rendered, _ } = Templates.render(template, greeting: "Hello", name: "Tobi")
+    { :ok, rendered, _ } = Template.render(template, greeting: "Hello", name: "Tobi")
     assert "Hello Tobi" == rendered
-    { :ok, rendered, _ } = Templates.render(template, greeting: "Hello", unknown: "Tobi")
+    { :ok, rendered, _ } = Template.render(template, greeting: "Hello", unknown: "Tobi")
     assert "Hello " == rendered
-    { :ok, rendered, _ } = Templates.render(template, greeting: "Hello", name: "Brian")
+    { :ok, rendered, _ } = Template.render(template, greeting: "Hello", name: "Brian")
     assert "Hello Brian" == rendered
-    { :ok, rendered, _ } = Templates.render(template, name: "Brian")
+    { :ok, rendered, _ } = Template.render(template, name: "Brian")
     assert "Goodbye Brian" == rendered
   end
 
   test :assigns_not_polluted_from_template do
-    template = Templates.parse("{{ test }}{% assign test = 'bar' %}{{ test }}", test: "baz")
-    { :ok, rendered, _ } = Templates.render(template)
+    template = Template.parse("{{ test }}{% assign test = 'bar' %}{{ test }}", test: "baz")
+    { :ok, rendered, _ } = Template.render(template)
     assert "bazbar" == rendered
-    { :ok, rendered, _ } = Templates.render(template)
+    { :ok, rendered, _ } = Template.render(template)
     assert "bazbar" == rendered
-    { :ok, rendered, _ } = Templates.render(template, test: "foo")
+    { :ok, rendered, _ } = Template.render(template, test: "foo")
     assert "foobar" == rendered
-    { :ok, rendered, _ } = Templates.render(template)
+    { :ok, rendered, _ } = Template.render(template)
     assert "bazbar" == rendered
   end
 end
