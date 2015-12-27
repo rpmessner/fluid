@@ -20,4 +20,19 @@ defmodule Liquid.Mixfile do
   defp deps do
     [{:credo, "~> 0.2", only: [:dev, :test]}]
   end
+
+  defp description do
+    """
+    Liquid implementation in elixir
+    """
+  end
+
+  defp package do
+    [
+      files: ["lib", "README*", "mix.exs"],
+      maintainers: ["Peter Arentsen"],
+      licences: ["MIT"],
+      links: %{"GitHub" => "https://github.com/nulian/liquid-elixir"}
+    ]
+  end
 end
