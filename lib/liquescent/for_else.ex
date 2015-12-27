@@ -43,11 +43,11 @@ defmodule Liquescent.ForElse do
 
   def render(output, %Block{iterator: it}=block, %Context{}=context) do
     { list, _ } = Variable.lookup(it.collection, context)
-    cond do
-      is_list(list) and Enum.count(list) > 0 ->
-        list = if it.reversed, do: Enum.reverse(list), else: list
-        each(output, list, block, context)
-      true -> Render.render(output, block.elselist, context)
+    if is_list(list) and Enum.count(list) > 0 do
+      list = if it.reversed, do: Enum.reverse(list), else: list
+      each(output, list, block, context)
+    else
+      Render.render(output, block.elselist, context)
     end
   end
 
