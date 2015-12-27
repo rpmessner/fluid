@@ -16,7 +16,7 @@ defmodule Liquescent.Unless do
 
   def render(output, %Block{condition: condition, nodelist: nodelist, elselist: elselist}, context) do
     condition = Condition.evaluate(condition, context)
-    conditionlist = unless condition, do: nodelist, else: elselist
+    conditionlist = if condition, do: elselist, else: nodelist
     Render.render(output, conditionlist, context)
   end
 end

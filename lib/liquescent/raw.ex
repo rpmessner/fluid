@@ -9,10 +9,11 @@ defmodule Liquescent.Raw do
   def parse(%Liquescent.Block{name: name}=block, [h|t], accum, %Template{}=template) do
     if Regex.match?(Liquescent.Raw.full_token_possibly_invalid, h) do
       block_delimiter = "end" <> to_string(name)
-      [ extra_data, endblock | _ ] = Regex.scan(Liquescent.Raw.full_token_possibly_invalid, h, capture: :all_but_first)
-        |> List.flatten
+      regex_result = Regex.scan(Liquescent.Raw.full_token_possibly_invalid, h, capture: :all_but_first)
+      [ extra_data, endblock | _ ] = regex_result |> List.flatten
       if block_delimiter == endblock do
-        block = %{ block | nodelist: (accum ++ [extra_data]) |> Enum.filter(&(&1 != "")) }
+        extra_accum = (accum ++ [extra_data])
+        block = %{ block | nodelist: extra_accum |> Enum.filter(&(&1 != "")) }
         { block, t, template }
       else
         if length(t) > 0 do
