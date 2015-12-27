@@ -33,7 +33,7 @@ defmodule Liquid.Mixfile do
     [
       files: ["lib", "README*", "mix.exs"],
       maintainers: ["Peter Arentsen"],
-      licences: ["MIT"],
+      licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/nulian/liquid-elixir"}
     ]
   end
