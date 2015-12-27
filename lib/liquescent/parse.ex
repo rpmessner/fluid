@@ -55,8 +55,8 @@ defmodule Liquescent.Parse do
               end
             { block, template } = mod.parse(block, template)
             { block, rest, template }
-          { mod, Liquescent.Tags } ->
-            tag = Liquescent.Tags.create(markup)
+          { mod, Liquescent.Tag } ->
+            tag = Liquescent.Tag.create(markup)
             { tag, template } = mod.parse(tag, template)
             { tag, rest, template }
           nil -> raise "unregistered tag: #{name}"

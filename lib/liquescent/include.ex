@@ -1,5 +1,5 @@
 defmodule Liquescent.Include do
-  alias Liquescent.Tags, as: Tags
+  alias Liquescent.Tag, as: Tag
   alias Liquescent.Context, as: Context
   alias Liquescent.Context, as: Context
   alias Liquescent.Template, as: Template
@@ -9,14 +9,14 @@ defmodule Liquescent.Include do
 
   def syntax, do: ~r/(#{Liquescent.quoted_fragment}+)(\s+(?:with|for)\s+(#{Liquescent.quoted_fragment}+))?/
 
-  def parse(%Tags{markup: markup}=tag, %Template{}=template) do
+  def parse(%Tag{markup: markup}=tag, %Template{}=template) do
     [parts|_]  = syntax |> Regex.scan(markup)
     tag        = parse_tag(tag, parts)
     attributes = parse_attributes(markup)
     { %{tag | attributes: attributes }, template }
   end
-  
-  defp parse_tag(%Tags{}=tag, parts) do
+
+  defp parse_tag(%Tag{}=tag, parts) do
     case parts do
       [_, name] -> %{tag | parts: [name: name |> Variable.create]}
       [_, name," with "<>_,v] -> %{tag | parts: [name: name |> Variable.create , variable: v |> Variable.create]}
@@ -30,7 +30,7 @@ defmodule Liquescent.Include do
     end)
   end
 
-  def render(output, %Tags{parts: parts}=tag, %Context{}=context) do
+  def render(output, %Tag{parts: parts}=tag, %Context{}=context) do
     { file_system, root } = context |> Context.registers(:file_system) || FileSystem.lookup
     { name, context } = parts[:name] |> Variable.lookup(context)
     { :ok, source } = file_system.read_template_file(root, name, context)
@@ -49,7 +49,7 @@ defmodule Liquescent.Include do
     end
   end
 
-  defp build_presets(%Tags{}=tag, context) do
+  defp build_presets(%Tag{}=tag, context) do
     tag.attributes |> Enum.reduce([], fn({key, value}, coll) ->
       { value, _ } = Variable.lookup(value, context)
       Dict.put(coll, key, value)

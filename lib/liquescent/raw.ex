@@ -1,5 +1,5 @@
 defmodule Liquescent.Raw do
-  alias Liquescent.Tags
+  alias Liquescent.Tag
   alias Liquescent.Template
   alias Liquescent.Context
   alias Liquescent.Render

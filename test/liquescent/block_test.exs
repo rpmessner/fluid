@@ -58,8 +58,8 @@ defmodule Liquescent.BlockTest do
   end
 
   test "registering custom tags/blocks" do
-    Liquescent.Registers.register("test", TestTag, Liquescent.Tags)
-    assert { TestTag, Liquescent.Tags } = Liquescent.Registers.lookup("test")
+    Liquescent.Registers.register("test", TestTag, Liquescent.Tag)
+    assert { TestTag, Liquescent.Tag } = Liquescent.Registers.lookup("test")
   end
 
   test "with custom block" do
@@ -69,9 +69,9 @@ defmodule Liquescent.BlockTest do
   end
 
   test "with custom tag" do
-    Liquescent.Registers.register("testtag", TestTag, Liquescent.Tags)
+    Liquescent.Registers.register("testtag", TestTag, Liquescent.Tag)
     template = Liquescent.Template.parse( "{% testtag %}")
-    assert [%Liquescent.Tags{name: :testtag}] = template.root.nodelist
+    assert [%Liquescent.Tag{name: :testtag}] = template.root.nodelist
   end
 
 end

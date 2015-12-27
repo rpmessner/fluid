@@ -1,6 +1,6 @@
 defmodule Liquescent.Case do
 
-  alias Liquescent.Tags
+  alias Liquescent.Tag
   alias Liquescent.Block
   alias Liquescent.Template
   alias Liquescent.Variable
@@ -16,8 +16,8 @@ defmodule Liquescent.Case do
 
   defp split(%Variable{}, []), do: []
   defp split(%Variable{}=v, [<<_::binary>>|t]), do: split(v, t)
-  defp split(%Variable{}=_, [%Liquescent.Tags{name: :else}|t]), do: t
-  defp split(%Variable{}=v, [%Liquescent.Tags{name: :when, markup: markup}|t]) do
+  defp split(%Variable{}=_, [%Liquescent.Tag{name: :else}|t]), do: t
+  defp split(%Variable{}=v, [%Liquescent.Tag{name: :when, markup: markup}|t]) do
     { nodelist, t } = Block.split(t, [:when, :else])
     condition = parse_condition(v, markup)
     %Block{name: :if, nodelist: nodelist, condition: condition, elselist: split(v, t)}
@@ -45,8 +45,8 @@ defmodule Liquescent.Case do
 end
 
 defmodule Liquescent.When do
-  alias Liquescent.Tags, as: Tags
+  alias Liquescent.Tag, as: Tag
   alias Liquescent.Template, as: Template
 
-  def parse(%Tags{}=tag, %Template{}=t), do: { tag, t }
+  def parse(%Tag{}=tag, %Template{}=t), do: { tag, t }
 end

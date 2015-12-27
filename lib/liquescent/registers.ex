@@ -2,24 +2,24 @@ defmodule Liquescent.Registers do
   use GenServer
 
   defp default_tags do
-    [defaultcontent: { Liquescent.Default,  Liquescent.Tags },
-     continue:       { Liquescent.Continue, Liquescent.Tags },
+    [defaultcontent: { Liquescent.Default,  Liquescent.Tag },
+     continue:       { Liquescent.Continue, Liquescent.Tag },
      extended:       { Liquescent.Extends,  Liquescent.Block },
      comment:        { Liquescent.Comment,  Liquescent.Block },
-     include:        { Liquescent.Include,  Liquescent.Tags },
-     assign:         { Liquescent.Assign,   Liquescent.Tags },
+     include:        { Liquescent.Include,  Liquescent.Tag },
+     assign:         { Liquescent.Assign,   Liquescent.Tag },
      block:          { Liquescent.Inherit,  Liquescent.Block },
-     break:          { Liquescent.Break,    Liquescent.Tags },
-     elsif:          { Liquescent.ElseIf,   Liquescent.Tags },
-     else:           { Liquescent.Else,     Liquescent.Tags },
+     break:          { Liquescent.Break,    Liquescent.Tag },
+     elsif:          { Liquescent.ElseIf,   Liquescent.Tag },
+     else:           { Liquescent.Else,     Liquescent.Tag },
      case:           { Liquescent.Case,     Liquescent.Block },
-     when:           { Liquescent.When,     Liquescent.Tags },
+     when:           { Liquescent.When,     Liquescent.Tag },
      for:            { Liquescent.ForElse,  Liquescent.Block },
      if:             { Liquescent.IfElse,   Liquescent.Block },
      unless:         { Liquescent.Unless,   Liquescent.Block},
      raw:            { Liquescent.Raw,      Liquescent.Block},
-     increment:      { Liquescent.Increment, Liquescent.Tags},
-     decrement:      { Liquescent.Decrement, Liquescent.Tags},
+     increment:      { Liquescent.Increment, Liquescent.Tag},
+     decrement:      { Liquescent.Decrement, Liquescent.Tag},
      capture:        { Liquescent.Capture, Liquescent.Block}]
   end
 

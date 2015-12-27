@@ -1,13 +1,13 @@
 defmodule Liquescent.Assign do
   alias Liquescent.Variable
-  alias Liquescent.Tags
+  alias Liquescent.Tag
   alias Liquescent.Context
 
   def syntax, do: ~r/([\w\-]+)\s*=\s*(.*)\s*/
 
-  def parse(%Tags{}=tag, %Liquescent.Template{}=template), do: { tag, template }
+  def parse(%Tag{}=tag, %Liquescent.Template{}=template), do: { tag, template }
 
-  def render(output, %Tags{markup: markup}, %Context{}=context) do
+  def render(output, %Tag{markup: markup}, %Context{}=context) do
     [[_, to, from]] = syntax |> Regex.scan(markup)
     to_atom  = to |> String.to_atom
     variable = Variable.create(from)

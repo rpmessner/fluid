@@ -1,14 +1,14 @@
 defmodule Liquescent.Decrement do
-  alias Liquescent.Tags
+  alias Liquescent.Tag
   alias Liquescent.Template
   alias Liquescent.Context
   alias Liquescent.Variable
 
-  def parse(%Tags{}=tag, %Template{}=template) do
+  def parse(%Tag{}=tag, %Template{}=template) do
     {tag, template }
   end
 
-  def render(output, %Tags{markup: markup}, %Context{}=context) do
+  def render(output, %Tag{markup: markup}, %Context{}=context) do
     to_atom = markup |> String.to_atom
     variable = Variable.create(markup)
     { value, context } = Variable.lookup(variable, context)

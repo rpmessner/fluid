@@ -1,10 +1,10 @@
 defmodule Liquescent.ElseIf do
-  def parse(%Liquescent.Tags{}=tag, %Liquescent.Template{}=t), do: { tag, t }
+  def parse(%Liquescent.Tag{}=tag, %Liquescent.Template{}=t), do: { tag, t }
   def render(_, _, _, _), do: raise "should never get here"
 end
 
 defmodule Liquescent.Else do
-  def parse(%Liquescent.Tags{}=tag, %Liquescent.Template{}=t), do: { tag, t }
+  def parse(%Liquescent.Tag{}=tag, %Liquescent.Template{}=t), do: { tag, t }
   def render(_, _, _, _), do: raise "should never get here"
 end
 
@@ -21,17 +21,17 @@ defmodule Liquescent.IfElse do
   def parse(%Liquescent.Block{}=block, %Liquescent.Template{}=t) do
     block = parse_conditions(block)
     case Block.split(block, [:else, :elsif]) do
-      { true_block, [%Liquescent.Tags{name: :elsif, markup: markup}|elsif_block] } ->
+      { true_block, [%Liquescent.Tag{name: :elsif, markup: markup}|elsif_block] } ->
         { elseif, t } = %Liquescent.Block{name: :if, markup: markup, nodelist: elsif_block} |> parse(t)
         { %{block | nodelist: true_block, elselist: [elseif] }, t }
-      { true_block, [%Liquescent.Tags{name: :else}|false_block] } ->
+      { true_block, [%Liquescent.Tag{name: :else}|false_block] } ->
         { %{block | nodelist: true_block, elselist: false_block}, t }
       { _, [] } ->
         { block, t }
     end
   end
 
-  def render(output, %Liquescent.Tags{}, context) do
+  def render(output, %Liquescent.Tag{}, context) do
     { output, context }
   end
 

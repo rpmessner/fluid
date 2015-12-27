@@ -121,24 +121,24 @@ defmodule Liquescent.ForElse do
 end
 
 defmodule Liquescent.Break do
-  alias Liquescent.Tags, as: Tags
+  alias Liquescent.Tag, as: Tag
   alias Liquescent.Context, as: Context
   alias Liquescent.Template, as: Template
 
-  def parse(%Tags{}=tag, %Template{}=template), do: { tag, template }
+  def parse(%Tag{}=tag, %Template{}=template), do: { tag, template }
 
-  def render(output, %Tags{}, %Context{}=context) do
+  def render(output, %Tag{}, %Context{}=context) do
     { output, %{context | break: true } }
   end
 end
 
 defmodule Liquescent.Continue do
-  alias Liquescent.Tags, as: Tags
+  alias Liquescent.Tag, as: Tag
   alias Liquescent.Context, as: Context
 
-  def parse(%Tags{}=tag, template), do: { tag, template }
+  def parse(%Tag{}=tag, template), do: { tag, template }
 
-  def render(output, %Tags{}, %Context{}=context) do
+  def render(output, %Tag{}, %Context{}=context) do
     { output, %{context | continue: true } }
   end
 end

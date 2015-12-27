@@ -4,7 +4,7 @@ defmodule Liquescent.Render do
   alias Liquescent.Registers, as: Registers
   alias Liquescent.Context, as: Context
   alias Liquescent.Block, as: Block
-  alias Liquescent.Tags, as: Tags
+  alias Liquescent.Tag, as: Tag
 
   def render(%Template{root: root}, %Context{}=context) do
     { output, context } = render([], root, context)
@@ -31,8 +31,8 @@ defmodule Liquescent.Render do
     { output ++ [rendered], context }
   end
 
-  def render(output, %Tags{name: name}=tag, %Context{}=context) do
-    { mod, Tags } = Registers.lookup(name)
+  def render(output, %Tag{name: name}=tag, %Context{}=context) do
+    { mod, Tag } = Registers.lookup(name)
     mod.render(output, tag, context)
   end
 
