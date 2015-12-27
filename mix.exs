@@ -7,6 +7,8 @@ defmodule Liquid.Mixfile do
       elixir: "~> 1.0",
       deps: deps,
       name: "Liquid",
+      description: description,
+      package: package,
       source_url: "https://github.com/nulian/liquid-elixir"]
   end
 
