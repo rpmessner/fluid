@@ -1,4 +1,4 @@
-# Liquescent
+# Liquid
 
 It's a templating library for Elixir.  
 Continuation of the fluid liquid conversion. 
@@ -8,15 +8,15 @@ Add the dependency to your mix file
 
 Start the application:
 
-`Liquescent.start`
+`Liquid.start`
 
 Compile a template from a string:
 
-`template = Liquescent.Template.parse("{% assign hello='hello' %}{{ hello }}{{world}}")`
+`template = Liquid.Template.parse("{% assign hello='hello' %}{{ hello }}{{world}}")`
 
 Render the template with a keyword list representing the local variables:
 
-`{ :ok, rendered } = Liquescent.Template.render(template, [world: "world"])`
+`{ :ok, rendered } = Liquid.Template.render(template, [world: "world"])`
 
 The tests should give a pretty good idea of the features implemented so far.
 
@@ -32,7 +32,3 @@ Feel free to add a bug report or pull request if you feel that anything is missi
 * Implement capture
 * Implement table_row tag
 * Fix empty check on arrays
-
-## Elsewhere
-
-If this is not for you, there is also a port of the Django template engine (which is quite similar) written for the ChicagoBoss framework: [https://github.com/evanmiller/erlydtl](https://github.com/evanmiller/erlydtl)

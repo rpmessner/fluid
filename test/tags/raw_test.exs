@@ -1,12 +1,12 @@
 Code.require_file "../../test_helper.exs", __ENV__.file
 
-defmodule Liquescent.RawTest do
+defmodule Liquid.RawTest do
   use ExUnit.Case
 
-  alias Liquescent.Template, as: Template
+  alias Liquid.Template, as: Template
 
   setup_all do
-    Liquescent.start
+    Liquid.start
     :ok
   end
 

@@ -1,6 +1,6 @@
 # Code.require_file "../../test_helper.exs", __ENV__.file
 #
-# defmodule Liquescent.TableRowTest do
+# defmodule Liquid.TableRowTest do
 #   use ExUnit.Case
 #
 #   test :test_table_row do
@@ -59,8 +59,8 @@
 #   end
 #
 #   defp assert_result(expected, markup, assigns) do
-#     template = Liquescent.Template.parse(markup)
-#     { :ok, result, _ } = Liquescent.Template.render(template, assigns)
+#     template = Liquid.Template.parse(markup)
+#     { :ok, result, _ } = Liquid.Template.render(template, assigns)
 #     assert result == expected
 #   end
 # end

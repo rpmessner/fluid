@@ -1,13 +1,13 @@
-defmodule Liquescent.Mixfile do
+defmodule Liquid.Mixfile do
   use Mix.Project
 
   def project do
-    [ app: :liquescent,
+    [ app: :liquid,
       version: "0.0.3",
       elixir: "~> 1.0",
       deps: deps,
-      name: "Liquescent",
-      source_url: "https://github.com/nulian/liquescent"]
+      name: "Liquid",
+      source_url: "https://github.com/nulian/liquid-elixir"]
   end
 
   # Configuration for the OTP application
