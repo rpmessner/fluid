@@ -36,7 +36,7 @@ defmodule Liquid.BlankTest do
   end
 
   test :test_mark_as_blank_only_during_parsing do
-    assert_template_result(" " * (String.to_integer(n) + 1), wrap(" {% if false %} this never happens, but still, this block is not blank {% endif %}"))
+    assert_template_result(String.duplicate(" ",String.to_integer(n) + 1), wrap(" {% if false %} this never happens, but still, this block is not blank {% endif %}"))
   end
 
   test :test_comments_are_blank do

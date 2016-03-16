@@ -2,6 +2,7 @@ Code.require_file "../../test_helper.exs", __ENV__.file
 
 defmodule Liquid.CaptureTest do
   use ExUnit.Case
+  alias Liquid.Template
 
   setup_all do
     Liquid.start

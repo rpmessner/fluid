@@ -22,7 +22,6 @@ defmodule Liquid.Condition do
   end
 
   def create({ %Variable{}=left, operator, <<right::binary>> }) do
-
     create({ left, operator, right |> Vars.create})
   end
 
@@ -31,7 +30,6 @@ defmodule Liquid.Condition do
   end
 
   def create({ %Variable{}=left, operator, %Variable{}=right }) do
-
     operator = String.to_atom(operator)
     %Cond{left: left, operator: operator, right: right}
   end
@@ -72,6 +70,9 @@ defmodule Liquid.Condition do
   end
 
   defp eval_operator(left, operator, right) when (is_nil(left) or is_nil(right)) and not(is_nil(left) and is_nil(right)) and operator in [:>=, :>, :<, :<=], do: false
+  defp eval_operator([] = left, :==, :empty?), do: Enum.empty?(left)
+  defp eval_operator([] = left, :<>, :empty?), do: eval_operator(left, :!==, :empty?)
+  defp eval_operator([] = left, :!=, :empty?), do: !Enum.empty?(left)
   defp eval_operator(left, operator, right) do
     case operator do
       :== -> left == right

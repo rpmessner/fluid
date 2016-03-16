@@ -3,7 +3,6 @@ defmodule Liquid.Capture do
   alias Liquid.Context
   alias Liquid.Variable
   alias Liquid.Template
-  require IEx
 
   def parse(%Block{}=block, %Template{}=template) do
     {block, template }
@@ -12,6 +11,5 @@ defmodule Liquid.Capture do
   def render(output, %Block{markup: markup}, %Context{}=context) do
     to_atom = markup |> String.to_atom
     variable = Variable.create(markup)
-    IEx.pry
   end
 end

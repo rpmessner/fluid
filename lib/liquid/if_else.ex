@@ -9,33 +9,35 @@ defmodule Liquid.Else do
 end
 
 defmodule Liquid.IfElse do
-  alias Liquid.Condition, as: Condition
-  alias Liquid.Render, as: Render
-  alias Liquid.Block, as: Block
+  alias Liquid.Condition
+  alias Liquid.Render
+  alias Liquid.Block
+  alias Liquid.Tag
+  alias Liquid.Template
 
   def syntax, do: ~r/(#{Liquid.quoted_fragment})\s*([=!<>a-z_]+)?\s*(#{Liquid.quoted_fragment})?/
   def expressions_and_operators do
     ~r/(?:\b(?:\s?and\s?|\s?or\s?)\b|(?:\s*(?!\b(?:\s?and\s?|\s?or\s?)\b)(?:#{Liquid.quoted_fragment}|\S+)\s*)+)/
   end
 
-  def parse(%Liquid.Block{}=block, %Liquid.Template{}=t) do
+  def parse(%Block{}=block, %Template{}=t) do
     block = parse_conditions(block)
     case Block.split(block, [:else, :elsif]) do
-      { true_block, [%Liquid.Tag{name: :elsif, markup: markup}|elsif_block] } ->
-        { elseif, t } = %Liquid.Block{name: :if, markup: markup, nodelist: elsif_block} |> parse(t)
+      { true_block, [%Tag{name: :elsif, markup: markup}|elsif_block] } ->
+        { elseif, t } = %Block{name: :if, markup: markup, nodelist: elsif_block} |> parse(t)
         { %{block | nodelist: true_block, elselist: [elseif] }, t }
-      { true_block, [%Liquid.Tag{name: :else}|false_block] } ->
+      { true_block, [%Tag{name: :else}|false_block] } ->
         { %{block | nodelist: true_block, elselist: false_block}, t }
       { _, [] } ->
         { block, t }
     end
   end
 
-  def render(output, %Liquid.Tag{}, context) do
+  def render(output, %Tag{}, context) do
     { output, context }
   end
 
-  def render(output, %Liquid.Block{condition: condition, nodelist: nodelist, elselist: elselist}, context) do
+  def render(output, %Block{condition: condition, nodelist: nodelist, elselist: elselist}, context) do
     condition = Condition.evaluate(condition, context)
     conditionlist = if condition, do: nodelist, else: elselist
     Render.render(output, conditionlist, context)
@@ -50,7 +52,7 @@ defmodule Liquid.IfElse do
     end)
   end
 
-  defp parse_conditions(%Liquid.Block{markup: markup}=block) do
+  defp parse_conditions(%Block{markup: markup}=block) do
     expressions = Regex.scan(expressions_and_operators, markup)
     expressions = expressions |> split_conditions |> Enum.reverse
     condition   = Condition.create(expressions)
