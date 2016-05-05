@@ -1,4 +1,8 @@
 defmodule Liquid do
+  use Application
+
+  def start(_type, _args), do: start
+
   def start do
     Liquid.Registers.start
     Liquid.FileSystem.start
