@@ -11,7 +11,7 @@ defmodule Liquid.CaptureTest do
   end
 
   test :test_captures_block_content_in_variable do
-    assert_template_result("test string", "{% capture 'var' %}test string{% endcapture %}{{var}}", {})
+    assert_template_result("test string", "{% capture 'var' %}test string{% endcapture %}{{var}}", [])
   end
 
   test :test_capture_with_hyphen_in_variable_name do
