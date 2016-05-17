@@ -20,8 +20,8 @@ defmodule Liquid.CaptureTest do
     {{ this-thing }}
     """
     template = Template.parse(template_source)
-    rendered = template.render(template)
-    assert "Print this-thing" == rendered |> String.strip
+    { :ok, result, _ } = Template.render(template)
+    assert "Print this-thing" == result |> String.strip
   end
 
   test :test_capture_to_variable_from_outer_scope_if_existing do
@@ -36,8 +36,24 @@ defmodule Liquid.CaptureTest do
     {{var}}
     """
     template = Template.parse(template_source)
-    rendered = template.render(template)
-    assert "test-string" == Regex.replace(~r/\s/, rendered, "")
+    { :ok, result, _ } = Template.render(template)
+    assert "test-string" == Regex.replace(~r/\s/, result, "")
+  end
+
+  test :test_capture_to_variable_from_outer_scope_if_existing do
+    template_source = """
+    {% assign var = '' %}
+    {% if true %}
+    {% capture var %}first-block-string{% endcapture %}
+    {% endif %}
+    {% if true %}
+    {% capture var %}test-string{% endcapture %}
+    {% endif %}
+    {{var}}
+    """
+    template = Template.parse(template_source)
+    { :ok, result, _ } = Template.render(template)
+    assert "test-string" == Regex.replace(~r/\s/, result, "")
   end
 
   test :test_assigning_from_capture do
@@ -51,8 +67,8 @@ defmodule Liquid.CaptureTest do
     {{ first }}-{{ second }}
     """
     template = Template.parse(template_source)
-    rendered = template.render(template)
-    assert "3-3" == Regex.replace(~r/\s/, rendered, "")
+    { :ok, result, _ } = Template.render(template)
+    assert "3-3" == Regex.replace(~r/\s/, result, "")
   end
 
   defp assert_template_result(expected, markup) do
