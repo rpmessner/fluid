@@ -23,6 +23,10 @@ defmodule Liquid.AssignTest do
                   [values: "foo,bar,baz"])
   end
 
+  test "assign string to var and then show" do
+    assert_result("test", "{% assign foo = 'test' %}{{foo}}", []) 
+  end
+
   defp assert_result(expected, markup, assigns) do
     template = Liquid.Template.parse(markup)
     { :ok, result, _ } = Liquid.Template.render(template, assigns)
