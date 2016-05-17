@@ -1,14 +1,33 @@
 # Liquid
 
-It's a templating library for Elixir.  
-Continuation of the fluid liquid conversion. 
+It's a templating library for Elixir.
+Continuation of the fluid liquid conversion.
 
 ## Usage
-Add the dependency to your mix file
 
-Start the application:
+Add the dependency to your mix file:
+
+``` elixir
+# mix.exs
+defp deps do
+  […,
+   {:liquid, "~> 0.1.0"}]
+end
+```
+
+You can either start the application directly:
 
 `Liquid.start`
+
+Or start it with your application:
+
+``` elixir
+# mix.exs
+def application do
+  [mod: {MyApp, []},
+   applications: […, :liquid]]
+end
+```
 
 Compile a template from a string:
 
@@ -16,7 +35,7 @@ Compile a template from a string:
 
 Render the template with a keyword list representing the local variables:
 
-`{ :ok, rendered } = Liquid.Template.render(template, [world: "world"])`
+`{ :ok, rendered, _ } = Liquid.Template.render(template, [world: "world"])`
 
 The tests should give a pretty good idea of the features implemented so far.
 
