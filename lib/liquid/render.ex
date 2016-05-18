@@ -8,7 +8,7 @@ defmodule Liquid.Render do
 
   def render(%Template{root: root}, %Context{}=context) do
     { output, context } = render([], root, context)
-    { :ok, Enum.join(output), context }
+    { :ok, output |> List.flatten |> Enum.join, context }
   end
 
   def render(output, [], %Context{}=context) do
@@ -22,7 +22,7 @@ defmodule Liquid.Render do
     end
   end
 
-  def render(output, <<text::binary>>, %Context{}=context) do
+  def render(output, text, %Context{}=context) when is_binary(text) do
     { output ++ [text], context }
   end
 
@@ -38,7 +38,8 @@ defmodule Liquid.Render do
 
   def render(output, %Block{name: name}=block, %Context{}=context) do
     case Registers.lookup(name) do
-      { mod, Block } -> mod.render(output, block, context)
+      { mod, Block } ->
+        mod.render(output, block, context)
       nil -> render(output, block.nodelist, context)
     end
   end

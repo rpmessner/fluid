@@ -1,7 +1,6 @@
 defmodule Liquid.Capture do
   alias Liquid.Block
   alias Liquid.Context
-  alias Liquid.Variable
   alias Liquid.Template
 
   def parse(%Block{}=block, %Template{}=template) do

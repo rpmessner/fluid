@@ -43,7 +43,7 @@ defmodule Liquid.ForElse do
       end
     end)
   end
-require IEx
+
   def render(output, %Block{iterator: it}=block, %Context{}=context) do
     list = parse_collection(it.collection, context)
     if is_list(list) and Enum.count(list) > 0 do
@@ -74,8 +74,8 @@ require IEx
       else { output, context }
     end
     case block_context do
-      %Context{break: true} -> each(output, [], block, context)
-      _ -> each(output, t, block, context)
+      %Context{break: true} -> each(output, [], block, %{context | assigns: block_context.assigns})
+      _ -> each(output, t, block, %{context | assigns: block_context.assigns})
     end
   end
 

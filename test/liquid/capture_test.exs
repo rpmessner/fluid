@@ -68,7 +68,7 @@ defmodule Liquid.CaptureTest do
     """
     template = Template.parse(template_source)
     { :ok, result, _ } = Template.render(template)
-    assert "3-3" == Regex.replace(~r/\s/, result, "")
+    assert "3-3" == Regex.replace(~r/\n/, result, "")
   end
 
   defp assert_template_result(expected, markup) do

@@ -44,7 +44,7 @@ defmodule ForElseTagTest do
     assert_raise(ArgumentError, fn ->
       markup = "{% for i in (a..2) %}{% endfor %}'"
       t = Template.parse(markup)
-      Template.render(t, [a: [1, 2]]) 
+      Template.render(t, [a: [1, 2]])
     end)
 
     assert_template_result(" 0  1  2  3 ", "{% for item in (a..3) %} {{item}} {% endfor %}", [a: "invalid integer"])
@@ -204,6 +204,28 @@ defmodule ForElseTagTest do
     expected = "1234"
     assert_result(expected,markup,assigns)
 
+    # test break does nothing when unreached
+    assigns = [array: [items: [1,2,3,4,5]]]
+    markup = "{% for i in array.items %}{% if i == 9999 %}{% break %}{% endif %}{{ i }}{% endfor %}"
+    expected = "12345"
+    assert_result(expected, markup, assigns)
+  end
+
+  test :for_with_loop_inside_loop do
+    # tests to ensure it only breaks out of the local for loop
+    # and not all of them.
+    assigns = [array: [[1,2],[3,4],[5,6]]]
+
+    markup = "{% for item in array %}" <>
+               "{% for i in item %}" <>
+                 "{{ i }}" <>
+               "{% endfor %}" <>
+             "{% endfor %}"
+    expected = "123456"
+    assert_result(expected, markup, assigns)
+  end
+
+  test :for_with_break_inside_loop do
     # tests to ensure it only breaks out of the local for loop
     # and not all of them.
     assigns = [array: [[1,2],[3,4],[5,6]]]
@@ -217,12 +239,6 @@ defmodule ForElseTagTest do
                "{% endfor %}" <>
              "{% endfor %}"
     expected = "3456"
-    assert_result(expected, markup, assigns)
-
-    # test break does nothing when unreached
-    assigns = [array: [items: [1,2,3,4,5]]]
-    markup = "{% for i in array.items %}{% if i == 9999 %}{% break %}{% endif %}{{ i }}{% endfor %}"
-    expected = "12345"
     assert_result(expected, markup, assigns)
   end
 
