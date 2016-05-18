@@ -38,9 +38,18 @@ defmodule ForElseTagTest do
     assert_result("321", "{%for item in array reversed %}{{item}}{%endfor%}", assigns)
   end
 
-  # test :for_with_range do
-  #   assert_result(" 1  2  3 ","{%for item in (1..3) %} {{item}} {%endfor%}")
-  # end
+  test :for_with_range do
+    assert_result(" 1  2  3 ","{%for item in (1..3) %} {{item}} {%endfor%}", [])
+
+    assert_raise(ArgumentError, fn ->
+      markup = "{% for i in (a..2) %}{% endfor %}'"
+      t = Template.parse(markup)
+      Template.render(t, [a: [1, 2]]) 
+    end)
+
+    assert_template_result(" 0  1  2  3 ", "{% for item in (a..3) %} {{item}} {% endfor %}", [a: "invalid integer"])
+
+  end
 
   test :for_with_variable do
     assert_result(" 1  2  3 ", "{%for item in array%} {{item}} {%endfor%}", [array: [1,2,3]])
@@ -286,6 +295,14 @@ defmodule ForElseTagTest do
   # test :blank_string_not_iterable do
   #   assert_result("", "{% for char in characters %}I WILL NOT BE OUTPUT{% endfor %}", [characters: ""])
   # end
+
+  defp assert_template_result(expected, markup) do
+    assert_result(expected, markup, [])
+  end
+
+  defp assert_template_result(expected, markup, assigns) do
+    assert_result(expected,markup,assigns)
+  end
 
   defp assert_result(expected, markup, assigns) do
     t = Template.parse(markup)

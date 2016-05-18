@@ -3,7 +3,6 @@ defmodule Liquid.Increment do
   alias Liquid.Template
   alias Liquid.Context
   alias Liquid.Variable
-  require IEx
 
   def parse(%Tag{}=tag, %Template{}=template) do
     {tag, template }

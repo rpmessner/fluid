@@ -25,16 +25,16 @@ defmodule Liquid.Parse do
         try do
           mod.tokenize(string)
         rescue
-          UndefinedFunctionError ->
+          UndefinedFunctionError -> nil
         end
-      _ ->
+      _ -> nil
     end
   end
 
   defp parse_tag_name(name) do
     case Regex.named_captures(Liquid.parser, name) do
       %{"tag" => tag_name, "variable" => _ } -> tag_name
-      _ ->
+      _ -> nil
     end
   end
 

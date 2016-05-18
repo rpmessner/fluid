@@ -12,7 +12,7 @@ defmodule Liquid.Variable do
   def integer, do: ~r/^(-?\d+)$/
   def float, do: ~r/^(-?\d[\d\.]+)$/
   def quoted_string, do: ~r/#{Liquid.quoted_string}/
-require IEx
+
   @doc """
     matches for [] access
   """

@@ -4,9 +4,12 @@ defmodule Liquid.ForElse do
   alias Liquid.Block
   alias Liquid.Variable
   alias Liquid.Context
+  alias Liquid.Expression
+  alias Liquid.RangeLookup
   defmodule Iterator do
-    defstruct collection: nil, item: nil, reversed: false,
+    defstruct name: nil, collection: nil, item: nil, reversed: false,
                         limit: nil, offset: nil, forloop: []
+
   end
 
   def syntax, do: ~r/(\w+)\s+in\s+(#{Liquid.quoted_fragment}+)\s*(reversed)?/
@@ -21,14 +24,14 @@ defmodule Liquid.ForElse do
   end
 
   defp parse_iterator(%Block{markup: markup}) do
-    [[_,item|[collection|reversed]]] = Regex.scan(syntax, markup)
-    collection = Variable.create(collection)
+    [[_,item|[orig_collection|reversed]]] = Regex.scan(syntax, markup)
+    collection = Expression.parse(orig_collection)
     reversed   = !(reversed |> List.first |> is_nil)
     attributes = Liquid.tag_attributes |> Regex.scan(markup)
     limit      = attributes |> parse_attribute("limit") |> Variable.create
     offset     = attributes |> parse_attribute("offset", "0") |> Variable.create
     item       = item |> String.to_atom
-    %Iterator{item: item, collection: collection,
+    %Iterator{name: orig_collection, item: item, collection: collection,
              limit: limit, offset: offset, reversed: reversed}
   end
 
@@ -40,9 +43,9 @@ defmodule Liquid.ForElse do
       end
     end)
   end
-
+require IEx
   def render(output, %Block{iterator: it}=block, %Context{}=context) do
-    { list, _ } = Variable.lookup(it.collection, context)
+    list = parse_collection(it.collection, context)
     if is_list(list) and Enum.count(list) > 0 do
       list = if it.reversed, do: Enum.reverse(list), else: list
       each(output, list, block, context)
@@ -51,8 +54,18 @@ defmodule Liquid.ForElse do
     end
   end
 
-  defp each(output, [], %Block{}=block, %Context{}=context), do: { output, remember_limit(block, context) }
-  defp each(output, [h|t]=list, %Block{iterator: it}=block, %Context{assigns: assigns}=context) do
+  defp parse_collection(list, _context) when is_list(list), do: list
+  defp parse_collection(%Variable{} = variable, context) do
+    {list, _} = Variable.lookup(variable, context)
+    list
+  end
+
+  defp parse_collection(%RangeLookup{} = range, context) do
+    RangeLookup.parse(range, context)
+  end
+
+  def each(output, [], %Block{}=block, %Context{}=context), do: { output, remember_limit(block, context) }
+  def each(output, [h|t]=list, %Block{iterator: it}=block, %Context{assigns: assigns}=context) do
     forloop = next_forloop(it, list |> Enum.count)
     block   = %{ block | iterator: %{it | forloop: forloop }}
     assigns = assigns |> Dict.put(:forloop, forloop) |> Dict.put(it.item, h)
@@ -69,7 +82,7 @@ defmodule Liquid.ForElse do
   defp remember_limit(%Block{iterator: it}, context) do
     { limit, context } = lookup_limit(it, context)
     limit      = limit || 0
-    key        = it.collection.name |> String.to_atom
+    key        = it.name |> String.to_atom
     remembered = context.offsets[key] || 0
     %{ context | offsets: context.offsets |> Dict.put(key, remembered + limit) }
   end
@@ -92,7 +105,7 @@ defmodule Liquid.ForElse do
   defp lookup_offset(%Iterator{offset: offset}=it, %Context{}=context) do
     case offset.name do
       "continue" ->
-        offset = context.offsets[it.collection.name |> String.to_atom]
+        offset = context.offsets[it.name |> String.to_atom]
         { offset || 0, context }
       <<_::binary>> -> Variable.lookup(offset, context)
     end
