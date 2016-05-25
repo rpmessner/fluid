@@ -9,17 +9,19 @@ defmodule Liquid.ForElse do
   defmodule Iterator do
     defstruct name: nil, collection: nil, item: nil, reversed: false,
                         limit: nil, offset: nil, forloop: []
-
   end
 
   def syntax, do: ~r/(\w+)\s+in\s+(#{Liquid.quoted_fragment}+)\s*(reversed)?/
 
-  def parse(%Block{}=block, %Liquid.Template{}=t) do
+  def parse(%Block{nodelist: nodelist}=block, %Liquid.Template{}=t) do
     block = %{block | iterator: parse_iterator(block) }
     case Block.split(block) do
       { true_block, [_,false_block] } ->
-        { %{block | nodelist: true_block, elselist: false_block}, t }
-      { _, [] } -> { block, t }
+        is_blank = Blank.blank?(true_block) && Blank.blank?(false_block)
+        { %{block | nodelist: true_block, elselist: false_block, blank: is_blank}, t }
+      { _, [] } ->
+          is_blank = Blank.blank?(nodelist)
+        { %{block | blank: is_blank}, t }
     end
   end
 
@@ -69,9 +71,13 @@ defmodule Liquid.ForElse do
     forloop = next_forloop(it, list |> Enum.count)
     block   = %{ block | iterator: %{it | forloop: forloop }}
     assigns = assigns |> Dict.put(:forloop, forloop) |> Dict.put(it.item, h)
-    { output, block_context } = if should_render?(block, forloop, context) do
-      Render.render(output, block.nodelist, %{context | assigns: assigns})
-      else { output, context }
+    { output, block_context } = cond do
+      should_render?(block, forloop, context) && !block.blank ->
+        Render.render(output, block.nodelist, %{context | assigns: assigns})
+      should_render?(block, forloop, context) && block.blank ->
+        { _, context } = Render.render(output, block.nodelist, %{context | assigns: assigns})
+        { output, context }
+      true -> { output, context }
     end
     case block_context do
       %Context{break: true} -> each(output, [], block, %{context | assigns: block_context.assigns})

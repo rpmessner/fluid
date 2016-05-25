@@ -1,10 +1,10 @@
 defmodule Liquid.Render do
-  alias Liquid.Variable, as: Variable
-  alias Liquid.Template, as: Template
-  alias Liquid.Registers, as: Registers
-  alias Liquid.Context, as: Context
-  alias Liquid.Block, as: Block
-  alias Liquid.Tag, as: Tag
+  alias Liquid.Variable
+  alias Liquid.Template
+  alias Liquid.Registers
+  alias Liquid.Context
+  alias Liquid.Block
+  alias Liquid.Tag
 
   def render(%Template{root: root}, %Context{}=context) do
     { output, context } = render([], root, context)
@@ -14,6 +14,7 @@ defmodule Liquid.Render do
   def render(output, [], %Context{}=context) do
     { output, context }
   end
+
   def render(output, [h|t], %Context{}=context) do
     { output, context } = render(output, h, context)
     case context do

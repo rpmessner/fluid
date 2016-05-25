@@ -19,7 +19,6 @@ defmodule Liquid.Template do
   end
 
   def parse(<<markup::binary>>, presets \\ []) do
-
     Liquid.Parse.parse(markup, %Template{presets: presets})
   end
 

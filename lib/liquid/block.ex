@@ -1,5 +1,5 @@
 defmodule Liquid.Block do
-  defstruct name: nil, markup: nil, condition: nil, parts: [], iterator: [], nodelist: [], elselist: []
+  defstruct name: nil, markup: nil, condition: nil, parts: [], iterator: [], nodelist: [], elselist: [], blank: false
 
   alias Liquid.Tag, as: Tag
   alias Liquid.Block, as: Block
@@ -9,7 +9,6 @@ defmodule Liquid.Block do
     name = String.to_atom(name)
     %Block{name: name, markup: Enum.join(rest, " ")}
   end
-
   def split(nodes), do: split(nodes, [:else])
   def split(%Block{nodelist: nodelist}, namelist), do: split(nodelist, namelist)
   def split(nodelist, namelist) when is_list(nodelist) do
