@@ -21,11 +21,6 @@ defmodule Liquid.IncrementTest do
     assert_template_result("1 5 2 2 5","{%increment port %} {%increment starboard%} {%increment port %} {%decrement port%} {%decrement starboard %}", [port: 1, starboard: 5 ])
   end
 
-
-  defp assert_template_result(expected, markup) do
-    assert_result(expected, markup, [])
-  end
-
   defp assert_template_result(expected, markup, assigns) do
     assert_result(expected,markup,assigns)
   end

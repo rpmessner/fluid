@@ -65,10 +65,6 @@ defmodule Liquid.BlankTest do
     assert_result(expected, markup, [])
   end
 
-  defp assert_template_result(expected, markup, assigns) do
-    assert_result(expected,markup,assigns)
-  end
-
   defp assert_result(expected, markup, assigns) do
     template = Liquid.Template.parse(markup)
     { :ok, result, _ } = Liquid.Template.render(template, assigns)
