@@ -4,7 +4,7 @@ defmodule Liquid.Capture do
   alias Liquid.Template
 
   def parse(%Block{}=block, %Template{}=template) do
-    {block, template }
+    {%{block | blank: true}, template }
   end
 
   def render(output, %Block{markup: markup, nodelist: content}, %Context{}=context) do

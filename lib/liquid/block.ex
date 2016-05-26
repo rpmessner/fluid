@@ -1,5 +1,5 @@
 defmodule Liquid.Block do
-  defstruct name: nil, markup: nil, condition: nil, parts: [], iterator: [], nodelist: [], elselist: []
+  defstruct name: nil, markup: nil, condition: nil, parts: [], iterator: [], nodelist: [], elselist: [], blank: false
 
   alias Liquid.Tag, as: Tag
   alias Liquid.Block, as: Block

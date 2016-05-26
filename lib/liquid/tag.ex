@@ -1,5 +1,5 @@
 defmodule Liquid.Tag do
-  defstruct name: nil, markup: nil, parts: [], attributes: []
+  defstruct name: nil, markup: nil, parts: [], attributes: [], blank: false
 
   def create(markup) do
     [name|rest] = String.split(markup, " ")

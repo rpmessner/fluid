@@ -46,7 +46,6 @@ defmodule Liquid.Parse do
         [name|_] = String.split(markup, " ")
         case Registers.lookup(name) do
           { mod, Liquid.Block } ->
-
             block = Liquid.Block.create(markup)
             { block, rest, template } = try do
                 mod.parse(block, rest, [], template)
@@ -74,7 +73,6 @@ defmodule Liquid.Parse do
   end
 
   def parse(%Block{name: name}=block, [h|t], accum, %Template{}=template) do
-
     endblock = "end" <> to_string(name)
     cond do
       Regex.match?(~r/{%\s*#{endblock}\s*%}/, h) ->

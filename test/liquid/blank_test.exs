@@ -49,21 +49,20 @@ defmodule Liquid.BlankTest do
 
   test :test_nested_blocks_are_blank_but_only_if_all_children_are do
     assert_template_result("", wrap(wrap(" ")))
-    assert_template_result("\n       but this is not " * (N + 1),
-      wrap('{% if true %} {% comment %} this is blank {% endcomment %} {% endif %}
-      {% if true %} but this is not {% endif %}'))
+    assert_template_result(String.duplicate("\n       but this is not ", String.to_integer(n) + 1),
+      wrap("{% if true %} {% comment %} this is blank {% endcomment %} {% endif %}\n      {% if true %} but this is not {% endif %}"))
   end
 
   test :test_assigns_are_blank do
     assert_template_result("", wrap(" {% assign foo = \"bar\" %} "))
   end
 
-  defp assert_template_result(expected, markup) do
-    assert_result(expected, markup, [])
+  test :loop_test do
+    assert_template_result("testtesttesttesttesttesttesttesttesttesttest", wrap("test"))
   end
 
-  defp assert_template_result(expected, markup, assigns) do
-    assert_result(expected,markup,assigns)
+  defp assert_template_result(expected, markup) do
+    assert_result(expected, markup, [])
   end
 
   defp assert_result(expected, markup, assigns) do

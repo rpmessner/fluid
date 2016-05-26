@@ -312,10 +312,6 @@ defmodule ForElseTagTest do
   #   assert_result("", "{% for char in characters %}I WILL NOT BE OUTPUT{% endfor %}", [characters: ""])
   # end
 
-  defp assert_template_result(expected, markup) do
-    assert_result(expected, markup, [])
-  end
-
   defp assert_template_result(expected, markup, assigns) do
     assert_result(expected,markup,assigns)
   end

@@ -24,12 +24,16 @@ defmodule Liquid.IfElse do
     block = parse_conditions(block)
     case Block.split(block, [:else, :elsif]) do
       { true_block, [%Tag{name: :elsif, markup: markup}|elsif_block] } ->
-        { elseif, t } = %Block{name: :if, markup: markup, nodelist: elsif_block} |> parse(t)
-        { %{block | nodelist: true_block, elselist: [elseif] }, t }
+        is_blank = Blank.blank?(elsif_block)
+        { elseif, t } = %Block{name: :if, markup: markup, nodelist: elsif_block, blank: is_blank} |> parse(t)
+        is_blank = Blank.blank?(true_block)
+        { %{block | nodelist: true_block, elselist: [elseif], blank: is_blank }, t }
       { true_block, [%Tag{name: :else}|false_block] } ->
-        { %{block | nodelist: true_block, elselist: false_block}, t }
+        is_blank = Blank.blank?(true_block) && Blank.blank?(false_block)
+        { %{block | nodelist: true_block, elselist: false_block, blank: is_blank}, t }
       { _, [] } ->
-        { block, t }
+        is_blank = Blank.blank?(block.nodelist)
+        { %{block | blank: is_blank}, t }
     end
   end
 
@@ -37,7 +41,12 @@ defmodule Liquid.IfElse do
     { output, context }
   end
 
-  def render(output, %Block{condition: condition, nodelist: nodelist, elselist: elselist}, context) do
+  def render(output, %Block{blank: true} = block, context) do
+    {_, context} = render(output, %{block | blank: false }, context)
+    {output, context}
+  end
+
+  def render(output, %Block{condition: condition, nodelist: nodelist, elselist: elselist, blank: false}, context) do
     condition = Condition.evaluate(condition, context)
     conditionlist = if condition, do: nodelist, else: elselist
     Render.render(output, conditionlist, context)
