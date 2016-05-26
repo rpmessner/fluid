@@ -15,11 +15,13 @@ defmodule Liquid.Include do
     attributes = parse_attributes(markup)
     { %{tag | attributes: attributes }, template }
   end
-
+require IEx
   defp parse_tag(%Tag{}=tag, parts) do
     case parts do
       [_, name] -> %{tag | parts: [name: name |> Variable.create]}
-      [_, name," with "<>_,v] -> %{tag | parts: [name: name |> Variable.create , variable: v |> Variable.create]}
+      [_, name," with "<>_,v] ->
+        IEx.pry
+        %{tag | parts: [name: name |> Variable.create , variable: v |> Variable.create]}
       [_, name," for "<>_,v] -> %{tag | parts: [name: name |> Variable.create, foreach: v |> Variable.create]}
     end
   end
@@ -50,9 +52,9 @@ defmodule Liquid.Include do
   end
 
   defp build_presets(%Tag{}=tag, context) do
-    tag.attributes |> Enum.reduce([], fn({key, value}, coll) ->
+    tag.attributes |> Enum.reduce(%{}, fn({key, value}, coll) ->
       { value, _ } = Variable.lookup(value, context)
-      Dict.put(coll, key, value)
+      Map.put(coll, key, value)
     end)
   end
 
@@ -71,7 +73,7 @@ defmodule Liquid.Include do
   end
 
   defp render_item(output, key, item, template, %Context{}=context) do
-    assigns = context.assigns |> Dict.merge([{ key, item }])
+    assigns = context.assigns |> Map.merge([{ key, item }])
     { :ok, rendered, _ } = Template.render(template, %{context | assigns: assigns })
     { output ++ [rendered], context }
   end

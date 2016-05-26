@@ -5,9 +5,9 @@ defmodule Liquid.Variable do
   alias Liquid.Variable, as: Variable
   alias Liquid.Context, as: Context
 
-  defp literals, do: [nil: nil, null: nil, "": nil,
-                      true: true, false: false,
-                      blank: :blank?, empty: :empty?]
+  defp literals, do: %{"nil" => nil, "null" => nil, "" => nil,
+                      "true" => true, "false" => false,
+                      "blank" => :blank?, "empty" => :empty?}
 
   def integer, do: ~r/^(-?\d+)$/
   def float, do: ~r/^(-?\d[\d\.]+)$/
@@ -18,10 +18,10 @@ defmodule Liquid.Variable do
   """
   def create(<<markup::binary>>) do
     [name|filters] = Filters.parse(markup)
-    key = name |> String.strip |> String.to_atom
+    key = name |> String.strip
     variable = %Liquid.Variable{name: name, filters: filters}
     cond do
-      literals      |> Dict.has_key?(key) ->
+      literals      |> Map.has_key?(key) ->
         value = literals |> Dict.get(key)
         %{variable | literal: value }
       integer       |> Regex.match?(name) ->
@@ -39,8 +39,10 @@ defmodule Liquid.Variable do
         %{variable | parts: parts}
     end
   end
+  require IEx
 
   def lookup(%Variable{filters: filters}=v, %Context{}=context) do
+    IEx.pry
     { ret, context } = case v do
       %Variable{literal: literal, parts: []} ->
         { literal, context }
@@ -51,37 +53,38 @@ defmodule Liquid.Variable do
     { ret, context }
   end
 
-  defp resolve([<<name::binary>>|_]=parts, %Context{}=current, %Context{}=context) do
-    key = name |> String.to_atom
+  defp resolve([<<key::binary>>|_]=parts, %Context{}=current, %Context{}=context) do
+    IEx.pry
     cond do
-      current.assigns |> Dict.has_key?(key) ->
+      current.assigns |> Map.has_key?(key) ->
         resolve(parts, current.assigns, context)
-      current.presets |> Dict.has_key?(key) ->
+      current.presets |> Map.has_key?(key) ->
         resolve(parts, current.presets, context)
       true -> { nil, context }
     end
   end
-
   defp resolve([], current, %Context{}=context), do: { current, context }
   defp resolve([<<?[,index::binary>>|parts], current, %Context{}=context) do
+    IEx.pry
     [index, _] = String.split(index, "]")
     index = String.to_integer(index)
     resolve(parts, current |> Enum.fetch!(index), context)
   end
 
   defp resolve(["size"|_], current, %Context{}=context) when is_list(current) do
+    IEx.pry
     { current |> Enum.count, context }
   end
 
   defp resolve([<<name::binary>>|parts], current, %Context{}=context) do
+    IEx.pry
     { current, context } = resolve(name, current, context)
     resolve(parts, current, context)
   end
-
-  defp resolve(<<_::binary>>, current, %Context{}=context) when not is_list(current), do: { nil, context } # !is_list(current)
-  defp resolve(<<name::binary>>, current, %Context{}=context) when is_list(current) do
-    key    = String.to_atom(name)
-    return = Dict.get(current, key)
+  defp resolve(<<_::binary>>, current, %Context{}=context) when not is_map(current), do: { nil, context } # !is_list(current)
+  defp resolve(key, current, %Context{}=context) when is_map(current) and is_binary(key) do
+    IEx.pry
+    return = Map.get(current, key)
     { return, context }
   end
 end

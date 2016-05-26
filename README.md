@@ -35,7 +35,7 @@ Compile a template from a string:
 
 Render the template with a keyword list representing the local variables:
 
-`{ :ok, rendered, _ } = Liquid.Template.render(template, [world: "world"])`
+`{ :ok, rendered, _ } = Liquid.Template.render(template, %{"world" => "world"})`
 
 The tests should give a pretty good idea of the features implemented so far.
 

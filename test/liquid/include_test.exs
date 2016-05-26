@@ -52,7 +52,7 @@ defmodule IncludeTagTest do
   test :include_tag_with do
     assert_result "Product: Draft 151cm ",
                   "{% include 'product' with products[0] %}",
-                  [products: [[title: "Draft 151cm"], [title: "Element 155cm"]]]
+                  %{"products" => [%{"title" => "Draft 151cm"}, %{"title" => "Element 155cm"}]}
   end
 
   test :include_tag_with_default_name do
