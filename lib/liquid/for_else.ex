@@ -24,7 +24,7 @@ defmodule Liquid.ForElse do
         { %{block | blank: is_blank}, t }
     end
   end
-require IEx
+
   defp parse_iterator(%Block{markup: markup}) do
     [[_,item|[orig_collection|reversed]]] = Regex.scan(syntax, markup)
     collection = Expression.parse(orig_collection)
@@ -65,7 +65,7 @@ require IEx
   defp parse_collection(%RangeLookup{} = range, context) do
     RangeLookup.parse(range, context)
   end
-require IEx
+
   def each(output, [], %Block{}=block, %Context{}=context), do: { output, remember_limit(block, context) }
   def each(output, [h|t]=list, %Block{iterator: it}=block, %Context{assigns: assigns}=context) do
     forloop = next_forloop(it, list |> Enum.count)

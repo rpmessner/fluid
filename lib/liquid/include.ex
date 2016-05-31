@@ -15,7 +15,7 @@ defmodule Liquid.Include do
     attributes = parse_attributes(markup)
     { %{tag | attributes: attributes }, template }
   end
-require IEx
+
   defp parse_tag(%Tag{}=tag, parts) do
     case parts do
       [_, name] -> %{tag | parts: [name: name |> Variable.create]}
