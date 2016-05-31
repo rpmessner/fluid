@@ -48,6 +48,5 @@ Feel free to add a bug report or pull request if you feel that anything is missi
 * Add full set of filters
 * Add ability to add custom filters
 * Add ability to add custom tags
-* Implement capture
 * Implement table_row tag
 * Fix empty check on arrays
