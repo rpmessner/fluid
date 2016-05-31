@@ -29,32 +29,32 @@ defmodule IfElseTagTest do
   end
 
   test :if_boolean do
-    assert_result(" YES ","{% if var %} YES {% endif %}", [var: true])
+    assert_result(" YES ","{% if var %} YES {% endif %}", %{"var" => true})
   end
 
   test :if_or do
-    assert_result(" YES ","{% if a or b %} YES {% endif %}", [a: true, b: true])
-    assert_result(" YES ","{% if a or b %} YES {% endif %}", [a: true, b: false])
-    assert_result(" YES ","{% if a or b %} YES {% endif %}", [a: false, b: true])
-    assert_result("","{% if a or b %} YES {% endif %}", [a: false, b: false])
-    assert_result(" YES ","{% if a or b or c %} YES {% endif %}", [a: false, b: false, c: true])
-    assert_result("","{% if a or b or c %} YES {% endif %}", [a: false, b: false, c: false])
+    assert_result(" YES ","{% if a or b %} YES {% endif %}", %{"a" => true, "b" => true})
+    assert_result(" YES ","{% if a or b %} YES {% endif %}", %{"a" => true, "b" => false})
+    assert_result(" YES ","{% if a or b %} YES {% endif %}", %{"a" => false, "b" => true})
+    assert_result("","{% if a or b %} YES {% endif %}", %{"a" => false, "b" => false})
+    assert_result(" YES ","{% if a or b or c %} YES {% endif %}", %{"a" => false, "b" => false, "c" => true})
+    assert_result("","{% if a or b or c %} YES {% endif %}", %{"a" => false, "b" => false, "c" => false})
   end
 
   test :if_or_with_operators do
-    assert_result(" YES ","{% if a == true or b == true %} YES {% endif %}", [a: true, b: true])
-    assert_result(" YES ","{% if a == true or b == false %} YES {% endif %}", [a: true, b: true])
-    assert_result("","{% if a == false or b == false %} YES {% endif %}", [a: true, b: true])
+    assert_result(" YES ","{% if a == true or b == true %} YES {% endif %}", %{"a" => true, "b" => true})
+    assert_result(" YES ","{% if a == true or b == false %} YES {% endif %}", %{"a" => true, "b" => true})
+    assert_result("","{% if a == false or b == false %} YES {% endif %}", %{"a" => true, "b" => true})
   end
 
   test :comparison_of_strings_containing_and_or_or do
     awful_markup = "a == 'and' and b == 'or' and c == 'foo and bar' and d == 'bar or baz' and e == 'foo' and foo and bar"
-    assigns = [a: "and", b: "or", c: "foo and bar", d: "bar or baz", e: "foo", foo: true, bar: true]
+    assigns = %{"a" => "and", "b" => "or", "c" => "foo and bar", "d" => "bar or baz", "e" => "foo", "foo" => true, "bar" => true}
     assert_result(" YES ","{% if #{awful_markup} %} YES {% endif %}", assigns)
   end
 
   test :comparison_of_expressions_starting_with_and_or_or do
-    assigns = [order: [items_count: 0], android: [name: "Roy"]]
+    assigns = %{"order" => %{"items_count" => 0}, "android" => %{"name" => "Roy"}}
 
     assert_result("YES", "{% if android.name == 'Roy' %}YES{% endif %}", assigns)
     assert_result("YES", "{% if order.items_count == 0 %}YES{% endif %}", assigns)
@@ -67,42 +67,42 @@ defmodule IfElseTagTest do
   end
 
   test :hash_miss_generates_false do
-    assert_result("","{% if foo.bar %} NO {% endif %}", [foo: []])
+    assert_result("","{% if foo.bar %} NO {% endif %}", %{"foo" => %{}})
   end
 
   test :if_from_variable do
-    assert_result("","{% if var %} NO {% endif %}", [var: false])
-    assert_result("","{% if var %} NO {% endif %}", [var: nil])
-    assert_result("","{% if foo.bar %} NO {% endif %}", [foo: [bar: false]])
-    assert_result("","{% if foo.bar %} NO {% endif %}", [foo: []])
+    assert_result("","{% if var %} NO {% endif %}", %{"var" => false})
+    assert_result("","{% if var %} NO {% endif %}", %{"var" => nil})
+    assert_result("","{% if foo.bar %} NO {% endif %}", %{"foo" => %{"bar" => false}})
+    assert_result("","{% if foo.bar %} NO {% endif %}", %{"foo" => %{}})
 
-    assert_result("","{% if foo.bar %} NO {% endif %}", [foo: nil])
+    assert_result("","{% if foo.bar %} NO {% endif %}", %{"foo" => nil})
 
-    assert_result("","{% if foo.bar %} NO {% endif %}", [foo: true])
+    assert_result("","{% if foo.bar %} NO {% endif %}", %{"foo" => true})
 
-    assert_result(" YES ","{% if var %} YES {% endif %}", [var: "text"])
-    assert_result(" YES ","{% if var %} YES {% endif %}", [var: true])
-    assert_result(" YES ","{% if var %} YES {% endif %}", [var: 1])
-    assert_result(" YES ","{% if var %} YES {% endif %}", [var: []])
-    assert_result(" YES ","{% if var %} YES {% endif %}", [var: []])
+    assert_result(" YES ","{% if var %} YES {% endif %}", %{"var" => "text"})
+    assert_result(" YES ","{% if var %} YES {% endif %}", %{"var" => true})
+    assert_result(" YES ","{% if var %} YES {% endif %}", %{"var" => 1})
+    assert_result(" YES ","{% if var %} YES {% endif %}", %{"var" => %{}})
+    assert_result(" YES ","{% if var %} YES {% endif %}", %{"var" => %{}})
     assert_result(" YES ","{% if \"foo\" %} YES {% endif %}")
-    assert_result(" YES ","{% if foo.bar %} YES {% endif %}", [foo: [bar: true]])
-    assert_result(" YES ","{% if foo.bar %} YES {% endif %}", [foo: [bar: "text"]])
-    assert_result(" YES ","{% if foo.bar %} YES {% endif %}", [foo: [bar: 1]])
-    assert_result(" YES ","{% if foo.bar %} YES {% endif %}", [foo: [bar: []]])
-    assert_result(" YES ","{% if foo.bar %} YES {% endif %}", [foo: [bar: []]])
+    assert_result(" YES ","{% if foo.bar %} YES {% endif %}", %{"foo" => %{"bar" => true}})
+    assert_result(" YES ","{% if foo.bar %} YES {% endif %}", %{"foo" => %{"bar" => "text"}})
+    assert_result(" YES ","{% if foo.bar %} YES {% endif %}", %{"foo" => %{"bar" => 1}})
+    assert_result(" YES ","{% if foo.bar %} YES {% endif %}", %{"foo" => %{"bar" => %{}}})
+    assert_result(" YES ","{% if foo.bar %} YES {% endif %}", %{"foo" => %{"bar" => %{}}})
 
-    assert_result(" YES ","{% if var %} NO {% else %} YES {% endif %}", [var: false])
-    assert_result(" YES ","{% if var %} NO {% else %} YES {% endif %}", [var: nil])
-    assert_result(" YES ","{% if var %} YES {% else %} NO {% endif %}", [var: true])
-    assert_result(" YES ","{% if \"foo\" %} YES {% else %} NO {% endif %}", [var: "text"])
+    assert_result(" YES ","{% if var %} NO {% else %} YES {% endif %}", %{"var" => false})
+    assert_result(" YES ","{% if var %} NO {% else %} YES {% endif %}", %{"var" => nil})
+    assert_result(" YES ","{% if var %} YES {% else %} NO {% endif %}", %{"var" => true})
+    assert_result(" YES ","{% if \"foo\" %} YES {% else %} NO {% endif %}", %{"var" => "text"})
 
-    assert_result(" YES ","{% if foo.bar %} NO {% else %} YES {% endif %}", [foo: [bar: false]])
-    assert_result(" YES ","{% if foo.bar %} YES {% else %} NO {% endif %}", [foo: [bar: true]])
-    assert_result(" YES ","{% if foo.bar %} YES {% else %} NO {% endif %}", [foo: [bar: "text"]])
-    assert_result(" YES ","{% if foo.bar %} NO {% else %} YES {% endif %}", [foo: [notbar: true]])
-    assert_result(" YES ","{% if foo.bar %} NO {% else %} YES {% endif %}", [foo: []])
-    assert_result(" YES ","{% if foo.bar %} NO {% else %} YES {% endif %}", [notfoo: [bar: true]])
+    assert_result(" YES ","{% if foo.bar %} NO {% else %} YES {% endif %}", %{"foo" => %{"bar" => false}})
+    assert_result(" YES ","{% if foo.bar %} YES {% else %} NO {% endif %}", %{"foo" => %{"bar" => true}})
+    assert_result(" YES ","{% if foo.bar %} YES {% else %} NO {% endif %}", %{"foo" => %{"bar" => "text"}})
+    assert_result(" YES ","{% if foo.bar %} NO {% else %} YES {% endif %}", %{"foo" => %{"notbar" => true}})
+    assert_result(" YES ","{% if foo.bar %} NO {% else %} YES {% endif %}", %{"foo" => %{}})
+    assert_result(" YES ","{% if foo.bar %} NO {% else %} YES {% endif %}", %{"notfoo" => %{"bar" => true}})
   end
 
   test :nested_if do
@@ -153,7 +153,7 @@ defmodule IfElseTagTest do
     assert_result("yes", "{% if 'gnomeslab-and-or-liquid' contains 'gnomeslab-and-or-liquid' %}yes{% endif %}")
   end
 
-  defp assert_result(expected, markup, assigns \\ []) do
+  defp assert_result(expected, markup, assigns \\ %{}) do
     t = Template.parse(markup)
     { :ok, rendered, _ } = Template.render(t, assigns)
     assert rendered == expected

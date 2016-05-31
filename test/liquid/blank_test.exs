@@ -24,7 +24,7 @@ defmodule Liquid.BlankTest do
   end
 
   test :test_loops_are_blank do
-    assert_result("", wrap_in_for(" "), [])
+    assert_result("", wrap_in_for(" "), %{})
   end
 
   test :test_if_else_are_blank do
@@ -62,7 +62,7 @@ defmodule Liquid.BlankTest do
   end
 
   defp assert_template_result(expected, markup) do
-    assert_result(expected, markup, [])
+    assert_result(expected, markup, %{})
   end
 
   defp assert_result(expected, markup, assigns) do

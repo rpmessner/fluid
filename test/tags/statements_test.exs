@@ -64,52 +64,52 @@ defmodule Liquid.StatementsTest do
 
   test :test_var_strings_equal do
     text = " {% if var == \"hello there!\" %} true {% else %} false {% endif %} "
-    assert_template_result "  true  ", text, [var: "hello there!"]
+    assert_template_result "  true  ", text, %{"var" => "hello there!"}
   end
 
   test :test_var_strings_are_not_equal do
     text = " {% if \"hello there!\" == var %} true {% else %} false {% endif %} "
-    assert_template_result "  true  ", text, [var: "hello there!"]
+    assert_template_result "  true  ", text, %{"var" => "hello there!"}
   end
 
   test :test_var_and_long_string_are_equal do
     text = " {% if var == 'hello there!' %} true {% else %} false {% endif %} "
-    assert_template_result "  true  ", text, [var: "hello there!"]
+    assert_template_result "  true  ", text, %{"var" => "hello there!"}
   end
 
   test :test_var_and_long_string_are_equal_backwards do
     text = " {% if 'hello there!' == var %} true {% else %} false {% endif %} "
-    assert_template_result "  true  ", text, [var: "hello there!"]
+    assert_template_result "  true  ", text, %{"var" => "hello there!"}
   end
 
   test :test_is_collection_empty do
     text = " {% if array == empty %} true {% else %} false {% endif %} "
-    assert_template_result "  true  ", text, [array: []]
+    assert_template_result "  true  ", text, %{"array" => []}
   end
 
   test :test_is_not_collection_empty do
     text = " {% if array == empty %} true {% else %} false {% endif %} "
-    assert_template_result "  false  ", text, [array: [1, 2, 3]]
+    assert_template_result "  false  ", text, %{"array" => [1, 2, 3]}
   end
 
   test :test_nil do
     text = " {% if var == nil %} true {% else %} false {% endif %} "
-    assert_template_result "  true  ", text, [var: nil]
+    assert_template_result "  true  ", text, %{"var" => nil}
 
     text = " {% if var == null %} true {% else %} false {% endif %} "
-    assert_template_result "  true  ", text, [var: nil]
+    assert_template_result "  true  ", text, %{"var" => nil}
   end
 
   test :test_not_nil do
     text = " {% if var != nil %} true {% else %} false {% endif %} "
-    assert_template_result "  true  ", text, [var: 1]
+    assert_template_result "  true  ", text, %{"var" => 1}
 
     text = " {% if var != null %} true {% else %} false {% endif %} "
-    assert_template_result "  true  ", text, [var: 1]
+    assert_template_result "  true  ", text, %{"var" => 1}
   end
 
   defp assert_template_result(expected, markup) do
-    assert_result(expected, markup, [])
+    assert_result(expected, markup, %{})
   end
 
   defp assert_template_result(expected, markup, assigns) do

@@ -5,17 +5,17 @@ defmodule Liquid.Template do
   alias Liquid.Context, as: Context
 
   def render(%Template{}=t), do: render(t, %{})
-  def render(%Template{}=t, assigns) when is_map(assigns) do
-    context = %Context{template: t,         assigns: assigns,
-                      presets:  t.presets, blocks: t.blocks}
-    Render.render(t, context)
-  end
-
   def render(%Template{}=t, %Context{}=c) do
     c = %{c | blocks: t.blocks }
     c = %{c | presets: t.presets }
     c = %{c | template: t }
     Render.render(t, c)
+  end
+
+  def render(%Template{}=t, assigns) when is_map(assigns) do
+    context = %Context{template: t,         assigns: assigns,
+                      presets:  t.presets, blocks: t.blocks}
+    Render.render(t, context)
   end
 
   def parse(<<markup::binary>>, presets \\ %{}) do

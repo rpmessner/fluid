@@ -20,15 +20,14 @@ require IEx
     case parts do
       [_, name] -> %{tag | parts: [name: name |> Variable.create]}
       [_, name," with "<>_,v] ->
-        IEx.pry
         %{tag | parts: [name: name |> Variable.create , variable: v |> Variable.create]}
       [_, name," for "<>_,v] -> %{tag | parts: [name: name |> Variable.create, foreach: v |> Variable.create]}
     end
   end
 
   defp parse_attributes(markup) do
-    Liquid.tag_attributes |> Regex.scan(markup) |> Enum.reduce([], fn ([_, key, val], coll) ->
-      Dict.put(coll, key |> String.to_atom, val |> Variable.create)
+    Liquid.tag_attributes |> Regex.scan(markup) |> Enum.reduce(%{}, fn ([_, key, val], coll) ->
+      Map.put(coll, key, val |> Variable.create)
     end)
   end
 
@@ -39,15 +38,14 @@ require IEx
     presets = build_presets(tag, context)
     t = Template.parse(source, presets)
     t = %{ t | blocks: context.template.blocks |> Dict.merge(t.blocks) }
-    key = name |> String.to_atom()
     cond do
       !is_nil(parts[:variable]) ->
         { item, _ } = Variable.lookup(parts[:variable], context)
-        render_item(output, key, item, t, context)
+        render_item(output, name, item, t, context)
       !is_nil(parts[:foreach]) ->
         { items, _ } = Variable.lookup(parts[:foreach], context)
-        render_list(output, key, items, t, context)
-      true -> render_item(output, key, nil, t, context)
+        render_list(output, name, items, t, context)
+      true -> render_item(output, name, nil, t, context)
     end
   end
 
@@ -73,7 +71,7 @@ require IEx
   end
 
   defp render_item(output, key, item, template, %Context{}=context) do
-    assigns = context.assigns |> Map.merge([{ key, item }])
+    assigns = context.assigns |> Map.merge(%{ key => item })
     { :ok, rendered, _ } = Template.render(template, %{context | assigns: assigns })
     { output ++ [rendered], context }
   end
