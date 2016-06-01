@@ -5,7 +5,6 @@ defmodule Liquid.CaseTest do
 
   setup_all do
     Liquid.start
-    on_exit fn -> Liquid.stop end
     :ok
   end
 

@@ -22,7 +22,7 @@ defmodule Liquid.Variable do
     variable = %Liquid.Variable{name: name, filters: filters}
     cond do
       literals      |> Map.has_key?(key) ->
-        value = literals |> Dict.get(key)
+        value = literals |> Map.get(key)
         %{variable | literal: value }
       integer       |> Regex.match?(name) ->
         value = name |> String.to_integer

@@ -37,7 +37,7 @@ defmodule Liquid.Include do
     { :ok, source } = file_system.read_template_file(root, name, context)
     presets = build_presets(tag, context)
     t = Template.parse(source, presets)
-    t = %{ t | blocks: context.template.blocks |> Dict.merge(t.blocks) }
+    t = %{ t | blocks: context.template.blocks ++ t.blocks }
     cond do
       !is_nil(parts[:variable]) ->
         { item, _ } = Variable.lookup(parts[:variable], context)

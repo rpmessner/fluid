@@ -2,7 +2,7 @@ defmodule Liquid.Registers do
   use GenServer
 
   defp default_tags do
-    [defaultcontent: { Liquid.Default,  Liquid.Tag },
+    %{defaultcontent: { Liquid.Default,  Liquid.Tag },
      continue:       { Liquid.Continue, Liquid.Tag },
      extended:       { Liquid.Extends,  Liquid.Block },
      comment:        { Liquid.Comment,  Liquid.Block },
@@ -20,11 +20,11 @@ defmodule Liquid.Registers do
      raw:            { Liquid.Raw,      Liquid.Block},
      increment:      { Liquid.Increment, Liquid.Tag},
      decrement:      { Liquid.Decrement, Liquid.Tag},
-     capture:        { Liquid.Capture, Liquid.Block}]
+     capture:        { Liquid.Capture, Liquid.Block}}
   end
 
-  def handle_cast({ :register, <<name::binary>>, module, tag }, dict) do
-    { :noreply, dict |> Dict.put(name |> String.to_atom, { module, tag }) }
+  def handle_cast({ :register, name, module, tag }, dict) when is_binary(name) do
+    { :noreply, dict |> Map.put(name |> String.to_atom, { module, tag }) }
   end
 
   def handle_cast(:clear, _dict) do
@@ -32,12 +32,12 @@ defmodule Liquid.Registers do
   end
 
   def handle_call({ :lookup, name }, _from, dict) when is_atom(name) do
-    result = Dict.get(dict, name)
+    result = Map.get(dict, name)
     { :reply, result, dict }
   end
 
-  def handle_call({ :lookup, <<name::binary>> }, _from, dict) do
-    result = Dict.get(dict, name |> String.to_atom)
+  def handle_call({ :lookup, name }, _from, dict) when is_binary(name) do
+    result = Map.get(dict, name |> String.to_atom)
     { :reply, result, dict }
   end
 
