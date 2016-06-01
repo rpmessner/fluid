@@ -11,7 +11,7 @@ Add the dependency to your mix file:
 # mix.exs
 defp deps do
   […,
-   {:liquid, "~> 0.1.0"}]
+   {:liquid, "~> 0.2.0"}]
 end
 ```
 
