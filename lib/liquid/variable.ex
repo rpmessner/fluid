@@ -71,6 +71,10 @@ defmodule Liquid.Variable do
     { current |> Enum.count, context }
   end
 
+  defp resolve(["size"|_], current, %Context{}=context) when is_map(current) do
+    { current |> map_size, context }
+  end
+
   defp resolve([<<name::binary>>|parts], current, %Context{}=context) do
     { current, context } = resolve(name, current, context)
     resolve(parts, current, context)
