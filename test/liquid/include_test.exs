@@ -52,19 +52,19 @@ defmodule IncludeTagTest do
   test :include_tag_with do
     assert_result "Product: Draft 151cm ",
                   "{% include 'product' with products[0] %}",
-                  [products: [[title: "Draft 151cm"], [title: "Element 155cm"]]]
+                  %{"products" => [%{"title" => "Draft 151cm"}, %{"title" => "Element 155cm"}]}
   end
 
   test :include_tag_with_default_name do
     assert_result "Product: Draft 151cm ",
                   "{% include 'product' %}",
-                  [product: [title: "Draft 151cm"]]
+                  %{"product" => %{"title" => "Draft 151cm"}}
   end
 
   test :include_tag_for do
     assert_result "Product: Draft 151cm Product: Element 155cm ",
                   "{% include 'product' for products %}",
-                  [products: [[title: "Draft 151cm"], [title: "Element 155cm"]]]
+                  %{"products" => [%{"title" => "Draft 151cm"}, %{"title" => "Element 155cm"}]}
   end
 
   test :include_tag_with_local_variables do
@@ -80,7 +80,7 @@ defmodule IncludeTagTest do
   test :include_tag_with_multiple_local_variables_from_context do
     assert_result "Locale: test123 test321",
                   "{% include 'locale_variables' echo1: echo1, echo2: more_echos.echo2 %}",
-                  [echo1: "test123", more_echos: [echo2: "test321"]]
+                  %{"echo1" => "test123", "more_echos" => %{"echo2" => "test321"}}
   end
 
   test :nested_include_tag do
@@ -91,10 +91,10 @@ defmodule IncludeTagTest do
   test :nested_include_with_variable do
     assert_result "Product: Draft 151cm details ",
                   "{% include 'nested_product_template' with product %}",
-                  [product: [title: "Draft 151cm"]]
+                  %{"product" => %{"title" => "Draft 151cm"}}
     assert_result "Product: Draft 151cm details Product: Element 155cm details ",
                   "{% include 'nested_product_template' for products %}",
-                  [products: [[title: "Draft 151cm"], [title: "Element 155cm"]]]
+                  %{"products" => [%{"title" => "Draft 151cm"}, %{"title" => "Element 155cm"}]}
   end
 
   # test :recursively_included_template_does_not_produce_endless_loop do

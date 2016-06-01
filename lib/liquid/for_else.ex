@@ -8,7 +8,7 @@ defmodule Liquid.ForElse do
   alias Liquid.RangeLookup
   defmodule Iterator do
     defstruct name: nil, collection: nil, item: nil, reversed: false,
-                        limit: nil, offset: nil, forloop: []
+                        limit: nil, offset: nil, forloop: %{}
   end
 
   def syntax, do: ~r/(\w+)\s+in\s+(#{Liquid.quoted_fragment}+)\s*(reversed)?/
@@ -32,7 +32,7 @@ defmodule Liquid.ForElse do
     attributes = Liquid.tag_attributes |> Regex.scan(markup)
     limit      = attributes |> parse_attribute("limit") |> Variable.create
     offset     = attributes |> parse_attribute("offset", "0") |> Variable.create
-    item       = item |> String.to_atom
+
     %Iterator{name: orig_collection, item: item, collection: collection,
              limit: limit, offset: offset, reversed: reversed}
   end
@@ -40,7 +40,7 @@ defmodule Liquid.ForElse do
   defp parse_attribute(attributes, name, default \\ "nil") do
     attributes |> Enum.reduce(default, fn(x, ret) ->
       case x do
-        [_, ^name, <<attribute::binary>>] -> attribute
+        [_, ^name, attribute] when is_binary(attribute) -> attribute
         [_|_] -> ret
       end
     end)
@@ -70,7 +70,7 @@ defmodule Liquid.ForElse do
   def each(output, [h|t]=list, %Block{iterator: it}=block, %Context{assigns: assigns}=context) do
     forloop = next_forloop(it, list |> Enum.count)
     block   = %{ block | iterator: %{it | forloop: forloop }}
-    assigns = assigns |> Dict.put(:forloop, forloop) |> Dict.put(it.item, h)
+    assigns = assigns |> Map.put("forloop", forloop) |> Map.put(it.item, h)
     { output, block_context } = cond do
       should_render?(block, forloop, context) && !block.blank ->
         Render.render(output, block.nodelist, %{context | assigns: assigns})
@@ -88,18 +88,18 @@ defmodule Liquid.ForElse do
   defp remember_limit(%Block{iterator: it}, context) do
     { limit, context } = lookup_limit(it, context)
     limit      = limit || 0
-    key        = it.name |> String.to_atom
-    remembered = context.offsets[key] || 0
-    %{ context | offsets: context.offsets |> Dict.put(key, remembered + limit) }
+    remembered = context.offsets[it.name] || 0
+    %{ context | offsets: context.offsets |> Map.put(it.name, remembered + limit) }
   end
 
   defp should_render?(%Block{iterator: %Iterator{}=it}, forloop, context) do
     { limit, _ }  = lookup_limit(it, context)
     { offset, _ } = lookup_offset(it, context)
+
     cond do
-      forloop[:index] <= offset        -> false
+      forloop["index"] <= offset        -> false
       limit |> is_nil                    -> true
-      forloop[:index] > limit + offset -> false
+      forloop["index"] > limit + offset -> false
       true                             -> true
     end
   end
@@ -111,30 +111,30 @@ defmodule Liquid.ForElse do
   defp lookup_offset(%Iterator{offset: offset}=it, %Context{}=context) do
     case offset.name do
       "continue" ->
-        offset = context.offsets[it.name |> String.to_atom]
+        offset = context.offsets[it.name]
         { offset || 0, context }
       <<_::binary>> -> Variable.lookup(offset, context)
     end
   end
 
-  defp next_forloop(%Iterator{forloop: []}, count) do
-    [index:   1,
-     index0:  0,
-     rindex:  count,
-     rindex0: count - 1,
-     length:  count,
-     first:   true,
-     last:    count == 1]
+  defp next_forloop(%Iterator{forloop: loop}, count) when map_size(loop) < 1 do
+    %{"index" => 1,
+     "index0" => 0,
+     "rindex" => count,
+     "rindex0"=> count - 1,
+     "length" => count,
+     "first"  => true,
+     "last"   => count == 1}
   end
 
   defp next_forloop(%Iterator{forloop: loop}, count) do
-    [index:   loop[:index]  + 1,
-     index0:  loop[:index0] + 1,
-     rindex:  loop[:rindex]  - 1,
-     rindex0: loop[:rindex0] - 1,
-     length:  loop[:length],
-     first:   false,
-     last:    count == 1]
+    %{"index" => loop["index"]  + 1,
+     "index0" => loop["index0"] + 1,
+     "rindex" => loop["rindex"]  - 1,
+     "rindex0"=> loop["rindex0"] - 1,
+     "length" => loop["length"],
+     "first"  => false,
+     "last"   => count == 1}
   end
 
 end

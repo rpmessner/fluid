@@ -52,7 +52,7 @@ defmodule ConditionTest do
   end
 
   test :contains_works_on_arrays do
-    assigns = [array: [1,2,3,4,5]]
+    assigns = %{"array" => [1,2,3,4,5]}
 
     assert_evaluates_false "array", "contains", "0", assigns
     assert_evaluates_true  "array", "contains", "1", assigns
@@ -102,21 +102,21 @@ defmodule ConditionTest do
 
   test :left_or_right_may_contain_operators do
     assign = "gnomeslab-and-or-liquid"
-    assigns = [one: assign, another: assign]
+    assigns = %{"one" => assign, "another" => assign}
     assert_evaluates_true "one", "==", "another", assigns
   end
 
-  defp assert_evaluates_true(left, op, right, assigns \\ []) do
+  defp assert_evaluates_true(left, op, right, assigns \\ %{}) do
     condition = Condition.create({left, op, right})
-    context = %Liquid.Context{assigns: assigns, presets: []}
+    context = %Liquid.Context{assigns: assigns, presets: %{}}
     evaled = Condition.evaluate(condition, context)
     unless evaled, do: IO.puts("Evaluated false: #{left} #{op} #{right}")
     assert evaled
   end
 
-  defp assert_evaluates_false(left, op, right, assigns \\ []) do
+  defp assert_evaluates_false(left, op, right, assigns \\ %{}) do
     condition = Condition.create({left, op, right})
-    context = %Liquid.Context{assigns: assigns, presets: []}
+    context = %Liquid.Context{assigns: assigns, presets: %{}}
     evaled = Condition.evaluate(condition, context)
     unless !evaled, do: IO.puts("Evaluated true: #{left} #{op} #{right}")
     assert !evaled

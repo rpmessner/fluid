@@ -34,7 +34,6 @@ defmodule Liquid.TemplateTest do
     t = Template.parse("{% assign foo = 'from returned assigns' %}{{ foo }}")
     { :ok, rendered, context } = Template.render(t)
     assert "from returned assigns" == rendered
-
     t = Template.parse("{{ foo }}")
     { :ok, rendered, _ } = Template.render(t, context)
     assert "from returned assigns" == rendered
@@ -51,7 +50,7 @@ defmodule Liquid.TemplateTest do
   test :custom_assigns_do_not_persist_on_same_template do
     t = Template.parse("{{ foo }}")
 
-    { :ok, rendered, _ } = Template.render(t, [foo: "from custom assigns"])
+    { :ok, rendered, _ } = Template.render(t, %{"foo" => "from custom assigns"})
     assert "from custom assigns" == rendered
     { :ok, rendered, _ } = Template.render(t)
     assert "" == rendered
@@ -61,12 +60,12 @@ defmodule Liquid.TemplateTest do
     t = Template.parse("{% assign foo = 'from instance assigns' %}{{ foo }}")
     { :ok, rendered, _ } = Template.render(t)
     assert "from instance assigns" == rendered
-    { :ok, rendered, _ } = Template.render(t, [foo: "from custom assigns"])
+    { :ok, rendered, _ } = Template.render(t, %{"foo" => "from custom assigns"})
     assert "from instance assigns" == rendered
   end
 
   test :template_assigns_squash_preset_assigns do
-    t = Template.parse("{% assign foo = 'from instance assigns' %}{{ foo }}", [foo: "from preset assigns"])
+    t = Template.parse("{% assign foo = 'from instance assigns' %}{{ foo }}", %{"foo" => "from preset assigns"})
     { :ok, rendered, _ } = Template.render(t)
     assert "from instance assigns" == rendered
   end

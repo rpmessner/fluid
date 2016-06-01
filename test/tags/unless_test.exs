@@ -23,15 +23,15 @@ defmodule Liquid.UnlessTest do
   end
 
   test :test_unless_in_loop do
-    assert_template_result "23", "{% for i in choices %}{% unless i %}{{ forloop.index }}{% endunless %}{% endfor %}", [choices: [1, nil, false]]
+    assert_template_result "23", "{% for i in choices %}{% unless i %}{{ forloop.index }}{% endunless %}{% endfor %}", %{"choices" => [1, nil, false]}
   end
 
   test :test_unless_else_in_loop do
-    assert_template_result " TRUE  2  3 ", "{% for i in choices %}{% unless i %} {{ forloop.index }} {% else %} TRUE {% endunless %}{% endfor %}", [choices: [1, nil, false]]
+    assert_template_result " TRUE  2  3 ", "{% for i in choices %}{% unless i %} {{ forloop.index }} {% else %} TRUE {% endunless %}{% endfor %}", %{"choices" => [1, nil, false]}
   end
 
   defp assert_template_result(expected, markup) do
-    assert_result(expected, markup, [])
+    assert_result(expected, markup, %{})
   end
 
   defp assert_template_result(expected, markup, assigns) do

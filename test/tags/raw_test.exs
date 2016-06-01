@@ -37,7 +37,7 @@ defmodule Liquid.RawTest do
   # end
 
   defp assert_template_result(expected, markup) do
-    assert_result(expected, markup, [])
+    assert_result(expected, markup, %{})
   end
 
   defp assert_result(expected, markup, assigns) do
