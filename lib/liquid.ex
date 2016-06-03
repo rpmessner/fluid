@@ -1,7 +1,6 @@
 defmodule Liquid do
   use Application
   import ExProf.Macro
-  @list Enum.to_list(1..100000)
 
   def start(_type, _args), do: start
 
@@ -12,7 +11,7 @@ defmodule Liquid do
 
   # Currently in for profiling
   def profile_run do
-    assigns = %{"array" => @list}
+    assigns = %{"array" => Enum.to_list(1..100000)}
       markup = "{%for item in array %}{{item}}{%endfor%}"
       t = Liquid.Template.parse(markup)
       profile do
