@@ -45,6 +45,8 @@ defmodule Liquid.Variable do
       %Variable{literal: literal, parts: []} ->
         { literal, context }
       %Variable{literal: nil, parts: parts} ->
+        #IO.inspect "resolve"
+        #IO.inspect parts
         resolve(parts, context, context)
     end
     ret = Filters.filter(filters, ret)
@@ -68,20 +70,22 @@ defmodule Liquid.Variable do
   end
 
   defp resolve(["size"|_], current, %Context{}=context) when is_list(current) do
+  IO.inspect "size"
     { current |> Enum.count, context }
   end
 
   defp resolve(["size"|_], current, %Context{}=context) when is_map(current) do
+  IO.inspect "size"
     { current |> map_size, context }
   end
 
-  defp resolve([<<name::binary>>|parts], current, %Context{}=context) do
+  defp resolve([name|parts], current, %Context{}=context) when is_binary(name) do
     { current, context } = resolve(name, current, context)
     resolve(parts, current, context)
   end
   defp resolve(<<_::binary>>, current, %Context{}=context) when not is_map(current), do: { nil, context } # !is_list(current)
   defp resolve(key, current, %Context{}=context) when is_map(current) and is_binary(key) do
-    return = Map.get(current, key)
+    return = current[key]
     { return, context }
   end
 end

@@ -29,7 +29,7 @@ defmodule Liquid.Render do
 
   def render(output, %Variable{}=v, %Context{}=context) do
     { rendered, context } = Variable.lookup(v, context)
-    { output ++ [rendered], context }
+    { [rendered] ++ output , context }
   end
 
   def render(output, %Tag{name: name}=tag, %Context{}=context) do
