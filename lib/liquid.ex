@@ -10,14 +10,15 @@ defmodule Liquid do
     Liquid.FileSystem.start
   end
 
-  def run do
-      assigns = %{"array" => @list}
-        markup = "{%for item in array %}{{item}}{%endfor%}"
-        t = Liquid.Template.parse(markup)
-        profile do
-        { :ok, rendered, _ } = Liquid.Template.render(t, assigns)
-        end
-    end
+  # Currently in for profiling
+  def profile_run do
+    assigns = %{"array" => @list}
+      markup = "{%for item in array %}{{item}}{%endfor%}"
+      t = Liquid.Template.parse(markup)
+      profile do
+      { :ok, _rendered, _ } = Liquid.Template.render(t, assigns)
+      end
+  end
 
   def stop do
     Liquid.Registers.stop

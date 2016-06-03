@@ -72,11 +72,13 @@ defmodule Liquid.ForElse do
     block   = %{ block | iterator: %{it | forloop: forloop }}
     assigns = assigns |> Map.put("forloop", forloop) |> Map.put(it.item, h)
     { output, block_context } = cond do
-      !block.blank ->
-        Render.render(output, block.nodelist, %{context | assigns: assigns})
-      block.blank ->
-        { _, context } = Render.render(output, block.nodelist, %{context | assigns: assigns})
-        { output, context }
+      should_render?(block, forloop, context) ->
+        if block.blank do
+          { _, context } = Render.render(output, block.nodelist, %{context | assigns: assigns})
+          { output, context }
+        else
+          Render.render(output, block.nodelist, %{context | assigns: assigns})
+        end
       true -> { output, context }
     end
     case block_context do
@@ -128,7 +130,7 @@ defmodule Liquid.ForElse do
      "last"   => count == 1}
   end
 
-  defp next_forloop(%Iterator{forloop: loop}, count) do
+  defp next_forloop(%Iterator{forloop: loop}, _count) do
     %{"index" => loop["index"]  + 1,
      "index0" => loop["index0"] + 1,
      "rindex" => loop["rindex"]  - 1,

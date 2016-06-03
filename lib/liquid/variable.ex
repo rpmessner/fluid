@@ -70,12 +70,10 @@ defmodule Liquid.Variable do
   end
 
   defp resolve(["size"|_], current, %Context{}=context) when is_list(current) do
-  IO.inspect "size"
     { current |> Enum.count, context }
   end
 
   defp resolve(["size"|_], current, %Context{}=context) when is_map(current) do
-  IO.inspect "size"
     { current |> map_size, context }
   end
 
