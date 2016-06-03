@@ -45,8 +45,6 @@ defmodule Liquid.Variable do
       %Variable{literal: literal, parts: []} ->
         { literal, context }
       %Variable{literal: nil, parts: parts} ->
-        #IO.inspect "resolve"
-        #IO.inspect parts
         resolve(parts, context, context)
     end
     ret = Filters.filter(filters, ret)
