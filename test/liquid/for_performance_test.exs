@@ -11,8 +11,8 @@ defmodule ForPerformanceTest do
   end
 
   test :performance_test do
-    assigns = %{"array" => Enum.to_list(1..100000)}
-    assert_result(Enum.to_list(1..100000) |> Enum.join, "{%for item in array %}{{item}}{%endfor%}", assigns)
+    assigns = %{"array" => Enum.to_list(1..1000)}
+    assert_result(Enum.to_list(1..1000) |> Enum.join, "{%for item in array %}{{item}}{%endfor%}", assigns)
   end
 
   defp assert_template_result(expected, markup, assigns) do

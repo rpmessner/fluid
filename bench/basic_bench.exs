@@ -2,7 +2,7 @@ defmodule BasicBench do
   use Benchfella
   alias Liquid.Template
 
-  @list Enum.to_list(1..100000)
+  @list Enum.to_list(1..1000)
 
   setup_all do
     Liquid.start
