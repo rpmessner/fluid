@@ -1,7 +1,7 @@
 Code.require_file "../../test_helper.exs", __ENV__.file
 
-defmodule ForElseTagTest do
-  import ExProf.Macro
+defmodule ForPerformanceTest do
+  use ExUnit.Case
 
   alias Liquid.Template, as: Template
 
@@ -10,13 +10,10 @@ defmodule ForElseTagTest do
     :ok
   end
 
-
-  def for_reversed do
-    assigns = %{"array" => Enum.to_list(1..1000)}
-    assert_result("321", "{%for item in array %}{{item}}{%endfor%}", assigns)
+  test :performance_test do
+    assigns = %{"array" => Enum.to_list(1..100000)}
+    assert_result(Enum.to_list(1..100000) |> Enum.join, "{%for item in array %}{{item}}{%endfor%}", assigns)
   end
-
-
 
   defp assert_template_result(expected, markup, assigns) do
     assert_result(expected,markup,assigns)
