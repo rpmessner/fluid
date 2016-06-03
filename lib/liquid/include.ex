@@ -67,13 +67,13 @@ defmodule Liquid.Include do
 
   defp render_item(output, _key, nil, template, %Context{}=context) do
     { :ok, rendered, _ } = Template.render(template, context)
-    { output ++ [rendered], context }
+    { [rendered] ++ output , context }
   end
 
   defp render_item(output, key, item, template, %Context{}=context) do
     assigns = context.assigns |> Map.merge(%{ key => item })
     { :ok, rendered, _ } = Template.render(template, %{context | assigns: assigns })
-    { output ++ [rendered], context }
+    {  [rendered] ++ output, context }
   end
 
 end

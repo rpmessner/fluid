@@ -14,6 +14,6 @@ defmodule Liquid.Increment do
     value = value || 0
     result_assign = context.assigns |> Map.put(markup, value + 1)
     context = %{context | assigns: result_assign }
-    { output ++ [value], context }
+    { [value] ++ output, context }
   end
 end

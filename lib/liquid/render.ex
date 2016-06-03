@@ -8,7 +8,7 @@ defmodule Liquid.Render do
 
   def render(%Template{root: root}, %Context{}=context) do
     { output, context } = render([], root, context)
-    { :ok, output |> List.flatten |> Enum.join, context }
+    { :ok, output |> List.flatten |> Enum.reverse |> Enum.join, context }
   end
 
   def render(output, [], %Context{}=context) do
@@ -24,12 +24,12 @@ defmodule Liquid.Render do
   end
 
   def render(output, text, %Context{}=context) when is_binary(text) do
-    { output ++ [text], context }
+    { [text] ++ output , context }
   end
 
   def render(output, %Variable{}=v, %Context{}=context) do
     { rendered, context } = Variable.lookup(v, context)
-    { output ++ [rendered], context }
+    { [rendered] ++ output, context }
   end
 
   def render(output, %Tag{name: name}=tag, %Context{}=context) do

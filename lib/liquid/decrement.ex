@@ -14,6 +14,6 @@ defmodule Liquid.Decrement do
     value = value || 0
     result_assign = context.assigns |> Map.put(markup, value - 1)
     context = %{context | assigns: result_assign }
-    { output ++ [value - 1], context }
+    { [value - 1] ++ output , context }
   end
 end

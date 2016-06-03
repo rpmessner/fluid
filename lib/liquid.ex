@@ -1,11 +1,22 @@
 defmodule Liquid do
   use Application
+  import ExProf.Macro
 
   def start(_type, _args), do: start
 
   def start do
     Liquid.Registers.start
     Liquid.FileSystem.start
+  end
+
+  # Currently in for profiling
+  def profile_run do
+    assigns = %{"array" => Enum.to_list(1..100000)}
+      markup = "{%for item in array %}{{item}}{%endfor%}"
+      t = Liquid.Template.parse(markup)
+      profile do
+      { :ok, _rendered, _ } = Liquid.Template.render(t, assigns)
+      end
   end
 
   def stop do
