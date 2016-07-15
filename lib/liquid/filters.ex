@@ -1,13 +1,39 @@
 defmodule Liquid.Filters do
 
   defmodule Functions do
+    def size(input) when is_binary(input) do
+      String.length(input)
+    end
+
+    def size(input) when is_list(input) do
+      length(input)
+    end
+
+    def size(input) when is_tuple(input) do
+      tuple_size(input)
+    end
+
+    def size(input), do: 0
+
+    def downcase(input) do
+      input |> to_string |> String.downcase
+    end
+
+    def update(input) do
+      input |> to_string |> String.upcase
+    end
+
+    def capitalize(input) do
+      input |> to_string |> String.capitalize
+    end
+
+    
+
     def split(<<string::binary>>, <<separator::binary>>) do
       String.split(string, separator)
     end
 
-    def capitalize(<<string::binary>>) do
-      String.capitalize(string)
-    end
+
   end
 
   def parse(<<markup::binary>>) do
