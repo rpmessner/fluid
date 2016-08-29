@@ -19,7 +19,7 @@ defmodule Liquid.Filters do
       input |> to_string |> String.downcase
     end
 
-    def update(input) do
+    def upcase(input) do
       input |> to_string |> String.upcase
     end
 
