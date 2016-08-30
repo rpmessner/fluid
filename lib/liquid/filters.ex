@@ -27,12 +27,29 @@ defmodule Liquid.Filters do
       input |> to_string |> String.capitalize
     end
 
-    
+
+    def replace(<<string::binary>>, <<from::binary>>, <<to::binary>>) do
+      string |> String.replace(from, to)
+    end
+
+    def prepend(<<string::binary>>, <<addition::binary>>) do
+      addition <> string
+    end
+
+    def prepend(<<string::binary>>, nil), do: string
+
 
     def split(<<string::binary>>, <<separator::binary>>) do
       String.split(string, separator)
     end
 
+    def split(nil, <<separator::binary>>), do: []
+
+    def url_encode(input) when is_binary(input) do
+      input |> URI.encode_www_form
+    end
+
+    def url_encode(nil), do: nil
 
   end
 
