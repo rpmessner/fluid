@@ -26,12 +26,12 @@ defmodule Liquid.HTML do
     {?", "&quot;"},
     {?', "&#39;"}
   ]
-  @escapes_map %{"<": "&lt;", ">": "&gt;","&": "&amp;","\"": "&quot;", "'": "&#39;"}
+  @escapes_map %{"<" => "&lt;", ">"=> "&gt;","&"=> "&amp;","\""=> "&quot;", "'"=> "&#39;"}
 
   @escape_regex ~r/["><']|&(?!([a-zA-Z]+|(#\d+));)/
 
   def html_escape_once(data) when is_binary(data) do
-    Regex.replace(@escape_regex, data, fn v, x -> @escapes_map[String.to_atom(v)] end)
+    Regex.replace(@escape_regex, data, fn v, _ -> @escapes_map[v] end)
   end
 
   Enum.each @escapes, fn { match, insert } ->
