@@ -192,10 +192,13 @@ defmodule Liquid.Filters do
     def default(input, _), do: input
 
 
-    # def modulo(input) when is_number(input) do
-    #   # mod operation is included in the latest(31.09.16) build of elixir
-    #   # elixir 1.3.0 doesn't support it
-    # end
+    def modulo(input, operand) when is_number(input) and is_number(operand) and input > 0, do: input |> rem(operand)
+    def modulo(input, operand) when is_number(input) and is_number(operand) and input < 0, do: input + operand |> modulo(operand)
+    def modulo(input, _) when is_number(input) and input == 0, do: 0;
+
+    def modulo(input, operand) do
+      input |> to_number |> modulo(to_number(operand))
+    end
 
 
     def truncate(input, l \\ 50)
@@ -270,11 +273,12 @@ defmodule Liquid.Filters do
       string <> operand
     end
 
+    def append(input, nil), do: input
+    
     def append(string, operand) do
       string |> to_string |> append(to_string(operand))
     end
 
-    def append(input, nil), do: input
 
     def prepend(<<string::binary>>, <<addition::binary>>) do
       addition <> string

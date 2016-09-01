@@ -190,6 +190,34 @@ defmodule Liquid.FilterTest do
     assert_template_result "2 1 1 1", "{{ '1 1 1 1' | replace_first: '1', 2 }}"
   end
 
+  test :date do
+    # assert 'May' == Functions.date(Time.parse("2006-05-05 10:00:00"), "%B")
+    # assert 'June' == Functions.date(Time.parse("2006-06-05 10:00:00"), "%B")
+    # assert 'July' == Functions.date(Time.parse("2006-07-05 10:00:00"), "%B")
+
+    assert 'May' == Functions.date("2006-05-05 10:00:00", "%B")
+    assert 'June' == Functions.date("2006-06-05 10:00:00", "%B")
+    assert 'July' == Functions.date("2006-07-05 10:00:00", "%B")
+
+    assert '2006-07-05 10:00:00' == Functions.date("2006-07-05 10:00:00", "")
+    assert '2006-07-05 10:00:00' == Functions.date("2006-07-05 10:00:00", "")
+    assert '2006-07-05 10:00:00' == Functions.date("2006-07-05 10:00:00", "")
+    assert '2006-07-05 10:00:00' == Functions.date("2006-07-05 10:00:00", nil)
+
+    assert '07/05/2006' == Functions.date("2006-07-05 10:00:00", "%m/%d/%Y")
+
+    assert "07/16/2004" == Functions.date("Fri Jul 16 01:00:00 2004", "%m/%d/%Y")
+    assert "#{Date.today.year}" == Functions.date('now', '%Y')
+    assert "#{Date.today.year}" == Functions.date('today', '%Y')
+
+    assert nil == Functions.date(nil, "%B")
+
+    # with_timezone("UTC") do
+    #   assert "07/05/2006" == Functions.date(1152098955, "%m/%d/%Y")
+    #   assert "07/05/2006" == Functions.date("1152098955", "%m/%d/%Y")
+    # end
+  end
+
   test :first_last do
     assert 1 == Functions.first([1,2,3])
     assert 3 == Functions.last([1,2,3])
@@ -261,9 +289,10 @@ defmodule Liquid.FilterTest do
     assert_template_result "0.5", "{{ 2.0 | divided_by:4 }}"
   end
 
-  # test :modulo do
-  #   assert_template_result "1", "{{ 3 | modulo:2 }}"
-  # end
+  test :modulo do
+    assert_template_result "1", "{{ 3 | modulo:2 }}"
+    assert_template_result "24", "{{ -1 | modulo:25 }}"
+  end
 
   test :round do
     assert_template_result "4", "{{ '4.3' | round }}"
