@@ -1,8 +1,10 @@
 defmodule Liquid.Filters do
-  import Kernel, except: [round: 1]
+  import Kernel, except: [round: 1, abs: 1]
   alias Liquid.HTML
 
   defmodule Functions do
+    use Timex
+
     def size(input) when is_binary(input) do
       String.length(input)
     end
@@ -79,11 +81,11 @@ defmodule Liquid.Filters do
       value + operand
     end
 
-    def plus(value, <<operand::binary>>) when is_number(value) do
+    def plus(value, operand) when is_number(value) do
       plus value, to_number(operand)
     end
 
-    def plus(<<value::binary>>, <<operand::binary>>) do
+    def plus(value, operand) do
       value |> to_number |> plus(to_number(operand))
     end
 
@@ -91,11 +93,11 @@ defmodule Liquid.Filters do
       value - operand
     end
 
-    def minus(value, <<operand::binary>>) when is_number(value) do
+    def minus(value, operand) when is_number(value) do
       minus value, to_number(operand)
     end
 
-    def minus(<<value::binary>>, <<operand::binary>>) do
+    def minus(value, operand) do
       value |> to_number |> minus(to_number(operand))
     end
 
@@ -175,7 +177,7 @@ defmodule Liquid.Filters do
     end
 
 
-    def default(input,default_val\\"")
+    def default(input, default_val\\"")
 
     def default(input, default_val) when is_nil(input), do: default_val
 
@@ -192,9 +194,17 @@ defmodule Liquid.Filters do
     def default(input, _), do: input
 
 
+    def abs(input) when is_binary(input), do: input |> to_number |> abs
+      
+    def abs(input) when input < 0, do: -input
+
+    def abs(input), do: input
+
+    def modulo(0, _), do: 0;
+
     def modulo(input, operand) when is_number(input) and is_number(operand) and input > 0, do: input |> rem(operand)
+
     def modulo(input, operand) when is_number(input) and is_number(operand) and input < 0, do: input + operand |> modulo(operand)
-    def modulo(input, _) when is_number(input) and input == 0, do: 0;
 
     def modulo(input, operand) do
       input |> to_number |> modulo(to_number(operand))
@@ -284,7 +294,7 @@ defmodule Liquid.Filters do
       addition <> string
     end
 
-    def prepend(<<string::binary>>, nil), do: string
+    def prepend(string, nil), do: string
 
     def prepend(string, addition) do
       string |> to_string |> append(to_string(addition))
@@ -325,7 +335,7 @@ defmodule Liquid.Filters do
       string |> String.slice(from, to)
     end
 
-    def slice(list, range) when is_list(list) and range == 0, do: list
+    def slice(list, 0) when is_list(list), do: list
 
     def slice(list, range) when is_list(list) and range > 0 do
       list |> Enum.slice(range, length(list))
@@ -336,7 +346,7 @@ defmodule Liquid.Filters do
       list |> Enum.slice(len + range, len)
     end
 
-    def slice(<<string::binary>>, range) when range == 0, do: string
+    def slice(<<string::binary>>, 0), do: string
 
     def slice(<<string::binary>>, range) when range > 0 do
       string |> String.slice(range, String.length(string))
@@ -376,6 +386,33 @@ defmodule Liquid.Filters do
 
     def url_encode(nil), do: nil
 
+    def date(input, format \\ "%F %T")
+
+    def date(nil,_), do: nil
+
+    def date(input, format) when is_nil(format) or format == "" do
+      input |> date
+    end
+
+    def date("now", format), do: Timex.now |> date(format)
+
+    def date("today", format), do: Timex.now |> date(format)
+
+    def date(input, format) when is_binary(input) do
+      with {:ok, input_date} <- NaiveDateTime.from_iso8601(input) do
+        input_date |> date(format)
+      else
+        {:error, :invalid_format } -> 
+          with {:ok, input_date} <- Timex.parse(input, "%a %b %d %T %Y", :strftime),
+          do: input_date |> date(format)
+      end
+    end
+
+    def date(input, format) do
+      with {:ok, date_str} <- Timex.format(input, format, :strftime),
+        do: date_str
+    end
+
     defp to_iterable(input) when is_list(input) do
       case List.first(input) do
         first when is_number(first) ->
@@ -411,7 +448,7 @@ defmodule Liquid.Filters do
     defp get_int_and_counter(input) when is_number(input) do
       {_, remainder} = input |> Float.to_string |> Integer.parse
       len = String.length(remainder) -1
-      new_value = (input * :math.pow(10, len)) |> Float.round |> trunc
+      new_value = input * :math.pow(10, len) |> Float.round |> trunc
       {new_value, len}
     end
 
@@ -422,7 +459,8 @@ defmodule Liquid.Filters do
   end
 
   def parse(<<markup::binary>>) do
-    [name|filters] = Regex.scan(Liquid.filter_parser, markup)
+    [name|filters] = Liquid.filter_parser 
+      |> Regex.scan(markup)
       |> List.flatten
       |> Enum.filter(&(&1 != "|"))
       |> Enum.map(&String.strip/1)

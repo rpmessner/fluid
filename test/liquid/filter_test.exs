@@ -2,6 +2,7 @@ Code.require_file "../../test_helper.exs", __ENV__.file
 
 defmodule Liquid.FilterTest do
   use ExUnit.Case
+  use Timex
   alias Liquid.{Filters, Template}
   alias Liquid.Filters.Functions
 
@@ -191,27 +192,29 @@ defmodule Liquid.FilterTest do
   end
 
   test :date do
-    # assert 'May' == Functions.date(Time.parse("2006-05-05 10:00:00"), "%B")
-    # assert 'June' == Functions.date(Time.parse("2006-06-05 10:00:00"), "%B")
-    # assert 'July' == Functions.date(Time.parse("2006-07-05 10:00:00"), "%B")
+    assert "May" == Functions.date(~N[2006-05-05 10:00:00], "%B")
+    assert "June" == Functions.date(Timex.parse!("2006-06-05 10:00:00", "%F %T", :strftime), "%B")
+    assert "July" == Functions.date(~N[2006-07-05 10:00:00], "%B")
 
-    assert 'May' == Functions.date("2006-05-05 10:00:00", "%B")
-    assert 'June' == Functions.date("2006-06-05 10:00:00", "%B")
-    assert 'July' == Functions.date("2006-07-05 10:00:00", "%B")
+    assert "May" == Functions.date("2006-05-05 10:00:00", "%B")
+    assert "June" == Functions.date("2006-06-05 10:00:00", "%B")
+    assert "July" == Functions.date("2006-07-05 10:00:00", "%B")
 
-    assert '2006-07-05 10:00:00' == Functions.date("2006-07-05 10:00:00", "")
-    assert '2006-07-05 10:00:00' == Functions.date("2006-07-05 10:00:00", "")
-    assert '2006-07-05 10:00:00' == Functions.date("2006-07-05 10:00:00", "")
-    assert '2006-07-05 10:00:00' == Functions.date("2006-07-05 10:00:00", nil)
+    assert "2006-07-05 10:00:00" == Functions.date("2006-07-05 10:00:00", "")
+    assert "2006-07-05 10:00:00" == Functions.date("2006-07-05 10:00:00", "")
+    assert "2006-07-05 10:00:00" == Functions.date("2006-07-05 10:00:00", "")
+    assert "2006-07-05 10:00:00" == Functions.date("2006-07-05 10:00:00", nil)
 
-    assert '07/05/2006' == Functions.date("2006-07-05 10:00:00", "%m/%d/%Y")
+    assert "07/05/2006" == Functions.date("2006-07-05 10:00:00", "%m/%d/%Y")
 
     assert "07/16/2004" == Functions.date("Fri Jul 16 01:00:00 2004", "%m/%d/%Y")
-    assert "#{Date.today.year}" == Functions.date('now', '%Y')
-    assert "#{Date.today.year}" == Functions.date('today', '%Y')
+
+    assert "#{Timex.today.year}" == Functions.date("now", "%Y")
+    assert "#{Timex.today.year}" == Functions.date("today", "%Y")
 
     assert nil == Functions.date(nil, "%B")
 
+    # Timex already uses UTC
     # with_timezone("UTC") do
     #   assert "07/05/2006" == Functions.date(1152098955, "%m/%d/%Y")
     #   assert "07/05/2006" == Functions.date("1152098955", "%m/%d/%Y")
@@ -287,6 +290,13 @@ defmodule Liquid.FilterTest do
     assert_template_result "Liquid error: divided by 0", "{{ 5 | divided_by:0 }}"
 
     assert_template_result "0.5", "{{ 2.0 | divided_by:4 }}"
+  end
+
+  test :abs do
+    assert_template_result "3", "{{ '3' | abs }}"
+    assert_template_result "3", "{{ -3 | abs }}"
+    assert_template_result "0", "{{ 0 | abs }}"
+    assert_template_result "0.1", "{{ -0.1 | abs }}"
   end
 
   test :modulo do
