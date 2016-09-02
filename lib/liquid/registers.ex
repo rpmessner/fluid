@@ -4,7 +4,6 @@ defmodule Liquid.Registers do
   defp default_tags do
     %{defaultcontent: { Liquid.Default,  Liquid.Tag },
      continue:       { Liquid.Continue, Liquid.Tag },
-     extended:       { Liquid.Extends,  Liquid.Block },
      comment:        { Liquid.Comment,  Liquid.Block },
      include:        { Liquid.Include,  Liquid.Tag },
      assign:         { Liquid.Assign,   Liquid.Tag },
