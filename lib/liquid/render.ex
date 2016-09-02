@@ -7,14 +7,8 @@ defmodule Liquid.Render do
   alias Liquid.Tag
 
   def render(%Template{root: root}, %Context{}=context) do
-    try do
       { output, context } = render([], root, context)
       { :ok, output |> List.flatten |> Enum.reverse |> Enum.join, context }
-    rescue
-      # TODO [future]: replace :ok with :error
-      UndefinedFunctionError -> {:ok, "Liquid error: function is not implemented yet", context}
-      e in ArithmeticError -> {:ok, "Liquid error: #{e.message}", context}
-    end
   end
 
   def render(output, [], %Context{}=context) do

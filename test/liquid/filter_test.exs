@@ -3,7 +3,7 @@ Code.require_file "../../test_helper.exs", __ENV__.file
 defmodule Liquid.FilterTest do
   use ExUnit.Case
   use Timex
-  alias Liquid.{Filters, Template}
+  alias Liquid.{Filters, Template, Variable}
   alias Liquid.Filters.Functions
 
   setup_all do
@@ -13,7 +13,7 @@ defmodule Liquid.FilterTest do
   end
 
   test :parse_input do
-    [name|filters] = "'foofoo' | replace:'foo','bar'" |> Filters.parse
+    [name|filters] = "'foofoo' | replace:'foo','bar'" |> Variable.parse
 
     assert "'foofoo'" == name
     assert [[:replace, ["'foo'", "'bar'"]]] == filters
@@ -257,6 +257,7 @@ defmodule Liquid.FilterTest do
   test :strip_newlines do
     assert_template_result "abc", "{{ source | strip_newlines }}", %{"source" => "a\nb\nc"}
     assert_template_result "abc", "{{ source | strip_newlines }}", %{"source" => "a\r\nb\nc"}
+    assert_template_result "abc", "{{ source | strip_newlines }}", %{"source" => "a\r\nb\nc\r\n"}
   end
 
   test :newlines_to_br do
@@ -341,6 +342,17 @@ defmodule Liquid.FilterTest do
     assert "bar" == Functions.default({}, "bar")
   end
 
+  test :filters_chain_with_assigments do
+    assert_template_result "abca\nb\nc", "{{ source | strip_newlines | append:source}}", %{"source" => "a\nb\nc"}
+  end
+
+  test :filters_error_wrong_in_chain do
+    assert_template_result "Liquid error: wrong number of arguments (2 for 1)", "{{ 'text' | upcase:1 | nonexisting | capitalize }}"
+  end
+
+  test :filters_nonexistent_in_chain do
+    assert_template_result "Text", "{{ 'text' | upcase | nonexistent | capitalize }}"
+  end
 
 
   defp assert_template_result(expected, markup, assigns \\ %{})

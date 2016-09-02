@@ -17,7 +17,7 @@ defmodule Liquid.Variable do
     matches for [] access
   """
   def create(markup) when is_binary(markup) do
-    [name|filters] = Filters.parse(markup)
+    [name|filters] = markup |> parse
     key = name |> String.strip
     variable = %Liquid.Variable{name: name, filters: filters}
     cond do
@@ -34,7 +34,7 @@ defmodule Liquid.Variable do
         unquoted_name = Liquid.quote_matcher |> Regex.replace(name, "")
         %{ variable | literal: unquoted_name }
       true ->
-        [name|_] = String.split(name, " ")
+        [name|_] = name |> String.split(" ")
         parts = Regex.scan(Liquid.variable_parser, name) |> List.flatten
         %{variable | parts: parts}
     end
@@ -47,9 +47,52 @@ defmodule Liquid.Variable do
       %Variable{literal: nil, parts: parts} ->
         resolve(parts, context, context)
     end
-    ret = Filters.filter(filters, ret, context)
-    { ret, context }
+
+    filters = filters |> assign_context(context.assigns)
+    try do
+      ret = Filters.filter(filters, ret)
+      { ret, context }
+    rescue
+      e in UndefinedFunctionError -> { e.message, context}
+      e in ArgumentError -> { e.message, context}
+      e in ArithmeticError -> { "Liquid error: #{e.message}", context}
+    end
   end
+
+  def parse(<<markup::binary>>) do
+    [name|filters] = Liquid.filter_parser 
+      |> Regex.scan(markup)
+      |> List.flatten
+      |> Enum.filter(&(&1 != "|"))
+      |> Enum.map(&String.strip/1)
+    filters = Enum.map(filters, fn(markup) ->
+      [[_, filter]|_] = Regex.scan(~r/\s*(\w+)/, markup)
+      args = Liquid.filter_arguments
+        |> Regex.scan(markup)
+        |> List.flatten
+        |> Liquid.List.even_elements
+
+      [String.to_atom(filter), args]
+    end)
+    [name|filters]
+  end
+
+  defp assign_context(filters, assigns) when assigns == %{}, do: filters
+
+  defp assign_context([], _), do: []
+
+  defp assign_context([head|tail], assigns) do
+    [name, args] = head
+    args = Enum.map(args, fn(arg) ->
+      cond do
+        assigns |> Map.has_key?(arg) -> "#{assigns[arg]}"
+        true -> arg
+      end
+    end)
+
+    [[name, args] | assign_context(tail,assigns)]
+  end
+
 
   defp resolve([<<key::binary>>|_]=parts, %Context{}=current, %Context{}=context) do
     cond do
@@ -60,6 +103,7 @@ defmodule Liquid.Variable do
       true -> { nil, context }
     end
   end
+
   defp resolve([], current, %Context{}=context), do: { current, context }
   defp resolve([<<?[,index::binary>>|parts], current, %Context{}=context) do
     [index, _] = String.split(index, "]")
@@ -79,6 +123,7 @@ defmodule Liquid.Variable do
     { current, context } = resolve(name, current, context)
     resolve(parts, current, context)
   end
+
   defp resolve(<<_::binary>>, current, %Context{}=context) when not is_map(current), do: { nil, context } # !is_list(current)
   defp resolve(key, current, %Context{}=context) when is_map(current) and is_binary(key) do
     return = current[key]

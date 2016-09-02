@@ -313,7 +313,7 @@ defmodule Liquid.Filters do
     end
 
     def strip_newlines(<<string::binary>>) do
-      string |> String.replace("\n", "") |> String.replace("\r", "")
+      string |> String.replace(~r/\r?\n/, "")
     end
 
     def newline_to_br(<<string::binary>>) do
@@ -458,51 +458,26 @@ defmodule Liquid.Filters do
 
   end
 
-  def parse(<<markup::binary>>) do
-    [name|filters] = Liquid.filter_parser 
-      |> Regex.scan(markup)
-      |> List.flatten
-      |> Enum.filter(&(&1 != "|"))
-      |> Enum.map(&String.strip/1)
-    filters = Enum.map(filters, fn(markup) ->
-      [[_, filter]|_] = Regex.scan(~r/\s*(\w+)/, markup)
-      args = Liquid.filter_arguments
-        |> Regex.scan(markup)
-        |> List.flatten
-        |> Liquid.List.even_elements
-
-      [String.to_atom(filter), args]
-    end)
-    [name|filters]
-  end
-
   def filter([], value), do: value
   def filter([filter|rest], value) do
     [name, args] = filter
     args = Enum.map(args, fn(arg) ->
       Regex.replace(Liquid.quote_matcher, arg, "")
     end)
-    ret  = apply(Functions, name, [value|args])
-    filter(rest, ret)
-  end
+    # This one also got __info__as an output:
+    # Functions.module_info(:exports)
+    functions = Functions.__info__(:functions)
 
-  def filter(a, b, _) when a == [] do
-    filter(a, b)
-  end
-
-  def filter([head|tail], b, context) do
-    case context.assigns do
-      assigns when assigns == %{} ->
-        filter([head|tail], b)
-      assigns ->
-        [name, args] = head
-        args = Enum.map(args, fn(arg) ->
-          cond do
-            assigns |> Map.has_key?(arg) -> "#{assigns[arg]}"
-            true -> arg
-          end
-        end)
-        filter([[name, args] | tail], b)
+    case functions[name] do
+      nil -> filter(rest, value)
+      arity ->
+        try do
+          ret  = apply(Functions, name, [value|args])
+          filter(rest, ret)
+        rescue
+          e in UndefinedFunctionError ->
+            raise ArgumentError, message: "Liquid error: wrong number of arguments (#{e.arity} for #{arity})"
+        end
     end
   end
 
