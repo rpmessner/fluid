@@ -262,6 +262,8 @@ defmodule Liquid.Filters do
     end
 
 
+    def replace(string, from, to\\"")
+
     def replace(<<string::binary>>, <<from::binary>>, <<to::binary>>) do
       string |> String.replace(from, to)
     end
@@ -277,6 +279,8 @@ defmodule Liquid.Filters do
     def replace(string, from, to) do
       string |> to_string |> replace(from, to)
     end
+
+    def replace_first(string, from, to\\"")
 
     def replace_first(<<string::binary>>, <<from::binary>>, to) do
       string |> String.replace(from, to_string(to), global: false)
@@ -480,26 +484,36 @@ defmodule Liquid.Filters do
 
   end
 
+
   def filter([], value), do: value
   def filter([filter|rest], value) do
     [name, args] = filter
     args = for arg <- args do 
       Liquid.quote_matcher |> Regex.replace(arg, "")
     end
-
-    # This one also got __info__ as an output:
-    # Functions.module_info(:exports)
+    
     functions = Functions.__info__(:functions)
-    case functions[name] do
-      nil -> filter(rest, value)
-      arity ->
-        try do
-          ret  = apply(Functions, name, [value|args])
-          filter(rest, ret)
-        rescue
-          e in UndefinedFunctionError ->
-            raise ArgumentError, message: "Liquid error: wrong number of arguments (#{e.arity} for #{arity})"
-        end
+    custom_filters = Application.get_env(:liquid, :custom_filters)
+
+    ret = case {name, functions[name], custom_filters[name]} do
+      # pass value in case of no filters
+      {nil, _, _} -> value
+      # pass non-existend filter
+      {_, nil, nil} -> value
+      # Fallback to custom if no standard
+      {_, nil, _} -> apply_function custom_filters[name], name, [value|args]
+      _ -> apply_function Functions, name, [value|args]
+    end
+    filter(rest, ret)
+  end
+
+  def apply_function(module, name, args) do
+    try do
+      apply module, name, args
+    rescue
+      e in UndefinedFunctionError ->
+        functions = module.__info__(:functions)
+        raise ArgumentError, message: "Liquid error: wrong number of arguments (#{e.arity} for #{functions[name]})"
     end
   end
 
