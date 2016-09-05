@@ -45,7 +45,6 @@ Feel free to add a bug report or pull request if you feel that anything is missi
 
 ### todo
 
-* Add full set of filters
 * Add ability to add custom filters
 * Add ability to add custom tags
 * Implement table_row tag

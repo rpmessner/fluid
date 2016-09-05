@@ -1,8 +1,6 @@
 defmodule Liquid.Include do
   alias Liquid.Tag, as: Tag
   alias Liquid.Context, as: Context
-  alias Liquid.Context, as: Context
-  alias Liquid.Template, as: Template
   alias Liquid.Template, as: Template
   alias Liquid.Variable, as: Variable
   alias Liquid.FileSystem, as: FileSystem

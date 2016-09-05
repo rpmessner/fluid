@@ -1,8 +1,14 @@
 defmodule Liquid.Filters do
+  @moduledoc """
+  Applies a chain of filters passed from Liquid.Variable
+  """
   import Kernel, except: [round: 1, abs: 1]
   alias Liquid.HTML
 
   defmodule Functions do
+    @moduledoc """
+    Structure that holds all the basic filter functions used in Liquid 3.
+    """
     use Timex
 
     def size(input) when is_binary(input) do
@@ -19,6 +25,11 @@ defmodule Liquid.Filters do
 
     def size(_), do: 0
 
+    @doc """
+    Makes each character in a string lowercase.
+    It has no effect on strings which are already all lowercase.
+    """
+    @spec downcase(any) :: String.t
     def downcase(input) do
       input |> to_string |> String.downcase
     end
@@ -67,6 +78,7 @@ defmodule Liquid.Filters do
     end
 
     def map(array, key) when is_list(array) do
+
       with mapped <- array |> Enum.map(fn(arg) -> arg[key] end) do
         case Enum.all?(mapped, &is_binary/1) do
           true -> mapped |> Enum.reduce("",fn(el, acc) -> acc <> el end)
@@ -177,6 +189,11 @@ defmodule Liquid.Filters do
     end
 
 
+    @doc """
+    Allows you to specify a fallback in case a value doesn’t exist.
+    `default` will show its value if the left side is nil, false, or empty
+    """
+    @spec default(any, any) :: any
     def default(input, default_val\\"")
 
     def default(input, default_val) when is_nil(input), do: default_val
@@ -229,11 +246,14 @@ defmodule Liquid.Filters do
 
     def truncatewords(nil, _), do: nil
 
+    def truncatewords(input, words) when words < 1 do
+      input |> String.split(" ") |> hd
+    end
+
     def truncatewords(input, words) do
       truncate_string = "..."
       wordlist = input |> String.split(" ")
       case words - 1 do
-        l when l < 0 -> wordlist[0]
         l when l < length(wordlist) ->
           words = wordlist |> Enum.slice(0..l) |> Enum.join(" ") 
           words <> truncate_string
@@ -413,6 +433,8 @@ defmodule Liquid.Filters do
         do: date_str
     end
 
+    # Helpers
+
     defp to_iterable(input) when is_list(input) do
       case List.first(input) do
         first when is_number(first) ->
@@ -461,13 +483,13 @@ defmodule Liquid.Filters do
   def filter([], value), do: value
   def filter([filter|rest], value) do
     [name, args] = filter
-    args = Enum.map(args, fn(arg) ->
-      Regex.replace(Liquid.quote_matcher, arg, "")
-    end)
-    # This one also got __info__as an output:
+    args = for arg <- args do 
+      Liquid.quote_matcher |> Regex.replace(arg, "")
+    end
+
+    # This one also got __info__ as an output:
     # Functions.module_info(:exports)
     functions = Functions.__info__(:functions)
-
     case functions[name] do
       nil -> filter(rest, value)
       arity ->

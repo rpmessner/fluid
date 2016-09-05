@@ -1,9 +1,6 @@
 defmodule Liquid.Variable do
   defstruct name: nil, literal: nil, filters: [], parts: []
-  alias Liquid.Filters, as: Filters
-  alias Liquid.Variable, as: Variable
-  alias Liquid.Variable, as: Variable
-  alias Liquid.Context, as: Context
+  alias Liquid.{Filters, Variable, Context}
 
   defp literals, do: %{"nil" => nil, "null" => nil, "" => nil,
                       "true" => true, "false" => false,
@@ -65,15 +62,15 @@ defmodule Liquid.Variable do
       |> List.flatten
       |> Enum.filter(&(&1 != "|"))
       |> Enum.map(&String.strip/1)
-    filters = Enum.map(filters, fn(markup) ->
-      [[_, filter]|_] = Regex.scan(~r/\s*(\w+)/, markup)
+    filters = for markup <- filters do
+      [_, filter] = ~r/\s*(\w+)/ |> Regex.scan(markup) |> hd
       args = Liquid.filter_arguments
         |> Regex.scan(markup)
         |> List.flatten
         |> Liquid.List.even_elements
 
       [String.to_atom(filter), args]
-    end)
+    end
     [name|filters]
   end
 
@@ -83,12 +80,9 @@ defmodule Liquid.Variable do
 
   defp assign_context([head|tail], assigns) do
     [name, args] = head
-    args = Enum.map(args, fn(arg) ->
-      cond do
-        assigns |> Map.has_key?(arg) -> "#{assigns[arg]}"
-        true -> arg
-      end
-    end)
+    args = for arg <- args do
+      if assigns |> Map.has_key?(arg), do: "#{assigns[arg]}", else: arg
+    end
 
     [[name, args] | assign_context(tail,assigns)]
   end
