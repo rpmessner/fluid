@@ -39,13 +39,54 @@ Render the template with a keyword list representing the local variables:
 
 The tests should give a pretty good idea of the features implemented so far.
 
+## Custom tags and filters
+
+You can add your own filters and tags/blocks inside your project:
+
+``` elixir
+defmodule MyFilters do
+  def meaning_of_life(_), do: 42
+  def one(_), do: 1
+end
+
+defmodule ExampleTag do
+  def parse(%Liquid.Tag{}=tag, %Liquid.Template{}=context) do
+    {tag, context}
+  end
+
+  def render(_input, tag, context) do
+    number = tag.markup |> Integer.parse |> elem(0)
+    {["#{number - 1}"], context}
+  end
+end
+
+defmodule ExampleBlock do
+  def parse(b, p), do: { b, p }
+end
+```
+
+and than include them in your `config.exs` file
+
+``` elixir
+config :liquid,
+  extra_filter_modules: [MyFilters],
+  extra_tags: %{minus_one: {ExampleTag, Liquid.Tag},
+                my_block: {ExampleBlock, Liquid.Block}}
+```
+
+Another option is to set up the tag using:
+`Liquid.Registers.register("minus_one", MinusOneTag, Tag)` for tag
+`Liquid.Registers.register("my_block", ExampleBlock, Liquid.Block)` same for blocks;
+and for filters you should use
+`Liquid.Filters.add_filters(MyFilters)`
+
+
 ## Missing Features
 
 Feel free to add a bug report or pull request if you feel that anything is missing.
 
 ### todo
 
-* Add ability to add custom filters
-* Add ability to add custom tags
+* Add full set of filters
 * Implement table_row tag
 * Fix empty check on arrays

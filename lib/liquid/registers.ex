@@ -1,8 +1,8 @@
 defmodule Liquid.Registers do
-  use GenServer
 
   defp default_tags do
-    %{defaultcontent: { Liquid.Default,  Liquid.Tag },
+    %{
+      # defaultcontent: { Liquid.Default,  Liquid.Tag },
      continue:       { Liquid.Continue, Liquid.Tag },
      comment:        { Liquid.Comment,  Liquid.Block },
      include:        { Liquid.Include,  Liquid.Tag },
@@ -22,49 +22,31 @@ defmodule Liquid.Registers do
      capture:        { Liquid.Capture, Liquid.Block}}
   end
 
-  def handle_cast({ :register, name, module, tag }, dict) when is_binary(name) do
-    { :noreply, dict |> Map.put(name |> String.to_atom, { module, tag }) }
-  end
-
-  def handle_cast(:clear, _dict) do
-    { :noreply, default_tags }
-  end
-
-  def handle_call({ :lookup, name }, _from, dict) when is_atom(name) do
-    result = Map.get(dict, name)
-    { :reply, result, dict }
-  end
-
-  def handle_call({ :lookup, name }, _from, dict) when is_binary(name) do
-    result = Map.get(dict, name |> String.to_atom)
-    { :reply, result, dict }
-  end
-
-  def handle_call(:stop, _from, dict) do
-    { :stop, :normal, :ok, dict }
-  end
-
-  def start_link(opts \\ []) do
-    GenServer.start_link(__MODULE__, :ok, opts)
-  end
-
-  def start do
-    :gen_server.start({ :local, __MODULE__ }, __MODULE__, default_tags, [])
-  end
-
-  def stop do
-    :gen_server.call(__MODULE__, :stop)
-  end
-
   def clear do
-    :gen_server.call(__MODULE__, :clear)
+    Application.put_env(:liquid, :extra_tags, default_tags)
   end
+
+  def lookup(name) when is_binary(name) do
+    name |> String.to_atom |> lookup
+  end
+
+  def lookup(name) when is_atom(name) do
+    custom_tags = Application.get_env(:liquid, :extra_tags)
+    case {name, default_tags[name], custom_tags[name]} do
+      {nil, _, _} -> nil
+      {_, nil, nil} -> nil
+      {_, nil, custom_tag} -> custom_tag
+      {_, tag, _} -> tag
+    end
+  end
+
+  def lookup(_), do: nil 
 
   def register(name, module, type) do
-    :gen_server.cast(__MODULE__, { :register, name, module, type })
+    custom_tags = Application.get_env(:liquid, :extra_tags) || %{}
+    custom_tags = %{name |> String.to_atom => {module, type}}
+      |> Map.merge(custom_tags)
+    Application.put_env(:liquid, :extra_tags, custom_tags)
   end
 
-  def lookup(name) do
-    :gen_server.call(__MODULE__, { :lookup, name })
-  end
 end

@@ -484,14 +484,16 @@ defmodule Liquid.Filters do
 
   end
 
-
+  @doc """
+  Recursively pass through all of the input filters applying them
+  """
   def filter([], value), do: value
   def filter([filter|rest], value) do
     [name, args] = filter
-    args = for arg <- args do 
+    args = for arg <- args do
       Liquid.quote_matcher |> Regex.replace(arg, "")
     end
-    
+
     functions = Functions.__info__(:functions)
     custom_filters = Application.get_env(:liquid, :custom_filters)
 
@@ -507,7 +509,31 @@ defmodule Liquid.Filters do
     filter(rest, ret)
   end
 
-  def apply_function(module, name, args) do
+
+  @doc """
+  Add filter modules mentioned in extra_filter_modules env variable
+  """
+  def add_filter_modules do
+    for filter_module <- Application.get_env(:liquid, :extra_filter_modules) || [] do
+      filter_module |> add_filters
+    end
+  end
+
+  @doc """
+  Fetches the current custom filters and extends with the functions from passed module
+  NB: you can't override the standard filters though
+  """
+  def add_filters(module) do
+    custom_filters = Application.get_env(:liquid, :custom_filters) || %{}
+
+    module_functions = module.__info__(:functions)
+      |> Enum.into(%{}, fn {key,_} -> {key, module} end)
+
+    custom_filters = module_functions |> Map.merge(custom_filters)
+    Application.put_env(:liquid, :custom_filters, custom_filters)
+  end
+
+  defp apply_function(module, name, args) do
     try do
       apply module, name, args
     rescue
@@ -516,5 +542,6 @@ defmodule Liquid.Filters do
         raise ArgumentError, message: "Liquid error: wrong number of arguments (#{e.arity} for #{functions[name]})"
     end
   end
+
 
 end

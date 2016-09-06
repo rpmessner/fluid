@@ -4,12 +4,11 @@ defmodule Liquid do
   def start(_type, _args), do: start
 
   def start do
-    Liquid.Registers.start
+    Liquid.Filters.add_filter_modules
     Liquid.FileSystem.start
   end
 
   def stop do
-    Liquid.Registers.stop
     Liquid.FileSystem.stop
   end
 
