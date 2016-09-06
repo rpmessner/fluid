@@ -22,7 +22,8 @@ defmodule Liquid.Mixfile do
   defp deps do
     [{:credo, "~> 0.2", only: [:dev, :test]},
      {:benchfella, "~> 0.3.0", only: [:dev, :test]},
-     {:timex, "~> 3.0"}]
+     {:timex, "~> 3.0"},
+     {:ex_doc, ">= 0.0.0", only: :dev}]
   end
 
   defp description do
