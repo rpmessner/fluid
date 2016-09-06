@@ -5,9 +5,9 @@ defmodule Liquid.Block do
   alias Liquid.Block, as: Block
 
   def create(markup) do
-    [name|rest] = String.split(markup, " ")
+    destructure [name, rest], String.split(markup, " ", parts: 2)
     name = String.to_atom(name)
-    %Block{name: name, markup: Enum.join(rest, " ")}
+    %Block{name: name, markup: rest}
   end
 
   def split(nodes), do: split(nodes, [:else])

@@ -27,6 +27,10 @@ defmodule Liquid.CustomFilterTest do
   	assert_template_result "2", "{{ 'text' | capitalize | not_meaning_of_life | minus_nonexistent: 1 }}"
   end
 
+  test :custom_filter_in_chain do
+    assert_template_result "41", "{{ 'text' | upcase | nonexistent | meaning_of_life | minus: 1 }}"
+  end
+
   defp assert_template_result(expected, markup, assigns \\ %{}) do
     assert_result(expected, markup, assigns)
   end
