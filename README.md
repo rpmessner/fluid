@@ -69,7 +69,7 @@ and than include them in your `config.exs` file
 
 ``` elixir
 config :liquid,
-  extra_filters_modules: [MyFilters],
+  extra_filter_modules: [MyFilters],
   extra_tags: %{minus_one: {ExampleTag, Liquid.Tag},
                 my_block: {ExampleBlock, Liquid.Block}}
 ```

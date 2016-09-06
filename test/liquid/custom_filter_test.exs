@@ -13,7 +13,7 @@ defmodule Liquid.CustomFilterTest do
   end
 
   setup_all do
-  	Application.put_env(:liquid, :extra_filters_modules, [MyFilter, MyFilterTwo])
+  	Application.put_env(:liquid, :extra_filter_modules, [MyFilter, MyFilterTwo])
     Liquid.start
     on_exit fn -> Liquid.stop end
     :ok

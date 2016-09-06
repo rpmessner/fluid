@@ -511,10 +511,10 @@ defmodule Liquid.Filters do
 
 
   @doc """
-  Add filter modules mentioned in extra_filters_modules env variable
+  Add filter modules mentioned in extra_filter_modules env variable
   """
   def add_filter_modules do
-    for filter_module <- Application.get_env(:liquid, :extra_filters_modules) || [] do
+    for filter_module <- Application.get_env(:liquid, :extra_filter_modules) || [] do
       filter_module |> add_filters
     end
   end
