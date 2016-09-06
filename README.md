@@ -41,7 +41,7 @@ The tests should give a pretty good idea of the features implemented so far.
 
 ## Custom tags and filters
 
-You can add your own filters and tags inside your project:
+You can add your own filters and tags/blocks inside your project:
 
 ``` elixir
 defmodule MyFilters do
@@ -59,18 +59,24 @@ defmodule ExampleTag do
     {["#{number - 1}"], context}
   end
 end
+
+defmodule ExampleBlock do
+  def parse(b, p), do: { b, p }
+end
 ```
 
 and than include them in your `config.exs` file
 
 ``` elixir
 config :liquid,
-  extra_filters_module: [MyFilters],
-  extra_tags: %{minus_one: {ExampleTag, Liquid.Tag}}
+  extra_filters_modules: [MyFilters],
+  extra_tags: %{minus_one: {ExampleTag, Liquid.Tag},
+                my_block: {ExampleBlock, Liquid.Block}}
 ```
 
 Another option is to set up the tag using:
 `Liquid.Registers.register("minus_one", MinusOneTag, Tag)` for tag
+`Liquid.Registers.register("my_block", ExampleBlock, Liquid.Block)` same for blocks;
 and for filters you should use
 `Liquid.Filters.add_filters(MyFilters)`
 

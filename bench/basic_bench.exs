@@ -29,7 +29,7 @@ defmodule BasicBench do
   end
 
   setup_all do
-    Application.put_env(:liquid, :extra_filters_module, [MyFilter, MyFilterTwo])
+    Application.put_env(:liquid, :extra_filters_modules, [MyFilter, MyFilterTwo])
     Liquid.start
     Liquid.Registers.register("minus_one", MinusOneTag, Tag)
     {:ok, nil}
