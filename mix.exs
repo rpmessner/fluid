@@ -4,12 +4,12 @@ defmodule Liquid.Mixfile do
   def project do
     [ app: :liquid,
       version: "0.2.2",
-      elixir: "~> 1.0",
+      elixir: "~> 1.3",
       deps: deps,
       name: "Liquid",
       description: description,
       package: package,
-      source_url: "https://github.com/nulian/liquid-elixir"]
+      source_url: "https://github.com/bettyblocks/liquid-elixir"]
   end
 
   # Configuration for the OTP application
@@ -21,7 +21,8 @@ defmodule Liquid.Mixfile do
   # { :foobar, "0.1", git: "https://github.com/elixir-lang/foobar.git" }
   defp deps do
     [{:credo, "~> 0.2", only: [:dev, :test]},
-     {:benchfella, "~> 0.3.0", only: [:dev, :test]}]
+     {:benchfella, "~> 0.3.0", only: [:dev, :test]},
+     {:timex, "~> 3.0"}]
   end
 
   defp description do

@@ -1,7 +1,6 @@
 defmodule Liquid.ForElse do
   alias Liquid.Render
   alias Liquid.Block
-  alias Liquid.Block
   alias Liquid.Variable
   alias Liquid.Context
   alias Liquid.Expression

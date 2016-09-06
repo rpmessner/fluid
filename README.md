@@ -1,4 +1,4 @@
-# Liquid [![Hex.pm](https://img.shields.io/hexpm/v/liquid.svg)](https://hex.pm/packages/liquid) [![Hex.pm](https://img.shields.io/hexpm/dt/liquid.svg)](https://hex.pm/packages/liquid) [![Build Status](https://travis-ci.org/bettyblocks/liquid-elixir.svg?branch=master)](https://travis-ci.org/nulian/liquid-elixir)
+# Liquid [![Hex.pm](https://img.shields.io/hexpm/v/liquid.svg)](https://hex.pm/packages/liquid) [![Hex.pm](https://img.shields.io/hexpm/dt/liquid.svg)](https://hex.pm/packages/liquid) [![Build Status](https://travis-ci.org/bettyblocks/liquid-elixir.svg?branch=master)](https://travis-ci.org/bettyblocks/liquid-elixir)
 
 It's a templating library for Elixir.
 Continuation of the fluid liquid conversion.
@@ -45,7 +45,6 @@ Feel free to add a bug report or pull request if you feel that anything is missi
 
 ### todo
 
-* Add full set of filters
 * Add ability to add custom filters
 * Add ability to add custom tags
 * Implement table_row tag

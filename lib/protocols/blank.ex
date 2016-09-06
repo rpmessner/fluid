@@ -9,8 +9,8 @@ defimpl Blank, for: List do
 
   def blank?([]), do: true
   def blank?(list) do
-    !(list
-      |> Enum.map(fn
+    list
+      |> Enum.all?(fn
           (x) when is_binary(x) ->
             cond do
               Regex.match?(~r/\A\s*\z/, x) -> true
@@ -20,7 +20,5 @@ defimpl Blank, for: List do
           (%Tag{blank: true}) -> true
           (_) -> false
         end)
-      |> Enum.uniq
-      |> Enum.any?(fn(x) -> x == false end))
   end
 end
