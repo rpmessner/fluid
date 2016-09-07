@@ -196,17 +196,7 @@ defmodule Liquid.Filters do
     @spec default(any, any) :: any
     def default(input, default_val\\"")
 
-    def default(input, default_val) when is_nil(input), do: default_val
-
-    def default(input, default_val) when input == "", do: default_val
-
-    def default(input, default_val) when input == false, do: default_val
-
-    def default(input, default_val) when input == {}, do: default_val
-
-    def default(input, default_val) when input == [], do: default_val
-
-    def default(input, default_val) when input == %{}, do: default_val
+    def default(input, default_val) when input in [nil,false,'',"",[],{},%{}], do: default_val
 
     def default(input, _), do: input
 

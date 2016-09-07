@@ -1,4 +1,8 @@
 defmodule Liquid.Variable do
+  @moduledoc """
+    Module to create and lookup for Variables
+
+  """
   defstruct name: nil, literal: nil, filters: [], parts: []
   alias Liquid.{Filters, Variable, Context}
 
@@ -11,15 +15,15 @@ defmodule Liquid.Variable do
   def quoted_string, do: ~r/#{Liquid.quoted_string}/
 
   @doc """
-    matches for [] access
+    resolves data from `Liquid.Variable.parse/1` and creates a variable struct
   """
   def create(markup) when is_binary(markup) do
     [name|filters] = markup |> parse
-    key = name |> String.strip
+    name = name |> String.trim
     variable = %Liquid.Variable{name: name, filters: filters}
     cond do
-      literals      |> Map.has_key?(key) ->
-        value = literals |> Map.get(key)
+      literals      |> Map.has_key?(name) ->
+        value = literals |> Map.get(name)
         %{variable | literal: value }
       integer       |> Regex.match?(name) ->
         value = name |> String.to_integer
@@ -31,23 +35,19 @@ defmodule Liquid.Variable do
         unquoted_name = Liquid.quote_matcher |> Regex.replace(name, "")
         %{ variable | literal: unquoted_name }
       true ->
-        [name|_] = name |> String.split(" ")
+        name = name |> String.split(" ", parts: 2) |> hd
         parts = Regex.scan(Liquid.variable_parser, name) |> List.flatten
         %{variable | parts: parts}
     end
   end
 
-  def lookup(%Variable{filters: filters}=v, %Context{}=context) do
-    { ret, context } = case v do
-      %Variable{literal: literal, parts: []} ->
-        { literal, context }
-      %Variable{literal: nil, parts: parts} ->
-        resolve(parts, context, context)
-    end
-
-    filters = filters |> assign_context(context.assigns)
+  @doc """
+  Assigns context to variable and than applies all filters
+  """
+  def lookup(%Variable{}=v, %Context{}=context) do
+    { ret, filters, context } = Liquid.Appointer.assign(v, context)
     try do
-      ret = Filters.filter(filters, ret)
+      ret = filters |> Filters.filter(ret)
       { ret, context }
     rescue
       e in UndefinedFunctionError -> { e.message, context}
@@ -56,12 +56,20 @@ defmodule Liquid.Variable do
     end
   end
 
-  def parse(<<markup::binary>>) do
-    [name|filters] = Liquid.filter_parser 
-      |> Regex.scan(markup)
-      |> List.flatten
-      |> Enum.filter(&(&1 != "|"))
-      |> Enum.map(&String.strip/1)
+
+  @doc """
+  Parses the markup to a list of filters
+  """
+  def parse(markup) when is_binary(markup) do
+    [name|filters] = if markup != "" do
+      Liquid.filter_parser
+        |> Regex.scan(markup)
+        |> List.flatten
+        |> Enum.filter(&(&1 != "|"))
+        |> Enum.map(&String.strip/1)
+      else
+        [""]
+      end
     filters = for markup <- filters do
       [_, filter] = ~r/\s*(\w+)/ |> Regex.scan(markup) |> hd
       args = Liquid.filter_arguments
@@ -74,53 +82,4 @@ defmodule Liquid.Variable do
     [name|filters]
   end
 
-  defp assign_context(filters, assigns) when assigns == %{}, do: filters
-
-  defp assign_context([], _), do: []
-
-  defp assign_context([head|tail], assigns) do
-    [name, args] = head
-    args = for arg <- args do
-      if assigns |> Map.has_key?(arg), do: "#{assigns[arg]}", else: arg
-    end
-
-    [[name, args] | assign_context(tail,assigns)]
-  end
-
-
-  defp resolve([<<key::binary>>|_]=parts, %Context{}=current, %Context{}=context) do
-    cond do
-      current.assigns |> Map.has_key?(key) ->
-        resolve(parts, current.assigns, context)
-      current.presets |> Map.has_key?(key) ->
-        resolve(parts, current.presets, context)
-      true -> { nil, context }
-    end
-  end
-
-  defp resolve([], current, %Context{}=context), do: { current, context }
-  defp resolve([<<?[,index::binary>>|parts], current, %Context{}=context) do
-    [index, _] = String.split(index, "]")
-    index = String.to_integer(index)
-    resolve(parts, current |> Enum.fetch!(index), context)
-  end
-
-  defp resolve(["size"|_], current, %Context{}=context) when is_list(current) do
-    { current |> Enum.count, context }
-  end
-
-  defp resolve(["size"|_], current, %Context{}=context) when is_map(current) do
-    { current |> map_size, context }
-  end
-
-  defp resolve([name|parts], current, %Context{}=context) when is_binary(name) do
-    { current, context } = resolve(name, current, context)
-    resolve(parts, current, context)
-  end
-
-  defp resolve(<<_::binary>>, current, %Context{}=context) when not is_map(current), do: { nil, context } # !is_list(current)
-  defp resolve(key, current, %Context{}=context) when is_map(current) and is_binary(key) do
-    return = current[key]
-    { return, context }
-  end
 end
