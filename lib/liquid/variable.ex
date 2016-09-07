@@ -6,14 +6,6 @@ defmodule Liquid.Variable do
   defstruct name: nil, literal: nil, filters: [], parts: []
   alias Liquid.{Filters, Variable, Context}
 
-  defp literals, do: %{"nil" => nil, "null" => nil, "" => nil,
-                      "true" => true, "false" => false,
-                      "blank" => :blank?, "empty" => :empty?}
-
-  def integer, do: ~r/^(-?\d+)$/
-  def float, do: ~r/^(-?\d[\d\.]+)$/
-  def quoted_string, do: ~r/#{Liquid.quoted_string}/
-
   @doc """
     resolves data from `Liquid.Variable.parse/1` and creates a variable struct
   """
@@ -21,24 +13,8 @@ defmodule Liquid.Variable do
     [name|filters] = markup |> parse
     name = name |> String.trim
     variable = %Liquid.Variable{name: name, filters: filters}
-    cond do
-      literals      |> Map.has_key?(name) ->
-        value = literals |> Map.get(name)
-        %{variable | literal: value }
-      integer       |> Regex.match?(name) ->
-        value = name |> String.to_integer
-        %{variable | literal: value }
-      float         |> Regex.match?(name) ->
-        value = name |> String.to_float
-        %{variable | literal: value }
-      quoted_string |> Regex.match?(name) ->
-        unquoted_name = Liquid.quote_matcher |> Regex.replace(name, "")
-        %{ variable | literal: unquoted_name }
-      true ->
-        name = name |> String.split(" ", parts: 2) |> hd
-        parts = Regex.scan(Liquid.variable_parser, name) |> List.flatten
-        %{variable | parts: parts}
-    end
+    parsed = Liquid.Appointer.parse_name(name)
+    Map.merge(variable, parsed)
   end
 
   @doc """

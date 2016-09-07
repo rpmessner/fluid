@@ -48,6 +48,11 @@ defmodule FetchAttributeTest do
     assert_template_result "4", "{{ input | minus:operand }}", %Values{"input": 5, "operand": 1}
   end
 
+  test 'assign struct inside' do
+    assigns = %{"arg"=> %{"value" => 1},"map" =>%User{:user => %{"name" => "Tester"}}}
+    assert_template_result "Tester1", "{{ map.user.name | append: arg.value }}", assigns
+  end
+
   defp assert_template_result(expected, markup, assigns \\ %{}) do
     assert_result(expected,markup,assigns)
   end
