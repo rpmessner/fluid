@@ -80,10 +80,8 @@ defmodule Liquid.ForElse do
         end
       true -> { output, context }
     end
-    case block_context do
-      %Context{break: true} -> each(output, [], block, %{context | assigns: block_context.assigns})
-      _ -> each(output, t, block, %{context | assigns: block_context.assigns})
-    end
+    if block_context.break == true, do: t = []
+    each(output, t, block, %{context | assigns: block_context.assigns})
   end
 
   defp remember_limit(%Block{iterator: it}, context) do

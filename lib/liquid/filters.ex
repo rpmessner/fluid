@@ -444,6 +444,8 @@ defmodule Liquid.Filters do
       List.wrap(input)
     end
 
+    defp to_number(nil), do: 0
+
     defp to_number(input) when is_number(input), do: input
 
     defp to_number(input) when is_binary(input) do
