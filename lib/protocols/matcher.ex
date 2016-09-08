@@ -1,12 +1,12 @@
-defprotocol Matcher do
+defprotocol Liquid.Matcher do
   @fallback_to_any true
   @doc "Assigns context to values"
   def match(_,_)
 end
 
-defimpl Matcher, for: Liquid.Context do
+defimpl Liquid.Matcher, for: Liquid.Context do
   @doc """
-  `Matcher` protocol implementation for `Liquid.Context`
+  `Liquid.Matcher` protocol implementation for `Liquid.Context`
   """
 
   def match(current, []), do: current
@@ -17,27 +17,28 @@ defimpl Matcher, for: Liquid.Context do
       current.presets |> Map.has_key?(key) -> current.presets
       !(is_nil(Map.get(current.assigns, key |> String.to_atom))) -> current.assigns
       !(is_nil(Map.get(current.presets, key |> String.to_atom))) -> current.presets
+      is_map(current.assigns) and Map.has_key?(current.assigns, :__struct__) -> current.assigns
       true -> nil
     end
-    Matcher.match(current, parts)
+    Liquid.Matcher.match(current, parts)
   end
 end
 
-defimpl Matcher, for: Map do
+defimpl Liquid.Matcher, for: Map do
 
   def match(current, []), do: current
 
   def match(current, ["size"|_]), do: current |> map_size
 
   def match(current, [name|parts]) when is_binary(name) do
-    current |> Matcher.match(name) |> Matcher.match(parts)
+    current |> Liquid.Matcher.match(name) |> Liquid.Matcher.match(parts)
   end
 
   def match(current, key) when is_binary(key), do: current[key]
 end
 
 
-defimpl Matcher, for: List do
+defimpl Liquid.Matcher, for: List do
 
   def match(current, []), do: current
 
@@ -45,12 +46,12 @@ defimpl Matcher, for: List do
 
   def match(current, [<<?[,index::binary>>|parts]) do
     index = index |> String.split("]") |> hd |> String.to_integer
-    current |> Enum.fetch!(index) |> Matcher.match(parts)
+    current |> Enum.fetch!(index) |> Liquid.Matcher.match(parts)
   end
 
 end
 
-defimpl Matcher, for: Any do
+defimpl Liquid.Matcher, for: Any do
 
   def match(nil,_), do: nil
 
@@ -63,7 +64,7 @@ defimpl Matcher, for: Any do
   Match functions for structs:
   """
   def match(current, [name|parts]) when is_map(current) and is_binary(name) do
-    current |> Matcher.match(name) |> Matcher.match(parts)
+    current |> Liquid.Matcher.match(name) |> Liquid.Matcher.match(parts)
   end
 
   def match(current, key) when is_map(current) and is_binary(key) do

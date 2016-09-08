@@ -81,6 +81,29 @@ and for filters you should use
 `Liquid.Filters.add_filters(MyFilters)`
 
 
+## Context assignment
+
+`Liquid.Matcher` protocol is designed to deal with your custom data types you want to assign
+For example having the following struct:
+``` elixir
+defmodule User do
+  defstruct name: "John", age: 27, about: []
+end
+```
+You can describe how to get the data from it:
+``` elixir
+defimpl Liquid.Matcher, for: User do
+  def match(current, ["info"|_]=parts) do
+    "His name is: "<> current.name
+  end
+end
+```
+And later you can use it in your code:
+``` elixir
+iex> "{{ info }}" |> Liquid.Template.parse |> Liquid.Template.render(%User{}) |> elem(1)
+"His name is: John"
+```
+
 ## Missing Features
 
 Feel free to add a bug report or pull request if you feel that anything is missing.

@@ -17,7 +17,7 @@ defmodule Liquid.Appointer do
   end
 
   def assign(%Variable{literal: nil, parts: parts, filters: filters}, context) do
-    {Matcher.match(context, parts), filters |> assign_context(context.assigns), context}
+    {Liquid.Matcher.match(context, parts), filters |> assign_context(context.assigns), context}
   end
 
   @doc """
@@ -50,7 +50,7 @@ defmodule Liquid.Appointer do
     args = for arg <- args do
       parsed = arg |> parse_name
       if parsed |> Map.has_key?(:parts) do
-        Matcher.match(%Context{assigns: assigns}, parsed.parts) |> to_string
+        Liquid.Matcher.match(assigns, parsed.parts) |> to_string
       else
         if Map.has_key?(assigns, :__struct__) do
           key = arg |> String.to_atom

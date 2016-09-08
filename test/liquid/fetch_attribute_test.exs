@@ -6,7 +6,7 @@ defmodule FetchAttributeTest do
   alias Liquid.Template
 
   defmodule User do
-    defstruct name: "John", age: 27, user: %{}
+    defstruct name: "John", age: 27, about: [], data: %{}
   end
 
   defmodule Site do
@@ -36,8 +36,8 @@ defmodule FetchAttributeTest do
   end
 
   test 'struct fetch attribute' do
-    assert_template_result "Tester", "{{ user.name }}", %User{:user => %{"name" => "Tester"}}
-    assert_template_result "John", "{{ name }}", %User{:user => %{"name" => "Tester"}}
+    assert_template_result "Tester", "{{ data.name }}", %User{:data => %{"name" => "Tester"}}
+    assert_template_result "John", "{{ name }}", %User{:data => %{"name" => "Tester"}}
   end
 
   test 'struct fetch attribute array' do
@@ -55,8 +55,8 @@ defmodule FetchAttributeTest do
   end
 
   test 'assign struct inside' do
-    assigns = %{"arg"=> %{"value" => 1},"map" =>%User{:user => %{"name" => "Tester"}}}
-    assert_template_result "Tester1", "{{ map.user.name | append: arg.value }}", assigns
+    assigns = %{"arg"=> %{"value" => 1},"map" =>%User{:data => %{"name" => "Tester"}}}
+    assert_template_result "Tester1", "{{ map.data.name | append: arg.value }}", assigns
   end
 
   defp assert_template_result(expected, markup, assigns \\ %{}) do
