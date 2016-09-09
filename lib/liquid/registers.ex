@@ -14,11 +14,13 @@ defmodule Liquid.Registers do
      case:           { Liquid.Case,     Liquid.Block },
      when:           { Liquid.When,     Liquid.Tag },
      for:            { Liquid.ForElse,  Liquid.Block },
+     ifchanged:      { Liquid.IfChanged, Liquid.Block},
      if:             { Liquid.IfElse,   Liquid.Block },
      unless:         { Liquid.Unless,   Liquid.Block},
      raw:            { Liquid.Raw,      Liquid.Block},
      increment:      { Liquid.Increment, Liquid.Tag},
      decrement:      { Liquid.Decrement, Liquid.Tag},
+     cycle:          { Liquid.Cycle,     Liquid.Tag},
      capture:        { Liquid.Capture, Liquid.Block}}
   end
 
