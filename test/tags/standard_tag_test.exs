@@ -316,11 +316,7 @@ defmodule StandardTagTest do
     assert_template_result "0 1 2 3", "0{%\nfor i in (1..3)\n%} {{\ni\n}}{%\nendfor\n%}"
   end
 
-  defp assert_template_result(expected, markup) do
-    assert_result(expected, markup, %{})
-  end
-
-  defp assert_template_result(expected, markup, assigns) do
+  defp assert_template_result(expected, markup, assigns \\ %{}) do
     assert_result(expected,markup,assigns)
   end
 

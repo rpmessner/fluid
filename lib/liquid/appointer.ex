@@ -9,6 +9,7 @@ defmodule Liquid.Appointer do
   def integer, do: ~r/^(-?\d+)$/
   def float, do: ~r/^(-?\d[\d\.]+)$/
   def quoted_string, do: ~r/#{Liquid.quoted_string}/
+  def start_quoted_string, do: ~r/^#{Liquid.quoted_string}/
 
 
   @doc "Assigns context for Variable and filters"
@@ -32,10 +33,9 @@ defmodule Liquid.Appointer do
         name |> String.to_integer
       float         |> Regex.match?(name) ->
         name |> String.to_float
-      quoted_string |> Regex.match?(name) ->
+      start_quoted_string |> Regex.match?(name) ->
         Liquid.quote_matcher |> Regex.replace(name, "")
       true ->
-        name = name |> String.split(" ", parts: 2) |> hd
         Regex.scan(Liquid.variable_parser, name) |> List.flatten
     end
     if is_list(value), do: %{parts: value}, else: %{literal: value }
