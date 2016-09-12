@@ -28,7 +28,7 @@ defmodule Liquid.Render do
   end
 
   def render(output, %Variable{}=v, %Context{}=context) do
-    { rendered, context } = Variable.lookup(v, context)
+    rendered = Variable.lookup(v, context)
     { [rendered|output], context }
   end
 

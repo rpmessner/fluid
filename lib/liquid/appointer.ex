@@ -1,6 +1,6 @@
 defmodule Liquid.Appointer do
   @moduledoc "A module to assign context for `Liquid.Variable`"
-  alias Liquid.{Variable, Context}
+  alias Liquid.Variable
 
   defp literals, do: %{"nil" => nil, "null" => nil, "" => nil,
                       "true" => true, "false" => false,
@@ -14,15 +14,15 @@ defmodule Liquid.Appointer do
 
   @doc "Assigns context for Variable and filters"
   def assign(%Variable{literal: literal, parts: [],filters: filters}, context) do
-    { literal, filters |> assign_context(context.assigns), context }
+    { literal, filters |> assign_context(context.assigns) }
   end
 
   def assign(%Variable{literal: nil, parts: parts, filters: filters}, context) do
-    {Liquid.Matcher.match(context, parts), filters |> assign_context(context.assigns), context}
+    {Liquid.Matcher.match(context, parts), filters |> assign_context(context.assigns)}
   end
 
   @doc """
-  Makes Variable.parts or literals from the given markup
+  Makes `Variable.parts` or literals from the given markup
   """
   @spec parse_name(String.t) :: String.t
   def parse_name(name) do

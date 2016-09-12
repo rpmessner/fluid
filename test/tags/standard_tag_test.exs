@@ -311,6 +311,10 @@ defmodule StandardTagTest do
     assert_template_result("1","{%for item in array%}{%ifchanged%}{{item}}{% endifchanged %}{%endfor%}",assigns)
   end
 
+  test :inner_ifchanged_name_overlap do
+    assert_template_result "145624563456", "{%for item in (1..3)%}{%ifchanged%}{{item}}{%for item in (4..6)%}{{item}}{%endfor%}{% endifchanged %}{%endfor%}"
+  end
+
   test :test_multiline_tag do
     assert_template_result "0 1 2 3", "0{% for i in (1..3) %} {{ i }}{% endfor %}"
     assert_template_result "0 1 2 3", "0{%\nfor i in (1..3)\n%} {{\ni\n}}{%\nendfor\n%}"

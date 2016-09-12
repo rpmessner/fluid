@@ -10,7 +10,7 @@ defmodule Liquid.Assign do
   def render(output, %Tag{markup: markup}, %Context{}=context) do
     [[_, to, from]] = syntax |> Regex.scan(markup)
     variable = Variable.create(from)
-    { from_value, context } = Variable.lookup(variable, context)
+    from_value = Variable.lookup(variable, context)
     result_assign = context.assigns |> Map.put(to, from_value)
     context = %{context | assigns: result_assign}
     { output, context }

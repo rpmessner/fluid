@@ -31,17 +31,17 @@ defmodule Liquid.Include do
 
   def render(output, %Tag{parts: parts}=tag, %Context{}=context) do
     { file_system, root } = context |> Context.registers(:file_system) || FileSystem.lookup
-    { name, context } = parts[:name] |> Variable.lookup(context)
+    name = parts[:name] |> Variable.lookup(context)
     { :ok, source } = file_system.read_template_file(root, name, context)
     presets = build_presets(tag, context)
     t = Template.parse(source, presets)
     t = %{ t | blocks: context.template.blocks ++ t.blocks }
     cond do
       !is_nil(parts[:variable]) ->
-        { item, _ } = Variable.lookup(parts[:variable], context)
+        item = Variable.lookup(parts[:variable], context)
         render_item(output, name, item, t, context)
       !is_nil(parts[:foreach]) ->
-        { items, _ } = Variable.lookup(parts[:foreach], context)
+        items = Variable.lookup(parts[:foreach], context)
         render_list(output, name, items, t, context)
       true -> render_item(output, name, nil, t, context)
     end
@@ -49,7 +49,7 @@ defmodule Liquid.Include do
 
   defp build_presets(%Tag{}=tag, context) do
     tag.attributes |> Enum.reduce(%{}, fn({key, value}, coll) ->
-      { value, _ } = Variable.lookup(value, context)
+      value = Variable.lookup(value, context)
       Map.put(coll, key, value)
     end)
   end

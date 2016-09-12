@@ -57,7 +57,7 @@ defmodule Liquid.ForElse do
 
   defp parse_collection(list, _context) when is_list(list), do: list
   defp parse_collection(%Variable{} = variable, context) do
-    Variable.lookup(variable, context) |> elem(0)
+    Variable.lookup(variable, context)
   end
 
   defp parse_collection(%RangeLookup{} = range, context) do
@@ -74,27 +74,26 @@ defmodule Liquid.ForElse do
     { output, block_context } = cond do
       should_render?(block, forloop, context) ->
         if block.blank do
-          { _, context } = Render.render(output, block.nodelist, %{context | assigns: assigns})
-          { output, context }
+          { _, new_context } = Render.render(output, block.nodelist, %{context | assigns: assigns})
+          { output, new_context }
         else
           Render.render(output, block.nodelist, %{context | assigns: assigns})
         end
       true -> { output, context }
     end
-    if block_context.break == true, do: t = []
+    t = if block_context.break == true, do: [], else: t
     each(output, h, t, block, %{context | assigns: block_context.assigns})
   end
 
   defp remember_limit(%Block{iterator: it}, context) do
-    { limit, context } = lookup_limit(it, context)
-    limit      = limit || 0
+    limit = lookup_limit(it, context) || 0
     remembered = context.offsets[it.name] || 0
     %{ context | offsets: context.offsets |> Map.put(it.name, remembered + limit) }
   end
 
   defp should_render?(%Block{iterator: %Iterator{}=it}, forloop, context) do
-    { limit, _ }  = lookup_limit(it, context)
-    { offset, _ } = lookup_offset(it, context)
+    limit  = lookup_limit(it, context)
+    offset = lookup_offset(it, context)
 
     cond do
       forloop["index"] <= offset        -> false
@@ -110,9 +109,7 @@ defmodule Liquid.ForElse do
 
   defp lookup_offset(%Iterator{offset: offset}=it, %Context{}=context) do
     case offset.name do
-      "continue" ->
-        offset = context.offsets[it.name]
-        { offset || 0, context }
+      "continue" -> context.offsets[it.name] || 0
       <<_::binary>> -> Variable.lookup(offset, context)
     end
   end
