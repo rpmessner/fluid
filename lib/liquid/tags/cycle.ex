@@ -26,8 +26,7 @@ defmodule Liquid.Cycle do
     value = values |>  Enum.fetch!(index) |> get_value_from_context(context)
     new_index = rem(index + 1, Enum.count(values))
     result_assign = context.assigns |> Map.put(name, new_index)
-    context = %{context | assigns: result_assign }
-    { [value|output], context }
+    { [value|output], %{context | assigns: result_assign } }
   end
 
 

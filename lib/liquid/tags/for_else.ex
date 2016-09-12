@@ -47,6 +47,7 @@ defmodule Liquid.ForElse do
 
   def render(output, %Block{iterator: it}=block, %Context{}=context) do
     list = parse_collection(it.collection, context)
+    list = if is_binary(list) and list != "", do: [list], else: list
     if is_list(list) and Enum.count(list) > 0 do
       list = if it.reversed, do: Enum.reverse(list), else: list
       each(output, make_ref(), list, block, context)
@@ -114,9 +115,10 @@ defmodule Liquid.ForElse do
     end
   end
 
-  defp next_forloop(%Iterator{forloop: loop}, count) when map_size(loop) < 1 do
+  defp next_forloop(%Iterator{forloop: loop}=it, count) when map_size(loop) < 1 do
     count = count |> Enum.count
-    %{"index" => 1,
+    %{"name" => it.item <> "-" <> it.name,
+    "index" => 1,
      "index0" => 0,
      "rindex" => count,
      "rindex0"=> count - 1,
@@ -125,8 +127,9 @@ defmodule Liquid.ForElse do
      "last"   => count == 1}
   end
 
-  defp next_forloop(%Iterator{forloop: loop}, _count) do
-    %{"index" => loop["index"]  + 1,
+  defp next_forloop(%Iterator{forloop: loop}=it, _count) do
+    %{"name" => it.item <> "-" <> it.name,
+    "index" => loop["index"]  + 1,
      "index0" => loop["index0"] + 1,
      "rindex" => loop["rindex"]  - 1,
      "rindex0"=> loop["rindex0"] - 1,
