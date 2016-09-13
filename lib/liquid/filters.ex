@@ -122,7 +122,8 @@ defmodule Liquid.Filters do
       {operand_int, operand_len} = operand |> get_int_and_counter
       case value_len + operand_len do
         0 -> value_int * operand_int
-        precision -> (value_int * operand_int / :math.pow(10, precision)) |> Float.round(precision)
+        precision ->
+          Float.round((value_int * operand_int / :math.pow(10, precision)), precision)
       end
     end
 
@@ -211,7 +212,7 @@ defmodule Liquid.Filters do
 
     def modulo(input, operand) when is_number(input) and is_number(operand) and input > 0, do: input |> rem(operand)
 
-    def modulo(input, operand) when is_number(input) and is_number(operand) and input < 0, do: input + operand |> modulo(operand)
+    def modulo(input, operand) when is_number(input) and is_number(operand) and input < 0, do: modulo(input + operand, operand)
 
     def modulo(input, operand) do
       input |> to_number |> modulo(to_number(operand))
@@ -465,8 +466,9 @@ defmodule Liquid.Filters do
 
     defp get_int_and_counter(input) when is_number(input) do
       {_, remainder} = input |> Float.to_string |> Integer.parse
-      len = String.length(remainder) -1
-      new_value = input * :math.pow(10, len) |> Float.round |> trunc
+      len = String.length(remainder) - 1
+      new_value = input * :math.pow(10, len)
+      new_value = new_value |> Float.round |> trunc
       {new_value, len}
     end
 

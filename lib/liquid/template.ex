@@ -4,7 +4,7 @@ defmodule Liquid.Template do
   alias Liquid.Render, as: Render
   alias Liquid.Context, as: Context
 
-  def render(%Template{}=t), do: render(t, %{})
+  def render(t, c \\ %{})#, do: render(t, %{})
   def render(%Template{}=t, %Context{}=c) do
     c = %{c | blocks: t.blocks }
     c = %{c | presets: t.presets }
@@ -16,6 +16,10 @@ defmodule Liquid.Template do
     context = %Context{template: t,         assigns: assigns,
                       presets:  t.presets, blocks: t.blocks}
     Render.render(t, context)
+  end
+
+  def render(_, _) do
+    raise Liquid.SyntaxError, message: "You can use only maps/structs to hold context data"
   end
 
   def parse(<<markup::binary>>, presets \\ %{}) do

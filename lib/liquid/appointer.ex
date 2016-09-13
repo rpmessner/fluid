@@ -36,7 +36,7 @@ defmodule Liquid.Appointer do
       start_quoted_string |> Regex.match?(name) ->
         Liquid.quote_matcher |> Regex.replace(name, "")
       true ->
-        Regex.scan(Liquid.variable_parser, name) |> List.flatten
+        Liquid.variable_parser |> Regex.scan(name) |> List.flatten
     end
     if is_list(value), do: %{parts: value}, else: %{literal: value }
   end
@@ -50,11 +50,11 @@ defmodule Liquid.Appointer do
     args = for arg <- args do
       parsed = arg |> parse_name
       if parsed |> Map.has_key?(:parts) do
-        Liquid.Matcher.match(assigns, parsed.parts) |> to_string
+        assigns |> Liquid.Matcher.match(parsed.parts) |> to_string
       else
         if Map.has_key?(assigns, :__struct__) do
           key = arg |> String.to_atom
-          if assigns |> Map.has_key?(key), do: Map.get(assigns,key) |> to_string, else: arg
+          if assigns |> Map.has_key?(key), do: assigns |> Map.get(key) |> to_string, else: arg
         else
           if assigns |> Map.has_key?(arg), do: assigns[arg] |> to_string, else: arg
         end

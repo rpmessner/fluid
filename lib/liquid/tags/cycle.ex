@@ -1,6 +1,7 @@
 defmodule Liquid.Cycle do
   @moduledoc """
   Implementation of `cycle` tag. Can be named or anonymous, rotates through pre-set values
+  Cycle is usually used within a loop to alternate between values, like colors or DOM classes.
   """
   alias Liquid.{Tag, Template, Context, Variable}
 

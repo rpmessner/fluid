@@ -5,7 +5,8 @@ defmodule Liquid.Parse do
   alias Liquid.Block
 
   def tokenize(<<string::binary>>) do
-    Regex.split(Liquid.template_parser, string, on: :all_but_first, trim: true)
+    Liquid.template_parser
+      |> Regex.split(string, on: :all_but_first, trim: true)
       |> List.flatten
       |> Enum.filter(&(&1 != ""))
   end
@@ -83,28 +84,36 @@ defmodule Liquid.Parse do
 
   defp parse_node(<<name::binary>>, rest, %Template{}=template) do
     case Regex.named_captures(Liquid.parser, name) do
-      %{"tag" => "", "variable" => <<markup::binary>>} ->
+      %{"tag" => "", "variable" => markup} when is_binary(markup) ->
         { Variable.create(markup), rest, template }
-      %{"tag" => <<markup::binary>>, "variable" => ""} ->
-        name = markup |> String.split(" ") |> hd
-        case Registers.lookup(name) do
-          { mod, Liquid.Block } ->
-            block = Liquid.Block.create(markup)
-            { block, rest, template } = try do
-                mod.parse(block, rest, [], template)
-              rescue
-                UndefinedFunctionError -> parse(block, rest, [], template)
-              end
-            { block, template } = mod.parse(block, template)
-            { block, rest, template }
-          { mod, Liquid.Tag } ->
-            tag = Liquid.Tag.create(markup)
-            { tag, template } = mod.parse(tag, template)
-            { tag, rest, template }
-          nil -> raise "unregistered tag: #{name}"
-        end
+      %{"tag" => markup, "variable" => ""} when is_binary(markup) ->
+        parse_markup(markup, rest, template)
       nil -> { name, rest, template }
     end
+  end
+
+  defp parse_markup(markup, rest, template) do
+    name = markup |> String.split(" ") |> hd
+    case Registers.lookup(name) do
+      { mod, Liquid.Block } ->
+        parse_block(mod, markup, rest, template)
+      { mod, Liquid.Tag } ->
+        tag = Liquid.Tag.create(markup)
+        { tag, template } = mod.parse(tag, template)
+        { tag, rest, template }
+      nil -> raise "unregistered tag: #{name}"
+    end
+  end
+
+  defp parse_block(mod, markup, rest, template) do
+    block = Liquid.Block.create(markup)
+    { block, rest, template } = try do
+        mod.parse(block, rest, [], template)
+      rescue
+        UndefinedFunctionError -> parse(block, rest, [], template)
+      end
+    { block, template } = mod.parse(block, template)
+    { block, rest, template }
   end
 
 end

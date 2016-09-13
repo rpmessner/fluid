@@ -1,4 +1,50 @@
 defmodule Liquid.ForElse do
+ @moduledoc """
+   Like in Shopify's liquid: "For" iterates over an array or collection.
+   Several useful variables are available to you within the loop.
+
+   == Basic usage:
+      {% for item in collection %}
+        {{ forloop.index }}: {{ item.name }}
+      {% endfor %}
+
+   == Advanced usage:
+      {% for item in collection %}
+        <div {% if forloop.first %}class="first"{% endif %}>
+          Item {{ forloop.index }}: {{ item.name }}
+        </div>
+      {% else %}
+        There is nothing in the collection.
+      {% endfor %}
+
+   You can also define a limit and offset much like SQL.  Remember
+   that offset starts at 0 for the first item.
+
+      {% for item in collection limit:5 offset:10 %}
+        {{ item.name }}
+      {% end %}
+
+    To reverse the for loop simply use {% for item in collection reversed %}
+
+   == Available variables:
+
+   forloop.name:: 'item-collection'
+   forloop.length:: Length of the loop
+   forloop.index:: The current item's position in the collection;
+                   forloop.index starts at 1.
+                   This is helpful for non-programmers who start believe
+                   the first item in an array is 1, not 0.
+   forloop.index0:: The current item's position in the collection
+                    where the first item is 0
+   forloop.rindex:: Number of items remaining in the loop
+                    (length - index) where 1 is the last item.
+   forloop.rindex0:: Number of items remaining in the loop
+                     where 0 is the last item.
+   forloop.first:: Returns true if the item is the first item.
+   forloop.last:: Returns true if the item is the last item.
+   forloop.parentloop:: Provides access to the parent loop, if present.
+
+"""
   alias Liquid.Render
   alias Liquid.Block
   alias Liquid.Variable
@@ -50,7 +96,9 @@ defmodule Liquid.ForElse do
     list = if is_binary(list) and list != "", do: [list], else: list
     if is_list(list) and Enum.count(list) > 0 do
       list = if it.reversed, do: Enum.reverse(list), else: list
-      each(output, make_ref(), list, block, context)
+      limit  = lookup_limit(it, context)
+      offset = lookup_offset(it, context)
+      each(output, [make_ref(), limit,offset], list, block, context)
     else
       Render.render(output, block.elselist, context)
     end
@@ -66,24 +114,29 @@ defmodule Liquid.ForElse do
   end
 
   def each(output, _, [], %Block{}=block, %Context{}=context), do: { output, remember_limit(block, context) }
-  def each(output, prev, [h|t]=list, %Block{iterator: it}=block, %Context{assigns: assigns}=context) do
-    forloop = next_forloop(it, list)
-    block   = %{ block | iterator: %{it | forloop: forloop }}
-    assigns = assigns |> Map.put("forloop", forloop)
-                      |> Map.put(it.item, h)
-                      |> Map.put("changed", {prev,h})
-    { output, block_context } = cond do
-      should_render?(block, forloop, context) ->
-        if block.blank do
-          { _, new_context } = Render.render(output, block.nodelist, %{context | assigns: assigns})
-          { output, new_context }
-        else
-          Render.render(output, block.nodelist, %{context | assigns: assigns})
-        end
-      true -> { output, context }
-    end
+  def each(output, [prev, limit, offset], [h|t]=list, %Block{}=block, %Context{}=context ) do
+    forloop = next_forloop(block.iterator, list)
+    block   = %{ block | iterator: %{block.iterator | forloop: forloop }}
+    assigns = context.assigns |> Map.put("forloop", forloop)
+                              |> Map.put(block.iterator.item, h)
+                              |> Map.put("changed", {prev,h})
+
+    { output, block_context } = render_content(output, block, context, assigns, [limit, offset])
+
     t = if block_context.break == true, do: [], else: t
-    each(output, h, t, block, %{context | assigns: block_context.assigns})
+    each(output, [h, limit, offset], t, block, %{context | assigns: block_context.assigns})
+  end
+
+  defp render_content(output, %Block{iterator: it}=block, context, assigns, [limit, offset]) do
+    case {should_render?(limit, offset, it.forloop["index"]), block.blank} do
+      {true, true} ->
+        { _, new_context } = Render.render([], block.nodelist, %{context | assigns: assigns})
+        { output, new_context }
+      {true, _ } ->
+        Render.render(output, block.nodelist, %{context | assigns: assigns})
+      _ ->
+        { output, context }
+    end
   end
 
   defp remember_limit(%Block{iterator: it}, context) do
@@ -92,28 +145,19 @@ defmodule Liquid.ForElse do
     %{ context | offsets: context.offsets |> Map.put(it.name, remembered + limit) }
   end
 
-  defp should_render?(%Block{iterator: %Iterator{}=it}, forloop, context) do
-    limit  = lookup_limit(it, context)
-    offset = lookup_offset(it, context)
+  defp should_render?(_limit, offset, index) when index <= offset, do: false
+  defp should_render?(nil, _, _), do: true
+  defp should_render?(limit, offset, index) when index > limit + offset, do: false
+  defp should_render?(_limit, _offset, _index), do: true
 
-    cond do
-      forloop["index"] <= offset        -> false
-      limit |> is_nil                    -> true
-      forloop["index"] > limit + offset -> false
-      true                             -> true
-    end
-  end
+  defp lookup_limit(%Iterator{limit: limit}, %Context{}=context),
+   do: Variable.lookup(limit, context)
 
-  defp lookup_limit(%Iterator{limit: limit}, %Context{}=context) do
-    Variable.lookup(limit, context)
-  end
+  defp lookup_offset(%Iterator{offset: %Variable{name: "continue"}}=it, %Context{}=context),
+   do: context.offsets[it.name] || 0
 
-  defp lookup_offset(%Iterator{offset: offset}=it, %Context{}=context) do
-    case offset.name do
-      "continue" -> context.offsets[it.name] || 0
-      <<_::binary>> -> Variable.lookup(offset, context)
-    end
-  end
+  defp lookup_offset(%Iterator{offset: offset}, %Context{}=context),
+   do: Variable.lookup(offset, context)
 
   defp next_forloop(%Iterator{forloop: loop}=it, count) when map_size(loop) < 1 do
     count = count |> Enum.count
