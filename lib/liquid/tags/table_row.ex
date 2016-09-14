@@ -34,6 +34,7 @@ defmodule Liquid.TableRow do
     end
   end
 
+
   defp parse_iterator(%Block{markup: markup}) do
     [[_,item|[orig_collection]]] = Regex.scan(syntax, markup)
     collection = Expression.parse(orig_collection)
@@ -47,6 +48,7 @@ defmodule Liquid.TableRow do
              limit: limit, offset: offset, cols: cols}
   end
 
+
   defp parse_attribute(attributes, name, default \\ "nil") do
     attributes |> Enum.reduce(default, fn(x, ret) ->
       case x do
@@ -55,6 +57,7 @@ defmodule Liquid.TableRow do
       end
     end)
   end
+
 
   @doc """
   Iterates through pre-set data and appends it to rendered output list
@@ -77,6 +80,7 @@ defmodule Liquid.TableRow do
       end
     end
   end
+
 
   defp parse_collection(list, _context) when is_list(list), do: list
 
@@ -104,6 +108,7 @@ defmodule Liquid.TableRow do
     each(output, [h, limit, offset], t, block, %{context | assigns: block_context.assigns})
   end
 
+
   defp render_content(%Block{iterator: it}=block, context, assigns, limit, offset) do
     case {should_render?(limit, offset, it.forloop["index"]), block.blank} do
       {true, true} ->
@@ -116,6 +121,7 @@ defmodule Liquid.TableRow do
     end
   end
 
+
   defp add_rows_data(output, forloop) do
     output = ["</td>"] ++ output ++ ["<td class=\"col#{forloop["col"]}\">"]
     if forloop["col_last"] and not forloop["last"],
@@ -123,16 +129,19 @@ defmodule Liquid.TableRow do
       else: output
   end
 
+
   defp remember_limit(%Block{iterator: it}, context) do
     limit = lookup_limit(it, context) || 0
     remembered = context.offsets[it.name] || 0
     %{context | offsets: context.offsets |> Map.put(it.name, remembered + limit)}
   end
 
+
   defp should_render?(_limit, offset, index) when index <= offset, do: false
   defp should_render?(nil, _, _), do: true
   defp should_render?(limit, offset, index) when index > limit + offset, do: false
   defp should_render?(_limit, _offset, _index), do: true
+
 
   defp lookup_limit(%Iterator{limit: limit}, %Context{}=context),
    do: Variable.lookup(limit, context)
@@ -142,6 +151,7 @@ defmodule Liquid.TableRow do
 
   defp lookup_offset(%Iterator{offset: offset}, %Context{}=context),
    do: Variable.lookup(offset, context)
+
 
   defp next_forloop(%Iterator{forloop: loop}=it, count, _, _) when map_size(loop) < 1 do
     count = count |> Enum.count
@@ -171,6 +181,7 @@ defmodule Liquid.TableRow do
     new_loop = if not is_nil(limit) and loop["index"] + 1 == limit + offset, do: %{new_loop| "last" => true}, else: new_loop
     new_loop
   end
+
 
   defp get_loop_indexes(%{"index" => index}=loop, cols, offset) when index > offset and cols == 0 do
     {loop["col"] + 1, loop["rindex0"] == 1, 1 }
