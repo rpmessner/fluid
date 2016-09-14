@@ -24,16 +24,14 @@ defmodule Liquid.IfElse do
     block = parse_conditions(block)
     case Block.split(block, [:else, :elsif]) do
       { true_block, [%Tag{name: :elsif, markup: markup}|elsif_block] } ->
-        is_blank = Blank.blank?(elsif_block)
-        { elseif, t } = %Block{name: :if, markup: markup, nodelist: elsif_block, blank: is_blank} |> parse(t)
-        is_blank = Blank.blank?(true_block)
-        { %{block | nodelist: true_block, elselist: [elseif], blank: is_blank }, t }
+        { elseif, t } =
+          parse(%Block{name: :if, markup: markup, nodelist: elsif_block, blank: Blank.blank?(elsif_block)}, t)
+        { %{block | nodelist: true_block, elselist: [elseif], blank: Blank.blank?(true_block) }, t }
       { true_block, [%Tag{name: :else}|false_block] } ->
-        is_blank = Blank.blank?(true_block) && Blank.blank?(false_block)
-        { %{block | nodelist: true_block, elselist: false_block, blank: is_blank}, t }
+        blank? = Blank.blank?(true_block) && Blank.blank?(false_block)
+        { %{block | nodelist: true_block, elselist: false_block, blank: blank?}, t }
       { _, [] } ->
-        is_blank = Blank.blank?(block.nodelist)
-        { %{block | blank: is_blank}, t }
+        { %{block | blank: Blank.blank?(block.nodelist)}, t }
     end
   end
 

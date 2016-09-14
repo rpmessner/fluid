@@ -7,8 +7,8 @@ defmodule Liquid.Render do
   alias Liquid.Tag
 
   def render(%Template{root: root}, %Context{}=context) do
-      { output, context } = render([], root, context)
-      { :ok, output |> List.flatten |> Enum.reverse |> Enum.join, context }
+    { output, context } = render([], root, context)
+    { :ok, output |> List.flatten |> Enum.reverse |> Enum.join, context }
   end
 
   def render(output, [], %Context{}=context) do
@@ -28,7 +28,7 @@ defmodule Liquid.Render do
   end
 
   def render(output, %Variable{}=v, %Context{}=context) do
-    { rendered, context } = Variable.lookup(v, context)
+    rendered = Variable.lookup(v, context)
     { [rendered|output], context }
   end
 
@@ -39,8 +39,7 @@ defmodule Liquid.Render do
 
   def render(output, %Block{name: name}=block, %Context{}=context) do
     case Registers.lookup(name) do
-      { mod, Block } ->
-        mod.render(output, block, context)
+      { mod, Block } -> mod.render(output, block, context)
       nil -> render(output, block.nodelist, context)
     end
   end

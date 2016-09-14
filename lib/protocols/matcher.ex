@@ -30,6 +30,11 @@ defimpl Liquid.Matcher, for: Map do
 
   def match(current, ["size"|_]), do: current |> map_size
 
+  def match(current,[<<?[,index::binary>>|parts]) do
+    index = index |> String.split("]") |> hd |> String.replace(Liquid.quote_matcher, "")
+    match(current,[index|parts])
+  end
+
   def match(current, [name|parts]) when is_binary(name) do
     current |> Liquid.Matcher.match(name) |> Liquid.Matcher.match(parts)
   end
