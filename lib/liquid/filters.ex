@@ -201,6 +201,16 @@ defmodule Liquid.Filters do
 
     def default(input, _), do: input
 
+    @doc """
+    Returns a single or plural word depending on input number
+    """
+    def pluralize(1, single, _), do: single
+
+    def pluralize(input, _, plural) when is_number(input) , do: plural
+
+    def pluralize(input, single, plural) , do: input |> to_number |> pluralize(single, plural)
+
+    defdelegate pluralise(input, single, plural), to: __MODULE__, as: :pluralize
 
     def abs(input) when is_binary(input), do: input |> to_number |> abs
       
