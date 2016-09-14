@@ -342,6 +342,11 @@ defmodule Liquid.FilterTest do
     assert "bar" == Functions.default({}, "bar")
   end
 
+  test :pluralize do
+    assert_template_result "items", "{{ 3 | pluralize: 'item', 'items' }}"
+    assert_template_result "word", "{{ 1 | pluralize: 'word', 'words' }}"
+  end
+
   test :filters_chain_with_assigments do
     assert_template_result "abca\nb\nc", "{{ source | strip_newlines | append:source}}", %{"source" => "a\nb\nc"}
   end
