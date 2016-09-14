@@ -5,12 +5,10 @@ defmodule Liquid do
 
   def start do
     Liquid.Filters.add_filter_modules
-    Liquid.FileSystem.start
+    Liquid.Supervisor.start_link()
   end
 
-  def stop do
-    Liquid.FileSystem.stop
-  end
+  def stop, do: {:ok, "stopped"}
 
   def filter_arguments, do: ~r/(?::|,)\s*(#{quoted_fragment})/
   def single_quote, do: "'"

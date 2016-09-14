@@ -27,8 +27,13 @@ defmodule Liquid.LocalFileSystem do
 end
 
 defmodule Liquid.FileSystem do
-  use GenServer
+  @moduledoc """
+  Allows to set up the file system and read the template file from it
+  """
 
+  @doc """
+  Get full file system path
+  """
   def full_path(path) do
     case lookup do
       nil -> { :error, "No file system defined" }
@@ -43,33 +48,12 @@ defmodule Liquid.FileSystem do
     end
   end
 
-  def handle_call({ :lookup }, _from, current) do
-    { :reply, current, current }
-  end
-
-  def handle_call(:stop, _from, module) do
-    { :stop, :normal, :ok, module }
-  end
-
-  def handle_cast({ :register, module, path }, _) do
-    { :noreply, { module, path } }
-  end
-
-  def register(module), do: register(module, "")
-  def register(module, path) do
-    :gen_server.cast(__MODULE__, { :register, module, path })
+  def register(module, path \\ "") do
+    Application.put_env(:liquid, :file_system, {module, path})
   end
 
   def lookup do
-    :gen_server.call(__MODULE__, { :lookup })
-  end
-
-  def start do
-    :gen_server.start({ :local, __MODULE__ }, __MODULE__, { nil, nil }, [])
-  end
-
-  def stop do
-    :gen_server.call(__MODULE__, :stop)
+    Application.get_env(:liquid, :file_system)
   end
 
 end
