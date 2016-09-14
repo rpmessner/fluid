@@ -4,7 +4,7 @@ defmodule Liquid.Expression do
 
   @literal_list [nil, "nil", "null", "", "true", "false", "blank", "empty"]
   @literals %{
-    nil: nil, "nil": nil, "null": nil, "": nil,
+    :nil=> nil, "nil": nil, "null": nil, "": nil,
     "true": true,
     "false": false,
     "blank": :blank?,

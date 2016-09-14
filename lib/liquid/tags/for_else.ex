@@ -1,4 +1,50 @@
 defmodule Liquid.ForElse do
+ @moduledoc """
+   Like in Shopify's liquid: "For" iterates over an array or collection.
+   Several useful variables are available to you within the loop.
+
+   == Basic usage:
+      {% for item in collection %}
+        {{ forloop.index }}: {{ item.name }}
+      {% endfor %}
+
+   == Advanced usage:
+      {% for item in collection %}
+        <div {% if forloop.first %}class="first"{% endif %}>
+          Item {{ forloop.index }}: {{ item.name }}
+        </div>
+      {% else %}
+        There is nothing in the collection.
+      {% endfor %}
+
+   You can also define a limit and offset much like SQL.  Remember
+   that offset starts at 0 for the first item.
+
+      {% for item in collection limit:5 offset:10 %}
+        {{ item.name }}
+      {% end %}
+
+    To reverse the for loop simply use {% for item in collection reversed %}
+
+   == Available variables:
+
+   forloop.name:: 'item-collection'
+   forloop.length:: Length of the loop
+   forloop.index:: The current item's position in the collection;
+                   forloop.index starts at 1.
+                   This is helpful for non-programmers who start believe
+                   the first item in an array is 1, not 0.
+   forloop.index0:: The current item's position in the collection
+                    where the first item is 0
+   forloop.rindex:: Number of items remaining in the loop
+                    (length - index) where 1 is the last item.
+   forloop.rindex0:: Number of items remaining in the loop
+                     where 0 is the last item.
+   forloop.first:: Returns true if the item is the first item.
+   forloop.last:: Returns true if the item is the last item.
+   forloop.parentloop:: Provides access to the parent loop, if present.
+
+"""
   alias Liquid.Render
   alias Liquid.Block
   alias Liquid.Variable
@@ -16,7 +62,7 @@ defmodule Liquid.ForElse do
     block = %{block | iterator: parse_iterator(block) }
     case Block.split(block) do
       { true_block, [_,false_block] } ->
-        is_blank = Blank.blank?(true_block) && Blank.blank?(false_block)
+        is_blank = Blank.blank?([true_block|false_block])
         { %{block | nodelist: true_block, elselist: false_block, blank: is_blank}, t }
       { _, [] } ->
           is_blank = Blank.blank?(nodelist)
@@ -40,16 +86,19 @@ defmodule Liquid.ForElse do
     attributes |> Enum.reduce(default, fn(x, ret) ->
       case x do
         [_, ^name, attribute] when is_binary(attribute) -> attribute
-        [_|_] -> ret
+        _ -> ret
       end
     end)
   end
 
   def render(output, %Block{iterator: it}=block, %Context{}=context) do
     list = parse_collection(it.collection, context)
+    list = if is_binary(list) and list != "", do: [list], else: list
     if is_list(list) and Enum.count(list) > 0 do
       list = if it.reversed, do: Enum.reverse(list), else: list
-      each(output, list, block, context)
+      limit  = lookup_limit(it, context)
+      offset = lookup_offset(it, context)
+      each(output, [make_ref(), limit,offset], list, block, context)
     else
       Render.render(output, block.elselist, context)
     end
@@ -57,68 +106,63 @@ defmodule Liquid.ForElse do
 
   defp parse_collection(list, _context) when is_list(list), do: list
   defp parse_collection(%Variable{} = variable, context) do
-    {list, _} = Variable.lookup(variable, context)
-    list
+    Variable.lookup(variable, context)
   end
 
   defp parse_collection(%RangeLookup{} = range, context) do
     RangeLookup.parse(range, context)
   end
 
-  def each(output, [], %Block{}=block, %Context{}=context), do: { output, remember_limit(block, context) }
-  def each(output, [h|t]=list, %Block{iterator: it}=block, %Context{assigns: assigns}=context) do
-    forloop = next_forloop(it, list)
-    block   = %{ block | iterator: %{it | forloop: forloop }}
-    assigns = assigns |> Map.put("forloop", forloop) |> Map.put(it.item, h)
-    { output, block_context } = cond do
-      should_render?(block, forloop, context) ->
-        if block.blank do
-          { _, context } = Render.render(output, block.nodelist, %{context | assigns: assigns})
-          { output, context }
-        else
-          Render.render(output, block.nodelist, %{context | assigns: assigns})
-        end
-      true -> { output, context }
+  def each(output, _, [], %Block{}=block, %Context{}=context), do: { output, remember_limit(block, context) }
+  def each(output, [prev, limit, offset], [h|t]=list, %Block{}=block, %Context{}=context ) do
+    forloop = next_forloop(block.iterator, list)
+    block   = %{ block | iterator: %{block.iterator | forloop: forloop }}
+    assigns = context.assigns |> Map.put("forloop", forloop)
+                              |> Map.put(block.iterator.item, h)
+                              |> Map.put("changed", {prev,h})
+
+    { output, block_context } = render_content(output, block, context, assigns, [limit, offset])
+
+    t = if block_context.break == true, do: [], else: t
+    each(output, [h, limit, offset], t, block, %{context | assigns: block_context.assigns})
+  end
+
+  defp render_content(output, %Block{iterator: it}=block, context, assigns, [limit, offset]) do
+    case {should_render?(limit, offset, it.forloop["index"]), block.blank} do
+      {true, true} ->
+        { _, new_context } = Render.render([], block.nodelist, %{context | assigns: assigns})
+        { output, new_context }
+      {true, _ } ->
+        Render.render(output, block.nodelist, %{context | assigns: assigns})
+      _ ->
+        { output, context }
     end
-    if block_context.break == true, do: t = []
-    each(output, t, block, %{context | assigns: block_context.assigns})
   end
 
   defp remember_limit(%Block{iterator: it}, context) do
-    { limit, context } = lookup_limit(it, context)
-    limit      = limit || 0
+    limit = lookup_limit(it, context) || 0
     remembered = context.offsets[it.name] || 0
     %{ context | offsets: context.offsets |> Map.put(it.name, remembered + limit) }
   end
 
-  defp should_render?(%Block{iterator: %Iterator{}=it}, forloop, context) do
-    { limit, _ }  = lookup_limit(it, context)
-    { offset, _ } = lookup_offset(it, context)
+  defp should_render?(_limit, offset, index) when index <= offset, do: false
+  defp should_render?(nil, _, _), do: true
+  defp should_render?(limit, offset, index) when index > limit + offset, do: false
+  defp should_render?(_limit, _offset, _index), do: true
 
-    cond do
-      forloop["index"] <= offset        -> false
-      limit |> is_nil                    -> true
-      forloop["index"] > limit + offset -> false
-      true                             -> true
-    end
-  end
+  defp lookup_limit(%Iterator{limit: limit}, %Context{}=context),
+   do: Variable.lookup(limit, context)
 
-  defp lookup_limit(%Iterator{limit: limit}, %Context{}=context) do
-    Variable.lookup(limit, context)
-  end
+  defp lookup_offset(%Iterator{offset: %Variable{name: "continue"}}=it, %Context{}=context),
+   do: context.offsets[it.name] || 0
 
-  defp lookup_offset(%Iterator{offset: offset}=it, %Context{}=context) do
-    case offset.name do
-      "continue" ->
-        offset = context.offsets[it.name]
-        { offset || 0, context }
-      <<_::binary>> -> Variable.lookup(offset, context)
-    end
-  end
+  defp lookup_offset(%Iterator{offset: offset}, %Context{}=context),
+   do: Variable.lookup(offset, context)
 
-  defp next_forloop(%Iterator{forloop: loop}, count) when map_size(loop) < 1 do
+  defp next_forloop(%Iterator{forloop: loop}=it, count) when map_size(loop) < 1 do
     count = count |> Enum.count
-    %{"index" => 1,
+    %{"name" => it.item <> "-" <> it.name,
+    "index" => 1,
      "index0" => 0,
      "rindex" => count,
      "rindex0"=> count - 1,
@@ -127,8 +171,9 @@ defmodule Liquid.ForElse do
      "last"   => count == 1}
   end
 
-  defp next_forloop(%Iterator{forloop: loop}, _count) do
-    %{"index" => loop["index"]  + 1,
+  defp next_forloop(%Iterator{forloop: loop}=it, _count) do
+    %{"name" => it.item <> "-" <> it.name,
+    "index" => loop["index"]  + 1,
      "index0" => loop["index0"] + 1,
      "rindex" => loop["rindex"]  - 1,
      "rindex0"=> loop["rindex0"] - 1,
@@ -160,4 +205,17 @@ defmodule Liquid.Continue do
   def render(output, %Tag{}, %Context{}=context) do
     { output, %{context | continue: true } }
   end
+end
+
+defmodule Liquid.IfChanged do
+  alias Liquid.{Template, Block}
+
+  def parse(%Block{}=block, %Template{}=t), do: { block, t }
+  def render(output, %Block{nodelist: nodelist}, context) do
+    case context.assigns["changed"] do
+      {l,r} when l != r -> Liquid.Render.render( output, nodelist, context)
+      _ -> {output, context}
+    end
+  end
+
 end

@@ -21,14 +21,13 @@ defmodule Liquid.Variable do
   Assigns context to variable and than applies all filters
   """
   def lookup(%Variable{}=v, %Context{}=context) do
-    { ret, filters, context } = Liquid.Appointer.assign(v, context)
+    { ret, filters } = Liquid.Appointer.assign(v, context)
     try do
-      ret = filters |> Filters.filter(ret)
-      { ret, context }
+      filters |> Filters.filter(ret)
     rescue
-      e in UndefinedFunctionError -> { e.message, context}
-      e in ArgumentError -> { e.message, context}
-      e in ArithmeticError -> { "Liquid error: #{e.message}", context}
+      e in UndefinedFunctionError -> e.message
+      e in ArgumentError -> e.message
+      e in ArithmeticError -> "Liquid error: #{e.message}"
     end
   end
 

@@ -284,32 +284,38 @@ defmodule ForElseTagTest do
     assert_result(expected, markup, assigns)
   end
 
-  # test :for_tag_string do
-  #   assert_result("test string",
-  #               "{%for val in string%}{{val}}{%endfor%}",
-  #               [string: "test string"])
+   test :for_tag_string do
 
-  #   assert_result("test string",
-  #               "{%for val in string limit:1%}{{val}}{%endfor%}",
-  #               [string: "test string"])
+    # test continue does nothing when unreached
+    assigns = %{"array" => %{"items" => [1,2,3,4,5]}}
+    markup = "{% for i in array.items %}{% if i == 9999 %}{% continue %}{% endif %}{{ i }}{% endfor %}"
+    expected = "12345"
+    assert_result(expected, markup, assigns)
+     assert_result("test string",
+                 "{%for val in string%}{{val}}{%endfor%}",
+                 %{"string" => "test string"})
 
-  #   assert_result("val-string-1-1-0-1-0-true-true-test string",
-  #               "{%for val in string%}" <>
-  #               "{{forloop.name}}-" <>
-  #               "{{forloop.index}}-" <>
-  #               "{{forloop.length}}-" <>
-  #               "{{forloop.index0}}-" <>
-  #               "{{forloop.rindex}}-" <>
-  #               "{{forloop.rindex0}}-" <>
-  #               "{{forloop.first}}-" <>
-  #               "{{forloop.last}}-" <>
-  #               "{{val}}{%endfor%}",
-  #               [string: "test string"])
-  # end
+     assert_result("test string",
+                 "{%for val in string limit:1%}{{val}}{%endfor%}",
+                 %{"string" => "test string"})
 
-  # test :blank_string_not_iterable do
-  #   assert_result("", "{% for char in characters %}I WILL NOT BE OUTPUT{% endfor %}", [characters: ""])
-  # end
+     assert_result("val-string-1-1-0-1-0-true-true-test string",
+                 "{%for val in string%}" <>
+                 "{{forloop.name}}-" <>
+                 "{{forloop.index}}-" <>
+                 "{{forloop.length}}-" <>
+                 "{{forloop.index0}}-" <>
+                 "{{forloop.rindex}}-" <>
+                 "{{forloop.rindex0}}-" <>
+                 "{{forloop.first}}-" <>
+                 "{{forloop.last}}-" <>
+                 "{{val}}{%endfor%}",
+                 %{"string" => "test string"})
+   end
+
+   test :blank_string_not_iterable do
+     assert_result("", "{% for char in characters %}I WILL NOT BE OUTPUT{% endfor %}", %{"characters" => ""})
+   end
 
   defp assert_template_result(expected, markup, assigns) do
     assert_result(expected,markup,assigns)
