@@ -119,21 +119,21 @@ defmodule Liquid.ForElse do
     block   = %{ block | iterator: %{block.iterator | forloop: forloop }}
     assigns = context.assigns |> Map.put("forloop", forloop)
                               |> Map.put(block.iterator.item, h)
-                              |> Map.put("changed", {prev,h})
+    registers = context.registers |> Map.put("changed", {prev,h})
 
-    { output, block_context } = render_content(output, block, context, assigns, [limit, offset])
+    { output, block_context } = render_content(output, block, %{context | assigns: assigns, registers: registers}, [limit, offset])
 
     t = if block_context.break == true, do: [], else: t
-    each(output, [h, limit, offset], t, block, %{context | assigns: block_context.assigns})
+    each(output, [h, limit, offset], t, block, %{context | assigns: block_context.assigns, registers: block_context.registers})
   end
 
-  defp render_content(output, %Block{iterator: it}=block, context, assigns, [limit, offset]) do
+  defp render_content(output, %Block{iterator: it}=block, context, [limit, offset]) do
     case {should_render?(limit, offset, it.forloop["index"]), block.blank} do
       {true, true} ->
-        { _, new_context } = Render.render([], block.nodelist, %{context | assigns: assigns})
+        { _, new_context } = Render.render([], block.nodelist, context)
         { output, new_context }
       {true, _ } ->
-        Render.render(output, block.nodelist, %{context | assigns: assigns})
+        Render.render(output, block.nodelist, context)
       _ ->
         { output, context }
     end
@@ -212,7 +212,7 @@ defmodule Liquid.IfChanged do
 
   def parse(%Block{}=block, %Template{}=t), do: { block, t }
   def render(output, %Block{nodelist: nodelist}, context) do
-    case context.assigns["changed"] do
+    case context.registers["changed"] do
       {l,r} when l != r -> Liquid.Render.render( output, nodelist, context)
       _ -> {output, context}
     end
