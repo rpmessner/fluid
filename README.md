@@ -68,6 +68,7 @@ end
 and than include them in your `config.exs` file
 
 ``` elixir
+# config.exs
 config :liquid,
   extra_filter_modules: [MyFilters],
   extra_tags: %{minus_one: {ExampleTag, Liquid.Tag},
@@ -83,11 +84,21 @@ and for filters you should use
 #### Global Filters 
 It's also possible to apply global filter to all rendered variables setting up the config:
 ``` elixir
+# config.exs
 config :liquid,
   &MyFilter.counting_sheeps/1
 ```
 or adding a `"global_filter"` value to context for `Liquid.Template.render` function:
 `Liquid.Template.render(tpl, %{global_filter: &MyFilter.counting_sheeps/1})` (you need to define filter function first) 
+
+## File systems
+You can also set up the desired default file system for your project using the `config.exs` file 
+``` elixir
+# config.exs
+config :liquid,
+  file_system: {Liquid.LocalFileSystem, "/your/path"}
+```
+ 
 
 ## Context assignment
 
