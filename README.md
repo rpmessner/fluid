@@ -86,7 +86,7 @@ It's also possible to apply global filter to all rendered variables setting up t
 ``` elixir
 # config.exs
 config :liquid,
-  &MyFilter.counting_sheeps/1
+  global_filter: &MyFilter.counting_sheeps/1
 ```
 or adding a `"global_filter"` value to context for `Liquid.Template.render` function:
 `Liquid.Template.render(tpl, %{global_filter: &MyFilter.counting_sheeps/1})` (you need to define filter function first) 
