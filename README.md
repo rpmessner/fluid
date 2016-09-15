@@ -68,6 +68,7 @@ end
 and than include them in your `config.exs` file
 
 ``` elixir
+# config.exs
 config :liquid,
   extra_filter_modules: [MyFilters],
   extra_tags: %{minus_one: {ExampleTag, Liquid.Tag},
@@ -80,6 +81,14 @@ Another option is to set up the tag using:
 and for filters you should use
 `Liquid.Filters.add_filters(MyFilters)`
 
+## File systems
+You can also set up the desired default file system for your project using the `config.exs` file 
+``` elixir
+# config.exs
+config :liquid,
+  file_system: {Liquid.LocalFileSystem, "/your/path"}
+```
+ 
 
 ## Context assignment
 
