@@ -81,6 +81,16 @@ Another option is to set up the tag using:
 and for filters you should use
 `Liquid.Filters.add_filters(MyFilters)`
 
+#### Global Filters 
+It's also possible to apply global filter to all rendered variables setting up the config:
+``` elixir
+# config.exs
+config :liquid,
+  global_filter: &MyFilter.counting_sheeps/1
+```
+or adding a `"global_filter"` value to context for `Liquid.Template.render` function:
+`Liquid.Template.render(tpl, %{global_filter: &MyFilter.counting_sheeps/1})` (you need to define filter function first) 
+
 ## File systems
 You can also set up the desired default file system for your project using the `config.exs` file 
 ``` elixir

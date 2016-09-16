@@ -5,7 +5,7 @@ defmodule Liquid do
 
   def start do
     Liquid.Filters.add_filter_modules
-    Liquid.Supervisor.start_link()
+    Liquid.Supervisor.start_link
   end
 
   def stop, do: {:ok, "stopped"}

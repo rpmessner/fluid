@@ -23,13 +23,23 @@ defmodule Liquid.Variable do
   def lookup(%Variable{}=v, %Context{}=context) do
     { ret, filters } = Liquid.Appointer.assign(v, context)
     try do
-      filters |> Filters.filter(ret)
+      filters |> Filters.filter(ret) |> apply_global_filter(context)
     rescue
-      e in UndefinedFunctionError -> e.message
+      e in UndefinedFunctionError -> e.reason
       e in ArgumentError -> e.message
       e in ArithmeticError -> "Liquid error: #{e.message}"
     end
   end
+
+  defp apply_global_filter(input, %Context{global_filter: nil}) do
+    case Application.get_env(:liquid, :global_filter) do
+      nil -> input
+      filter -> input |> filter.()
+    end
+  end
+
+  defp apply_global_filter(input, %Context{}=context),
+   do: input |> context.global_filter.()
 
 
   @doc """
