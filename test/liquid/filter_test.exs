@@ -87,6 +87,7 @@ defmodule Liquid.FilterTest do
     assert "..." == Functions.truncate("1234567890", 0)
     assert "1234567890" == Functions.truncate("1234567890")
     assert "测试..." == Functions.truncate("测试测试测试测试", 5)
+    assert "1234..." == Functions.truncate("1234567890", "7")
   end
 
 
@@ -120,6 +121,7 @@ defmodule Liquid.FilterTest do
     assert "one two three" == Functions.truncatewords("one two three")
     assert "Two small (13&#8221; x 5.5&#8221; x 10&#8221; high) baskets fit inside one large basket (13&#8221;..." == Functions.truncatewords("Two small (13&#8221; x 5.5&#8221; x 10&#8221; high) baskets fit inside one large basket (13&#8221; x 16&#8221; x 10.5&#8221; high) with cover.", 15)
     assert "测试测试测试测试" == Functions.truncatewords("测试测试测试测试", 5)
+    assert "one two three" == Functions.truncatewords("one two three", "4")
   end
 
   test :strip_html do

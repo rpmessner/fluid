@@ -233,7 +233,7 @@ defmodule Liquid.Filters do
 
     def truncate(nil, _), do: nil
 
-    def truncate(input, l) do
+    def truncate(input, l) when is_number(l) do
       truncate_string = "..."
       l = l - String.length(truncate_string) - 1
       case {l, String.length(input)} do
@@ -242,16 +242,19 @@ defmodule Liquid.Filters do
         _ -> input
       end
     end
+
+    def truncate(input, l),
+     do: truncate(input, to_number(l))
     
     def truncatewords(input, words \\ 15)
 
     def truncatewords(nil, _), do: nil
 
-    def truncatewords(input, words) when words < 1 do
+    def truncatewords(input, words) when is_number(words) and words < 1 do
       input |> String.split(" ") |> hd
     end
 
-    def truncatewords(input, words) do
+    def truncatewords(input, words) when is_number(words) do
       truncate_string = "..."
       wordlist = input |> String.split(" ")
       case words - 1 do
@@ -261,6 +264,9 @@ defmodule Liquid.Filters do
         _ -> input
       end
     end
+
+    def truncatewords(input, words),
+     do: truncatewords(input, to_number(words))
 
 
     def replace(string, from, to\\"")
