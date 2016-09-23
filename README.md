@@ -11,7 +11,7 @@ Add the dependency to your mix file:
 # mix.exs
 defp deps do
   […,
-   {:liquid, "~> 0.2.0"}]
+   {:liquid, "~> 0.4.0"}]
 end
 ```
 
@@ -129,6 +129,4 @@ Feel free to add a bug report or pull request if you feel that anything is missi
 
 ### todo
 
-* Add full set of filters
-* Implement table_row tag
 * Fix empty check on arrays
