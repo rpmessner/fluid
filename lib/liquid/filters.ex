@@ -228,12 +228,9 @@ defmodule Liquid.Filters do
       input |> to_number |> modulo(to_number(operand))
     end
 
-    def truncate(input, l \\ 50)
+    def truncate(input, l \\ 50, truncate_string \\ "...")
 
-    def truncate(nil, _), do: nil
-
-    def truncate(input, l),
-     do: truncate(input, to_number(l), "...")
+    def truncate(nil, _, _), do: nil
 
     def truncate(input, l, truncate_string) when is_number(l) do
       l = l - String.length(truncate_string) - 1
@@ -243,6 +240,9 @@ defmodule Liquid.Filters do
         _ -> input
       end
     end
+
+    def truncate(input, l, truncate_string),
+     do: truncate(input, to_number(l), truncate_string)
 
     def truncatewords(input, words \\ 15)
 
