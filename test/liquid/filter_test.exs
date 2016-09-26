@@ -30,7 +30,7 @@ defmodule Liquid.FilterTest do
     assert 0 == Functions.size([])
     assert 0 == Functions.size(nil)
   end
-  
+
   test :downcase do
     assert "testing", Functions.downcase("Testing")
     assert "" == Functions.downcase(nil)
@@ -88,6 +88,8 @@ defmodule Liquid.FilterTest do
     assert "1234567890" == Functions.truncate("1234567890")
     assert "测试..." == Functions.truncate("测试测试测试测试", 5)
     assert "1234..." == Functions.truncate("1234567890", "7")
+    assert "1234!!!" == Functions.truncate("1234567890", 7, "!!!")
+    assert "1234567" == Functions.truncate("1234567890", 7, "")
   end
 
 

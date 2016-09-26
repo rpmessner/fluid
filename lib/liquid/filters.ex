@@ -213,7 +213,7 @@ defmodule Liquid.Filters do
     defdelegate pluralise(input, single, plural), to: __MODULE__, as: :pluralize
 
     def abs(input) when is_binary(input), do: input |> to_number |> abs
-      
+
     def abs(input) when input < 0, do: -input
 
     def abs(input), do: input
@@ -228,13 +228,11 @@ defmodule Liquid.Filters do
       input |> to_number |> modulo(to_number(operand))
     end
 
+    def truncate(input, l \\ 50, truncate_string \\ "...")
 
-    def truncate(input, l \\ 50)
+    def truncate(nil, _, _), do: nil
 
-    def truncate(nil, _), do: nil
-
-    def truncate(input, l) when is_number(l) do
-      truncate_string = "..."
+    def truncate(input, l, truncate_string) when is_number(l) do
       l = l - String.length(truncate_string) - 1
       case {l, String.length(input)} do
         {l, _} when l <= 0 -> truncate_string
@@ -243,9 +241,9 @@ defmodule Liquid.Filters do
       end
     end
 
-    def truncate(input, l),
-     do: truncate(input, to_number(l))
-    
+    def truncate(input, l, truncate_string),
+     do: truncate(input, to_number(l), truncate_string)
+
     def truncatewords(input, words \\ 15)
 
     def truncatewords(nil, _), do: nil
@@ -259,7 +257,7 @@ defmodule Liquid.Filters do
       wordlist = input |> String.split(" ")
       case words - 1 do
         l when l < length(wordlist) ->
-          words = wordlist |> Enum.slice(0..l) |> Enum.join(" ") 
+          words = wordlist |> Enum.slice(0..l) |> Enum.join(" ")
           words <> truncate_string
         _ -> input
       end
@@ -315,7 +313,7 @@ defmodule Liquid.Filters do
     end
 
     def append(input, nil), do: input
-    
+
     def append(string, operand) do
       string |> to_string |> append(to_string(operand))
     end
@@ -350,7 +348,7 @@ defmodule Liquid.Filters do
     def newline_to_br(<<string::binary>>) do
       string |> String.replace("\n", "<br />\n")
     end
-    
+
 
     def split(<<string::binary>>, <<separator::binary>>) do
       String.split(string, separator)
@@ -402,10 +400,10 @@ defmodule Liquid.Filters do
     end
 
     def strip_html(nil), do: ""
-    
+
     def strip_html(input) when is_binary(input) do
       input
-        |> String.replace(~r/<script.*?<\/script>/m, "") 
+        |> String.replace(~r/<script.*?<\/script>/m, "")
         |> String.replace(~r/<!--.*?-->/m, "")
         |> String.replace(~r/<style.*?<\/style>/m, "")
         |> String.replace(~r/<.*?>/m, "")
@@ -433,7 +431,7 @@ defmodule Liquid.Filters do
       with {:ok, input_date} <- NaiveDateTime.from_iso8601(input) do
         input_date |> date(format)
       else
-        {:error, :invalid_format } -> 
+        {:error, :invalid_format } ->
           with {:ok, input_date} <- Timex.parse(input, "%a %b %d %T %Y", :strftime),
           do: input_date |> date(format)
       end
@@ -457,7 +455,7 @@ defmodule Liquid.Filters do
 
     defp to_iterable(input) do
       # input when is_map(input) -> [input]
-      # input when is_tuple(input) -> input 
+      # input when is_tuple(input) -> input
       List.wrap(input)
     end
 
