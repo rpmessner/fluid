@@ -3,6 +3,7 @@ defmodule Liquid.Filters do
   Applies a chain of filters passed from Liquid.Variable
   """
   import Kernel, except: [round: 1, abs: 1]
+  import Liquid.Utils, only: [to_number: 1]
   alias Liquid.HTML
 
   defmodule Functions do
@@ -446,10 +447,9 @@ defmodule Liquid.Filters do
 
     defp to_iterable(input) when is_list(input) do
       case List.first(input) do
-        first when is_number(first) ->
-          input |> List.flatten
         first when is_nil(first) -> []
-        _ -> [input]
+        first when is_tuple(first) -> [input]
+        _ -> input |> List.flatten
       end
     end
 
@@ -457,23 +457,6 @@ defmodule Liquid.Filters do
       # input when is_map(input) -> [input]
       # input when is_tuple(input) -> input
       List.wrap(input)
-    end
-
-    defp to_number(nil), do: 0
-
-    defp to_number(input) when is_number(input), do: input
-
-    defp to_number(input) when is_binary(input) do
-      case Integer.parse(input) do
-        {integer, ""} -> integer
-        :error -> 0
-        {integer, remainder} ->
-          case Float.parse(input) do
-            {_, float_remainder} when float_remainder == remainder ->
-              integer
-            {float, _} -> float
-          end
-      end
     end
 
     defp get_int_and_counter(input) when is_integer(input), do: {input, 0}

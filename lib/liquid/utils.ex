@@ -40,3 +40,29 @@ defmodule Liquid.HTML do
 
   defp escape_char(char), do: char
 end
+
+defmodule Liquid.Utils do
+  @moduledoc """
+  A number of useful utils for liquid parser/filters
+  """
+
+  @doc """
+  Converts various input to number for further processing
+  """
+  def to_number(nil), do: 0
+
+  def to_number(input) when is_number(input), do: input
+
+  def to_number(input) when is_binary(input) do
+    case Integer.parse(input) do
+      {integer, ""} -> integer
+      :error -> 0
+      {integer, remainder} ->
+        case Float.parse(input) do
+          {_, float_remainder} when float_remainder == remainder ->
+            integer
+          {float, _} -> float
+        end
+    end
+  end
+end
