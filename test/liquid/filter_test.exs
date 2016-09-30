@@ -150,8 +150,6 @@ defmodule Liquid.FilterTest do
     assert ["a": 1, "a": 2, "a": 3, "a": 4] == Functions.sort([{:a, 4}, {:a, 3}, {:a, 1}, {:a, 2}], "a")
   end
 
-  # FIXME: reverse ordering issue
-  @tag :skip
   test :sort_integrity do
     assert_template_result "11245", ~s({{"1: 2: 1: 4: 5" | split: ": " | sort }})
   end
@@ -368,6 +366,11 @@ defmodule Liquid.FilterTest do
 
   test :filters_nonexistent_in_chain do
     assert_template_result "Text", "{{ 'text' | upcase | nonexistent | capitalize }}"
+  end
+
+  test :filter_and_tag do
+    assert_template_result("V 1: 2: 1: 4: 5: 0 | 011245",
+                           "V {{ var2 }}{% capture var2 %}{{ '1: 2: 1: 4: 5' }}: 0{% endcapture %}{{ var2 }} | {{ var2 | split: ': ' | sort }}")
   end
 
 

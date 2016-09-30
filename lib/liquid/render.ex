@@ -8,7 +8,7 @@ defmodule Liquid.Render do
 
   def render(%Template{root: root}, %Context{}=context) do
     { output, context } = render([], root, context)
-    { :ok, output |> List.flatten |> Enum.reverse |> Enum.join, context }
+    { :ok, output |> to_text, context }
   end
 
   def render(output, [], %Context{}=context) do
@@ -28,7 +28,7 @@ defmodule Liquid.Render do
   end
 
   def render(output, %Variable{}=v, %Context{}=context) do
-    rendered = Variable.lookup(v, context)
+    rendered = Variable.lookup(v, context) |> join_list
     { [rendered|output], context }
   end
 
@@ -43,5 +43,12 @@ defmodule Liquid.Render do
       nil -> render(output, block.nodelist, context)
     end
   end
+
+  def to_text(list), do: list |> List.flatten |> Enum.reverse |> Enum.join
+
+  defp join_list(input) when is_list(input),
+   do: input |> List.flatten |> Enum.join
+
+  defp join_list(input), do: input
 
 end
