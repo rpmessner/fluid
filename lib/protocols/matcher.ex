@@ -15,8 +15,8 @@ defimpl Liquid.Matcher, for: Liquid.Context do
     current = cond do
       current.assigns |> Map.has_key?(key) -> current.assigns
       current.presets |> Map.has_key?(key) -> current.presets
-      !(is_nil(Map.get(current.assigns, key |> String.to_atom))) -> current.assigns
-      !(is_nil(Map.get(current.presets, key |> String.to_atom))) -> current.presets
+      !(is_nil(Map.get(current.assigns, key |> Liquid.Atomizer.to_existing_atom))) -> current.assigns
+      !(is_nil(Map.get(current.presets, key |> Liquid.Atomizer.to_existing_atom))) -> current.presets
       is_map(current.assigns) and Map.has_key?(current.assigns, :__struct__) -> current.assigns
       true -> nil
     end
@@ -73,7 +73,7 @@ defimpl Liquid.Matcher, for: Any do
   end
 
   def match(current, key) when is_map(current) and is_binary(key) do
-    key = if Map.has_key?(current, :__struct__), do: key |> String.to_atom, else: key
+    key = if Map.has_key?(current, :__struct__), do: key |> Liquid.Atomizer.to_existing_atom, else: key
     current |> Map.get(key)
   end
 

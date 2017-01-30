@@ -42,4 +42,14 @@ defmodule Liquid do
     end
     def even_elements([]), do: []
   end
+
+  defmodule Atomizer do
+    def to_existing_atom(string) do
+      try do
+        String.to_existing_atom(string)
+      rescue
+        ArgumentError -> nil
+      end
+    end
+  end
 end
