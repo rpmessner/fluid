@@ -35,14 +35,14 @@ defmodule Liquid.FileSystem do
   Get full file system path
   """
   def full_path(path) do
-    case lookup do
+    case lookup() do
       nil -> { :error, "No file system defined" }
       { mod, root } -> mod.full_path(root, path)
     end
   end
 
   def read_template_file(path, options \\ []) do
-    case lookup do
+    case lookup() do
       nil -> { :error, "No file system defined" }
       { mod, root } -> mod.read_template_file(root, path, options)
     end

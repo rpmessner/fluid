@@ -71,7 +71,7 @@ defmodule Liquid.ForElse do
   end
 
   defp parse_iterator(%Block{markup: markup}) do
-    [[_,item|[orig_collection|reversed]]] = Regex.scan(syntax, markup)
+    [[_,item|[orig_collection|reversed]]] = Regex.scan(syntax(), markup)
     collection = Expression.parse(orig_collection)
     reversed   = !(reversed |> List.first |> is_nil)
     attributes = Liquid.tag_attributes |> Regex.scan(markup)

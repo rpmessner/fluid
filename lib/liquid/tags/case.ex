@@ -11,7 +11,7 @@ defmodule Liquid.Case do
 
 
   def parse(%Block{markup: markup}=b, %Template{}=t) do
-    [[_, name]] = syntax |> Regex.scan(markup)
+    [[_, name]] = syntax() |> Regex.scan(markup)
     { split(name |> Variable.create, b.nodelist), t }
   end
 
@@ -39,7 +39,7 @@ defmodule Liquid.Case do
 
 
   defp parse_when(markup) do
-    [[_,h|t]|m] = when_syntax |> Regex.scan(markup)
+    [[_,h|t]|m] = when_syntax() |> Regex.scan(markup)
     m = m |> List.flatten |> Liquid.List.even_elements
     t = [t|m]  |> Enum.join(" ")
     t = if t == "", do: [], else: [t]

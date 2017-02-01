@@ -3,12 +3,12 @@ defmodule Liquid.Mixfile do
 
   def project do
     [ app: :liquid,
-      version: "0.5.0",
+      version: "0.6.0",
       elixir: "~> 1.3",
-      deps: deps,
+      deps: deps(),
       name: "Liquid",
-      description: description,
-      package: package,
+      description: description(),
+      package: package(),
       source_url: "https://github.com/bettyblocks/liquid-elixir"]
   end
 

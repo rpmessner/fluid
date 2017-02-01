@@ -36,7 +36,7 @@ defmodule Liquid.TableRow do
 
 
   defp parse_iterator(%Block{markup: markup}) do
-    [[_,item|[orig_collection]]] = Regex.scan(syntax, markup)
+    [[_,item|[orig_collection]]] = Regex.scan(syntax(), markup)
     collection = Expression.parse(orig_collection)
     attributes = Liquid.tag_attributes |> Regex.scan(markup)
     limit      = attributes |> parse_attribute("limit") |> Variable.create

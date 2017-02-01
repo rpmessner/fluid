@@ -27,13 +27,13 @@ defmodule Liquid.Appointer do
   @spec parse_name(String.t) :: String.t
   def parse_name(name) do
     value = cond do
-      literals      |> Map.has_key?(name) ->
-        literals |> Map.get(name)
-      integer       |> Regex.match?(name) ->
+      literals()      |> Map.has_key?(name) ->
+        literals() |> Map.get(name)
+      integer()       |> Regex.match?(name) ->
         name |> String.to_integer
-      float         |> Regex.match?(name) ->
+      float()         |> Regex.match?(name) ->
         name |> String.to_float
-      start_quoted_string |> Regex.match?(name) ->
+      start_quoted_string() |> Regex.match?(name) ->
         Liquid.quote_matcher |> Regex.replace(name, "")
       true ->
         Liquid.variable_parser |> Regex.scan(name) |> List.flatten

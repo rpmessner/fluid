@@ -52,7 +52,7 @@ defmodule Liquid.IfElse do
 
   defp split_conditions(expressions) do
     expressions |> List.flatten |> Enum.map(&String.strip/1) |> Enum.map(fn(x) ->
-      case syntax |> Regex.scan(x) do
+      case syntax() |> Regex.scan(x) do
         [[_, left, operator, right]] -> { left, operator, right }
         [[_, x]] -> x
       end
@@ -60,7 +60,7 @@ defmodule Liquid.IfElse do
   end
 
   defp parse_conditions(%Block{markup: markup}=block) do
-    expressions = Regex.scan(expressions_and_operators, markup)
+    expressions = Regex.scan(expressions_and_operators(), markup)
     expressions = expressions |> split_conditions |> Enum.reverse
     condition   = Condition.create(expressions)
     %{block | condition: condition }

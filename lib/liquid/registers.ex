@@ -26,7 +26,7 @@ defmodule Liquid.Registers do
   end
 
   def clear do
-    Application.put_env(:liquid, :extra_tags, default_tags)
+    Application.put_env(:liquid, :extra_tags, default_tags())
   end
 
   def lookup(name) when is_binary(name) do
@@ -35,7 +35,7 @@ defmodule Liquid.Registers do
 
   def lookup(name) when is_atom(name) do
     custom_tags = Application.get_env(:liquid, :extra_tags)
-    case {name, default_tags[name], custom_tags[name]} do
+    case {name, default_tags()[name], custom_tags[name]} do
       {nil, _, _} -> nil
       {_, nil, nil} -> nil
       {_, nil, custom_tag} -> custom_tag
@@ -43,7 +43,7 @@ defmodule Liquid.Registers do
     end
   end
 
-  def lookup(_), do: nil 
+  def lookup(_), do: nil
 
   def register(name, module, type) do
     custom_tags = Application.get_env(:liquid, :extra_tags) || %{}
