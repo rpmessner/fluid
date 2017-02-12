@@ -64,6 +64,11 @@ defimpl Liquid.Matcher, for: Any do
 
   def match(true, _), do: nil
 
+  @doc """
+  Match size for strings:
+  """
+  def match(current, ["size"|_]) when is_binary(current), do: current |> String.length
+
 
   @doc """
   Match functions for structs:
