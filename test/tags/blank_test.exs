@@ -11,7 +11,7 @@ defmodule Liquid.BlankTest do
   end
 
   def wrap_in_for(body) do
-    "{% for i  in (1.."<> n <> ") %}" <> body <> "{% endfor %}"
+    "{% for i  in (1.."<> n() <> ") %}" <> body <> "{% endfor %}"
   end
 
   def wrap_in_if(body) do
@@ -36,7 +36,7 @@ defmodule Liquid.BlankTest do
   end
 
   test :test_mark_as_blank_only_during_parsing do
-    assert_template_result(String.duplicate(" ",String.to_integer(n) + 1), wrap(" {% if false %} this never happens, but still, this block is not blank {% endif %}"))
+    assert_template_result(String.duplicate(" ",String.to_integer(n()) + 1), wrap(" {% if false %} this never happens, but still, this block is not blank {% endif %}"))
   end
 
   test :test_comments_are_blank do
@@ -49,7 +49,7 @@ defmodule Liquid.BlankTest do
 
   test :test_nested_blocks_are_blank_but_only_if_all_children_are do
     assert_template_result("", wrap(wrap(" ")))
-    assert_template_result(String.duplicate("\n       but this is not ", String.to_integer(n) + 1),
+    assert_template_result(String.duplicate("\n       but this is not ", String.to_integer(n()) + 1),
       wrap("{% if true %} {% comment %} this is blank {% endcomment %} {% endif %}\n      {% if true %} but this is not {% endif %}"))
   end
 
