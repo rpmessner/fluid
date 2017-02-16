@@ -29,6 +29,10 @@ defmodule Liquid.FilterTest do
     assert 3 == Functions.size([1,2,3])
     assert 0 == Functions.size([])
     assert 0 == Functions.size(nil)
+
+    # for strings
+    assert 3 == Functions.size("foo")
+    assert 0 == Functions.size("")
   end
 
   test :downcase do

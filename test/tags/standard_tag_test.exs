@@ -296,6 +296,11 @@ defmodule StandardTagTest do
     assert_template_result("hash has 4 elements", "hash has {{ hash.size }} elements", assigns)
   end
 
+  test :test_size_of_string do
+    assigns = %{"string" => "foo"}
+    assert_template_result("string has 3 characters", "string has {{ string.size }} characters", assigns)
+  end
+
   test :test_illegal_symbols do
     assert_template_result("", "{% if true == empty %}?{% endif %}", %{})
     assert_template_result("", "{% if true == null %}?{% endif %}", %{})
