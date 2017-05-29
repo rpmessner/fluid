@@ -3,7 +3,7 @@ defmodule Liquid.Mixfile do
 
   def project do
     [ app: :liquid,
-      version: "0.6.0",
+      version: "0.6.1",
       elixir: "~> 1.3",
       deps: deps(),
       name: "Liquid",

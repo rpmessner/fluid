@@ -37,9 +37,15 @@ defmodule Liquid.Template do
   @doc """
   Function to parse markup with given presets (if any)
   """
-  @spec render(String.t, map) :: Liquid.Template
-  def parse(<<markup::binary>>, presets \\ %{}) do
+  @spec parse(String.t, map) :: Liquid.Template
+  def parse(value, presets \\ %{})
+  def parse(<<markup::binary>>, presets) do
     Liquid.Parse.parse(markup, %Template{presets: presets})
+  end
+
+  @spec parse(nil, map) :: Liquid.Template
+  def parse(nil, presets) do
+    Liquid.Parse.parse("", %Template{presets: presets})
   end
 
 end

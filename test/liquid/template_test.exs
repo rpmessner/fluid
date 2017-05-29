@@ -30,6 +30,11 @@ defmodule Liquid.TemplateTest do
     assert ["  ", "{% comment %}", " ", "{% endcomment %}", " "] == Parse.tokenize("  {% comment %} {% endcomment %} ")
   end
 
+  test :should_be_able_to_handle_nil_in_parse do
+    t = Template.parse(nil)
+    assert { :ok, "", _context} = Template.render(t)
+  end
+
   test :returns_assigns_from_assign_tags do
     t = Template.parse("{% assign foo = 'from returned assigns' %}{{ foo }}")
     { :ok, rendered, context } = Template.render(t)
