@@ -19,19 +19,27 @@ defmodule Liquid.Template do
     Render.render(t, c)
   end
 
-  def render(%Template{}=t, assigns) when is_map(assigns) do
-    context = %Context{template: t,         assigns: assigns,
-                       presets:  t.presets, blocks: t.blocks}
+  def render(%Template{} = t, assigns), do: render(t, assigns, [])
+
+
+  def render(_, _) do
+    raise Liquid.SyntaxError, message: "You can use only maps/structs to hold context data"
+  end
+
+  def render(%Template{} = t, %Context{} = context, options) do
+    registers = Keyword.get(options, :registers, %{})
+    context = %{context | registers: registers}
+    render(t, context)
+  end
+
+  def render(%Template{}=t, assigns, options) when is_map(assigns) do
+    context = %Context{assigns: assigns}
     context = case {Map.has_key?(assigns,"global_filter"), Map.has_key?(assigns,:global_filter)} do
       {true,_} -> %{context|global_filter: Map.fetch!(assigns, "global_filter")}
       {_,true} -> %{context|global_filter: Map.fetch!(assigns, :global_filter)}
       _ -> context
     end
-    Render.render(t, context)
-  end
-
-  def render(_, _) do
-    raise Liquid.SyntaxError, message: "You can use only maps/structs to hold context data"
+    render(t, context, options)
   end
 
   @doc """
