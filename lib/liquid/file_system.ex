@@ -1,11 +1,11 @@
 defmodule Liquid.BlankFileSystem do
-  def read_template_file(_, _, _) do
+  def read_template_file(_root, _name, _context) do
     { :error, "This liquid context does not allow includes." }
   end
 end
 
 defmodule Liquid.LocalFileSystem do
-  def read_template_file(_, _, _) do
+  def read_template_file(_root, _name, _context) do
     { :ok, "" }
   end
 
