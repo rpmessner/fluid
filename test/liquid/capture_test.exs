@@ -21,7 +21,7 @@ defmodule Liquid.CaptureTest do
     """
     template = Template.parse(template_source)
     { :ok, result, _ } = Template.render(template)
-    assert "Print this-thing" == result |> String.strip
+    assert "Print this-thing" == result |> String.trim
   end
 
   test :test_capture_to_variable_from_outer_scope_if_existing do

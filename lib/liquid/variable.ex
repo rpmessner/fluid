@@ -51,7 +51,7 @@ defmodule Liquid.Variable do
         |> Regex.scan(markup)
         |> List.flatten
         |> Enum.filter(&(&1 != "|"))
-        |> Enum.map(&String.strip/1)
+        |> Enum.map(&String.trim/1)
       else
         [""]
       end

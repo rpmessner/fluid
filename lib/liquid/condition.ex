@@ -37,7 +37,7 @@ defmodule Liquid.Condition do
   def create(condition, []), do: condition
   def create(condition, [join, right|_]) when join == "and" or join == "or" do
     right = create(right)
-    join  = join |> String.strip |> String.to_atom
+    join  = join |> String.trim |> String.to_atom
     join(join, condition, right)
   end
 
@@ -88,9 +88,9 @@ defmodule Liquid.Condition do
 
   defp contains(nil, _), do: false
   defp contains(_, nil), do: false
-  defp contains(<<left::binary>>, <<right::binary>>), do: contains(left |> to_char_list, right |> to_char_list)
-  defp contains(left, <<right::binary>>) when is_list(left), do: contains(left, right |> to_char_list)
-  defp contains(<<left::binary>>, right) when is_list(right), do: contains(left |> to_char_list, right)
+  defp contains(<<left::binary>>, <<right::binary>>), do: contains(left |> to_charlist, right |> to_charlist)
+  defp contains(left, <<right::binary>>) when is_list(left), do: contains(left, right |> to_charlist)
+  defp contains(<<left::binary>>, right) when is_list(right), do: contains(left |> to_charlist, right)
   defp contains(left, right) when is_list(left) and not is_list(right), do: contains(left, [right])
   defp contains(left, right) when is_list(right) and is_list(left), do: :string.rstr(left, right) > 0
 end

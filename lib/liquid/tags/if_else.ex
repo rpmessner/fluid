@@ -51,7 +51,7 @@ defmodule Liquid.IfElse do
   end
 
   defp split_conditions(expressions) do
-    expressions |> List.flatten |> Enum.map(&String.strip/1) |> Enum.map(fn(x) ->
+    expressions |> List.flatten |> Enum.map(&String.trim/1) |> Enum.map(fn(x) ->
       case syntax() |> Regex.scan(x) do
         [[_, left, operator, right]] -> { left, operator, right }
         [[_, x]] -> x
