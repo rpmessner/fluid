@@ -37,6 +37,10 @@ Render the template with a keyword list representing the local variables:
 
 `{ :ok, rendered, _ } = Liquid.Template.render(template, %{"world" => "world"})`
 
+For registers you might want to use in custom tags you can assign them like this:
+
+`{ :ok, rendered, _ } = Liquid.Template.render(template, %{"world" => "world"}, registers: %{test: "hallo")`
+
 The tests should give a pretty good idea of the features implemented so far.
 
 ## Custom tags and filters
