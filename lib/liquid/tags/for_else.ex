@@ -91,6 +91,19 @@ defmodule Liquid.ForElse do
     end)
   end
 
+  def render(output, %Block{iterator: it} = block, %Context{version: 2} = context) do
+    list = parse_collection(it.collection, context)
+    list = if is_binary(list) and list != "", do: [list], else: list
+    if is_list(list) and !is_empty_list(list) do
+      list = if it.reversed, do: Enum.reverse(list), else: list
+      limit  = lookup_limit(it, context)
+      offset = lookup_offset(it, context)
+      each(output, [make_ref(), limit,offset], list, block, context)
+    else
+      Render.render(output, block.elselist, context)
+    end
+  end
+
   def render(output, %Block{iterator: it}=block, %Context{}=context) do
     list = parse_collection(it.collection, context)
     list = if is_binary(list) and list != "", do: [list], else: list
@@ -141,8 +154,8 @@ defmodule Liquid.ForElse do
 
   defp remember_limit(%Block{iterator: it}, context) do
     limit = lookup_limit(it, context) || 0
-    remembered = context.offsets[it.name] || 0
-    %{ context | offsets: context.offsets |> Map.put(it.name, remembered + limit) }
+    remembered = Map.get(offsets, name, 0)
+    %{ context | offsets: offsets |> Map.put(name, remembered + limit) }
   end
 
   defp should_render?(_limit, offset, index) when index <= offset, do: false
@@ -153,8 +166,9 @@ defmodule Liquid.ForElse do
   defp lookup_limit(%Iterator{limit: limit}, %Context{}=context),
    do: Variable.lookup(limit, context)
 
-  defp lookup_offset(%Iterator{offset: %Variable{name: "continue"}}=it, %Context{}=context),
-   do: context.offsets[it.name] || 0
+  defp lookup_offset(%Iterator{offset: %Variable{name: "continue"}, name: name}=it, %Context{offsets: offsets}=context) do
+    Map.get(offsets, name, 0)
+  end
 
   defp lookup_offset(%Iterator{offset: offset}, %Context{}=context),
    do: Variable.lookup(offset, context)
