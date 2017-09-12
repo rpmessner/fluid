@@ -107,7 +107,7 @@ defmodule Liquid.ForElse do
   def render(output, %Block{iterator: it}=block, %Context{}=context) do
     list = parse_collection(it.collection, context)
     list = if is_binary(list) and list != "", do: [list], else: list
-    if is_list(list) and Enum.count(list) > 0 do
+    if is_list(list) and !is_empty_list(list) do
       list = if it.reversed, do: Enum.reverse(list), else: list
       limit  = lookup_limit(it, context)
       offset = lookup_offset(it, context)
@@ -116,6 +116,10 @@ defmodule Liquid.ForElse do
       Render.render(output, block.elselist, context)
     end
   end
+
+  defp is_empty_list([]), do: true
+  defp is_empty_list(value) when is_list(value), do: false
+  defp is_empty_list(_value), do: false
 
   defp parse_collection(list, _context) when is_list(list), do: list
   defp parse_collection(%Variable{} = variable, context) do
@@ -140,19 +144,19 @@ defmodule Liquid.ForElse do
     each(output, [h, limit, offset], t, block, %{context | assigns: block_context.assigns, registers: block_context.registers})
   end
 
-  defp render_content(output, %Block{iterator: it}=block, context, [limit, offset]) do
-    case {should_render?(limit, offset, it.forloop["index"]), block.blank} do
+  defp render_content(output, %Block{iterator: %{forloop: %{"index" => index}}, nodelist: nodelist, blank: blank}=block, context, [limit, offset]) do
+    case {should_render?(limit, offset, index), blank} do
       {true, true} ->
-        { _, new_context } = Render.render([], block.nodelist, context)
+        { _, new_context } = Render.render([], nodelist, context)
         { output, new_context }
       {true, _ } ->
-        Render.render(output, block.nodelist, context)
+        Render.render(output, nodelist, context)
       _ ->
         { output, context }
     end
   end
 
-  defp remember_limit(%Block{iterator: it}, context) do
+  defp remember_limit(%Block{iterator: %{name: name} = it}, %{offsets: offsets} = context) do
     limit = lookup_limit(it, context) || 0
     remembered = Map.get(offsets, name, 0)
     %{ context | offsets: offsets |> Map.put(name, remembered + limit) }
