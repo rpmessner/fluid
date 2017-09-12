@@ -189,15 +189,15 @@ defmodule Liquid.ForElse do
      "last"   => count == 1}
   end
 
-  defp next_forloop(%Iterator{forloop: loop}=it, _count) do
-    %{"name" => it.item <> "-" <> it.name,
-    "index" => loop["index"]  + 1,
-     "index0" => loop["index0"] + 1,
-     "rindex" => loop["rindex"]  - 1,
-     "rindex0"=> loop["rindex0"] - 1,
-     "length" => loop["length"],
+  defp next_forloop(%Iterator{forloop: %{"name" => name, "index" => index, "index0" => index0, "rindex" => rindex, "rindex0" => rindex0, "length" => length}}=it, _count) do
+    %{"name" => name,
+    "index" => index  + 1,
+     "index0" => index0 + 1,
+     "rindex" => rindex  - 1,
+     "rindex0"=> rindex0 - 1,
+     "length" => length,
      "first"  => false,
-     "last"   => loop["rindex0"] == 1}
+     "last"   => rindex0 == 1}
   end
 
 end
