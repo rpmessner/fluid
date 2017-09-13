@@ -32,10 +32,7 @@ defmodule Liquid.Variable do
   end
 
   defp apply_global_filter(input, %Context{global_filter: nil}) do
-    case Application.get_env(:liquid, :global_filter) do
-      nil -> input
-      filter -> input |> filter.()
-    end
+    input
   end
 
   defp apply_global_filter(input, %Context{}=context),
