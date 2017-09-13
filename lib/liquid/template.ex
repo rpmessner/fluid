@@ -37,7 +37,7 @@ defmodule Liquid.Template do
     context = case {Map.has_key?(assigns,"global_filter"), Map.has_key?(assigns,:global_filter)} do
       {true,_} -> %{context|global_filter: Map.fetch!(assigns, "global_filter")}
       {_,true} -> %{context|global_filter: Map.fetch!(assigns, :global_filter)}
-      _ -> %{context| global_filter: Application.get_env(:liquid, :global_filter)}
+      _ -> %{context| global_filter: Application.get_env(:liquid, :global_filter), extra_tags: Application.get_env(:liquid, :extra_tags, %{})}
     end
     render(t, context, options)
   end
