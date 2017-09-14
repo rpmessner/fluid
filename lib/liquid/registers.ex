@@ -51,11 +51,8 @@ defmodule Liquid.Registers do
     name |> String.to_atom |> lookup(context)
   end
 
-  def lookup(name, %{extra_tags: extra_tags} = context) do
-    custom_tag = case extra_tags do
-      %{^name => value} -> value
-      _ -> nil
-    end
+  def lookup(name, %{extra_tags: extra_tags}) do
+    custom_tag = Map.get(extra_tags, name)
 
     case {name, Map.get(@default_tags, name), custom_tag} do
       {nil, _, _} -> nil
