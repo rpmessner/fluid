@@ -177,9 +177,9 @@ defmodule Liquid.ForElse do
   defp lookup_offset(%Iterator{offset: offset}, %Context{}=context),
    do: Variable.lookup(offset, context)
 
-  defp next_forloop(%Iterator{forloop: loop}=it, count) when map_size(loop) < 1 do
-    count = count |> Enum.count
-    %{"name" => it.item <> "-" <> it.name,
+  defp next_forloop(%Iterator{forloop: loop, item: item, name: name}, count) when map_size(loop) < 1 do
+    count = Enum.count(count)
+    %{"name" => item <> "-" <> name,
     "index" => 1,
      "index0" => 0,
      "rindex" => count,
