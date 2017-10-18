@@ -58,9 +58,9 @@ defmodule ExampleTag do
     {tag, context}
   end
 
-  def render(_input, tag, context) do
+  def render(output, tag, context) do
     number = tag.markup |> Integer.parse |> elem(0)
-    {["#{number - 1}"], context}
+    {["#{number - 1}"] ++ output, context}
   end
 end
 
