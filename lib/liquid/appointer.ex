@@ -22,8 +22,8 @@ defmodule Liquid.Appointer do
   end
 
   def match(%{assigns: assigns} = context, [key|_]=parts) when is_binary(key) do
-    value = case assigns do
-      %{^key => value} -> match(assigns, parts)
+    case assigns do
+      %{^key => _value} -> match(assigns, parts)
       _ -> Liquid.Matcher.match(context, parts)
     end
   end

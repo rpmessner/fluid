@@ -131,7 +131,7 @@ defmodule Liquid.ForElse do
     each(output, [h, limit, offset], t, block, %{context | assigns: block_context.assigns, registers: block_context.registers})
   end
 
-  defp render_content(output, %Block{iterator: %{forloop: %{"index" => index}}, nodelist: nodelist, blank: blank}=block, context, [limit, offset]) do
+  defp render_content(output, %Block{iterator: %{forloop: %{"index" => index}}, nodelist: nodelist, blank: blank}, context, [limit, offset]) do
     case {should_render?(limit, offset, index), blank} do
       {true, true} ->
         { _, new_context } = Render.render([], nodelist, context)
@@ -157,7 +157,7 @@ defmodule Liquid.ForElse do
   defp lookup_limit(%Iterator{limit: limit}, %Context{}=context),
    do: Variable.lookup(limit, context)
 
-  defp lookup_offset(%Iterator{offset: %Variable{name: "continue"}, name: name}=it, %Context{offsets: offsets}=context) do
+  defp lookup_offset(%Iterator{offset: %Variable{name: "continue"}, name: name}, %Context{offsets: offsets}) do
     Map.get(offsets, name, 0)
   end
 
@@ -176,7 +176,7 @@ defmodule Liquid.ForElse do
      "last"   => count == 1}
   end
 
-  defp next_forloop(%Iterator{forloop: %{"name" => name, "index" => index, "index0" => index0, "rindex" => rindex, "rindex0" => rindex0, "length" => length}}=it, _count) do
+  defp next_forloop(%Iterator{forloop: %{"name" => name, "index" => index, "index0" => index0, "rindex" => rindex, "rindex0" => rindex0, "length" => length}}, _count) do
     %{"name" => name,
     "index" => index  + 1,
      "index0" => index0 + 1,
