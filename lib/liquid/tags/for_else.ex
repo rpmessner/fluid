@@ -91,19 +91,6 @@ defmodule Liquid.ForElse do
     end)
   end
 
-  def render(output, %Block{iterator: it} = block, %Context{version: 2} = context) do
-    list = parse_collection(it.collection, context)
-    list = if is_binary(list) and list != "", do: [list], else: list
-    if is_list(list) and !is_empty_list(list) do
-      list = if it.reversed, do: Enum.reverse(list), else: list
-      limit  = lookup_limit(it, context)
-      offset = lookup_offset(it, context)
-      each(output, [make_ref(), limit,offset], list, block, context)
-    else
-      Render.render(output, block.elselist, context)
-    end
-  end
-
   def render(output, %Block{iterator: it}=block, %Context{}=context) do
     list = parse_collection(it.collection, context)
     list = if is_binary(list) and list != "", do: [list], else: list
