@@ -11,13 +11,13 @@ defimpl Liquid.Matcher, for: Liquid.Context do
 
   def match(current, []), do: current
 
-  def match(current, [key|_]=parts) when is_binary(key) do
+  def match(%{assigns: assigns, presets: presets}, [key|_]=parts) when is_binary(key) do
     current = cond do
-      current.assigns |> Map.has_key?(key) -> current.assigns
-      current.presets |> Map.has_key?(key) -> current.presets
-      !(is_nil(Map.get(current.assigns, key |> Liquid.Atomizer.to_existing_atom))) -> current.assigns
-      !(is_nil(Map.get(current.presets, key |> Liquid.Atomizer.to_existing_atom))) -> current.presets
-      is_map(current.assigns) and Map.has_key?(current.assigns, :__struct__) -> current.assigns
+      assigns |> Map.has_key?(key) -> assigns
+      presets |> Map.has_key?(key) -> presets
+      !(is_nil(Map.get(assigns, key |> Liquid.Atomizer.to_existing_atom))) -> assigns
+      !(is_nil(Map.get(presets, key |> Liquid.Atomizer.to_existing_atom))) -> presets
+      is_map(assigns) and Map.has_key?(assigns, :__struct__) -> assigns
       true -> nil
     end
     Liquid.Matcher.match(current, parts)
