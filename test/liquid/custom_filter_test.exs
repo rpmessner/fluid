@@ -13,7 +13,7 @@ defmodule Liquid.CustomFilterTest do
   end
 
   defmodule MyFilterOverwriter do
-    def strip(_), do: "This is a overwritten module"
+    def strip(_), do: "This is an overwritten module"
   end
 
   setup_all do
