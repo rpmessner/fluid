@@ -1,6 +1,6 @@
 Code.require_file "../../test_helper.exs", __ENV__.file
 
-defmodule Liquid.FilterTest do
+defmodule Liquid.FiltersTest do
   use ExUnit.Case
   use Timex
   alias Liquid.{Filters, Template, Variable}

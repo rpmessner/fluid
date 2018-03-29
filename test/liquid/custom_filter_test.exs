@@ -12,8 +12,12 @@ defmodule Liquid.CustomFilterTest do
   	def not_meaning_of_life(_), do: 2
   end
 
+  defmodule MyFilterOverwriter do
+    def strip(_), do: "This is an overwritten module"
+  end
+
   setup_all do
-  	Application.put_env(:liquid, :extra_filter_modules, [MyFilter, MyFilterTwo])
+  	Application.put_env(:liquid, :extra_filter_modules, [MyFilter, MyFilterTwo, MyFilterOverwriter])
     Liquid.start
     on_exit fn -> Liquid.stop end
     :ok
@@ -21,6 +25,10 @@ defmodule Liquid.CustomFilterTest do
 
   test "custom filter uses the first passed filter" do
   	assert_template_result "42", "{{ 'whatever' | meaning_of_life }}"
+  end
+
+  test "overwrite standard filter" do
+    assert_template_result "This is an overwritten module", "{{ source | strip }}", %{"source" => " ab c  "}
   end
 
   test :nonexistent_in_custom_chain do

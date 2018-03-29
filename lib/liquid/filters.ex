@@ -488,14 +488,14 @@ defmodule Liquid.Filters do
     functions = Functions.__info__(:functions)
     custom_filters = Application.get_env(:liquid, :custom_filters)
 
-    ret = case {name, functions[name], custom_filters[name]} do
+    ret = case {name, custom_filters[name], functions[name]} do
       # pass value in case of no filters
       {nil, _, _} -> value
       # pass non-existend filter
       {_, nil, nil} -> value
-      # Fallback to custom if no standard
-      {_, nil, _} -> apply_function custom_filters[name], name, [value|args]
-      _ -> apply_function Functions, name, [value|args]
+      # Fallback to standard if no custom
+      {_, nil, _} -> apply_function Functions, name, [value|args]
+      _ -> apply_function custom_filters[name], name, [value|args]
     end
     filter(rest, ret)
   end
@@ -512,7 +512,7 @@ defmodule Liquid.Filters do
 
   @doc """
   Fetches the current custom filters and extends with the functions from passed module
-  NB: you can't override the standard filters though
+  You can override the standard filters with custom filters
   """
   def add_filters(module) do
     custom_filters = Application.get_env(:liquid, :custom_filters) || %{}
@@ -533,6 +533,5 @@ defmodule Liquid.Filters do
         raise ArgumentError, message: "Liquid error: wrong number of arguments (#{e.arity} for #{functions[name]})"
     end
   end
-
 
 end
