@@ -1,5 +1,3 @@
-Code.require_file "../../test_helper.exs", __ENV__.file
-
 defmodule Liquid.FiltersTest do
   use ExUnit.Case
   use Timex

@@ -1,4 +1,3 @@
-Code.require_file "../../test_helper.exs", __ENV__.file
 defmodule Liquid.CustomTagTest do
   use ExUnit.Case
   alias Liquid.{Template, Tag}

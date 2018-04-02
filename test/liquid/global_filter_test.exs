@@ -1,4 +1,3 @@
-Code.require_file "../../test_helper.exs", __ENV__.file
 defmodule Liquid.GlobalFilterTest do
   use ExUnit.Case, async: false
   alias Liquid.Template

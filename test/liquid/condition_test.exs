@@ -1,5 +1,3 @@
-Code.require_file "../../test_helper.exs", __ENV__.file
-
 defmodule ConditionTest do
   use ExUnit.Case
 
