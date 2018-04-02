@@ -20,11 +20,11 @@ defmodule Liquid.FiltersTest do
   test :filter_parsed do
     name = "'foofoo'"
     filters = [[:replace, ["'foo'", "'bar'"]]]
-    assert "'barbar'" == Filters.filter( filters, name)
+    assert "'barbar'" == Filters.filter(filters, name)
   end
 
   test :size do
-    assert 3 == Functions.size([1,2,3])
+    assert 3 == Functions.size([1, 2, 3])
     assert 0 == Functions.size([])
     assert 0 == Functions.size(nil)
 
@@ -69,8 +69,7 @@ defmodule Liquid.FiltersTest do
   end
 
   test :slice_on_arrays do
-    input = "foobar" |> String.split("")
-    input = input |> List.delete("")
+    input = String.split("foobar", "", trim: true)
     assert ~w{o o b} == Functions.slice(input, 1, 3)
     assert ~w{o o b a r} == Functions.slice(input, 1, 1000)
     assert ~w{} == Functions.slice(input, 1, 0)
@@ -94,16 +93,14 @@ defmodule Liquid.FiltersTest do
     assert "1234567" == Functions.truncate("1234567890", 7, "")
   end
 
-
   test :split do
-    assert ["12","34"] == Functions.split("12~34", "~")
-    assert ["A? "," ,Z"] == Functions.split("A? ~ ~ ~ ,Z", "~ ~ ~")
+    assert ["12", "34"] == Functions.split("12~34", "~")
+    assert ["A? ", " ,Z"] == Functions.split("A? ~ ~ ~ ,Z", "~ ~ ~")
     assert ["A?Z"] == Functions.split("A?Z", "~")
     # Regexp works although Liquid does not support.
     # assert ["A","Z"] == Functions.split("AxZ", ~r/x/)
     assert [] == Functions.split(nil, " ")
   end
-
 
   test :escape do
     assert "&lt;strong&gt;" == Functions.escape("<strong>")
@@ -146,8 +143,10 @@ defmodule Liquid.FiltersTest do
 
   test :sort do
     assert [1, 2, 3, 4] == Functions.sort([4, 3, 2, 1])
-    assert [%{"a" => 1}, %{"a" => 2}, %{"a" => 3}, %{"a" => 4}] == Functions.sort([%{"a" => 4}, %{"a" => 3}, %{"a" => 1}, %{"a" => 2}], "a")
-    assert [%{"a" => 1, "b" => 1}, %{"a" => 3, "b" => 2}, %{"a" => 2, "b"=> 3}] == Functions.sort([%{"a" => 3, "b" => 2}, %{"a" => 1, "b" => 1}, %{"a" => 2, "b"=> 3}], "b")
+    assert [%{"a" => 1}, %{"a" => 2}, %{"a" => 3}, %{"a" => 4}] == Functions.sort([%{"a" => 4}, %{"a" => 3},
+                                                                                   %{"a" => 1}, %{"a" => 2}], "a")
+    assert [%{"a" => 1, "b" => 1}, %{"a" => 3, "b" => 2}, %{"a" => 2, "b"=> 3}] ==
+      Functions.sort([%{"a" => 3, "b" => 2}, %{"a" => 1, "b" => 1}, %{"a" => 2, "b"=> 3}], "b")
     # Elixir keyword list support
     assert ["a": 1, "a": 2, "a": 3, "a": 4] == Functions.sort([{:a, 4}, {:a, 3}, {:a, 1}, {:a, 2}], "a")
   end
@@ -182,9 +181,8 @@ defmodule Liquid.FiltersTest do
     assert [Map.to_list(%{a: 1, b: 2})] == Functions.reverse(a: 1, b: 2)
   end
 
-
   test :map do
-    assert [1,2,3,4] == Functions.map([%{"a" => 1}, %{"a" => 2}, %{"a" => 3}, %{"a" => 4}], "a")
+    assert [1, 2, 3, 4] == Functions.map([%{"a" => 1}, %{"a" => 2}, %{"a" => 3}, %{"a" => 4}], "a")
     assert_template_result "abc", "{{ ary | map:'foo' | map:'bar' }}",
       %{"ary" => [%{"foo" => %{"bar" => "a"}}, %{"foo" => %{"bar" => "b"}}, %{"foo" => %{"bar" => "c"}}]}
   end
@@ -233,8 +231,8 @@ defmodule Liquid.FiltersTest do
   end
 
   test :first_last do
-    assert 1 == Functions.first([1,2,3])
-    assert 3 == Functions.last([1,2,3])
+    assert 1 == Functions.first([1, 2, 3])
+    assert 3 == Functions.last([1, 2, 3])
     assert nil == Functions.first([])
     assert nil == Functions.last([])
   end
@@ -248,7 +246,6 @@ defmodule Liquid.FiltersTest do
   test :pipes_in_string_arguments do
     assert_template_result "foobar", "{{ 'foo|bar' | remove: '|' }}"
   end
-
 
   test :strip do
     assert_template_result "ab c", "{{ source | strip }}", %{"source" => " ab c  "}
@@ -333,13 +330,13 @@ defmodule Liquid.FiltersTest do
   end
 
   test :append do
-    assigns = %{"a" => "bc", "b" => "d" }
+    assigns = %{"a" => "bc", "b" => "d"}
     assert_template_result("bcd", "{{ a | append: 'd'}}", assigns)
     assert_template_result("bcd", "{{ a | append: b}}", assigns)
   end
 
   test :prepend_template do
-    assigns = %{"a" => "bc", "b" => "a" }
+    assigns = %{"a" => "bc", "b" => "a"}
     assert_template_result("abc", "{{ a | prepend: 'a'}}", assigns)
     assert_template_result("abc", "{{ a | prepend: b}}", assigns)
   end
@@ -375,7 +372,6 @@ defmodule Liquid.FiltersTest do
                            "V {{ var2 }}{% capture var2 %}{{ '1: 2: 1: 4: 5' }}: 0{% endcapture %}{{ var2 }} | {{ var2 | split: ': ' | sort }}")
   end
 
-
   defp assert_template_result(expected, markup, assigns \\ %{})
 
   defp assert_template_result(expected, markup, assigns) do
@@ -384,10 +380,10 @@ defmodule Liquid.FiltersTest do
 
   defp assert_result(expected, markup, assigns) do
     template = Template.parse(markup)
-    with { :ok, result, _ } <- Template.render(template, assigns) do
+    with {:ok, result, _} <- Template.render(template, assigns) do
       assert result == expected
     else
-      { :error, message, _ } ->
+      {:error, message, _} ->
         assert message == expected
     end
   end
