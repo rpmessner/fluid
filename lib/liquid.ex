@@ -4,8 +4,8 @@ defmodule Liquid do
   def start(_type, _args), do: start()
 
   def start do
-    Liquid.Filters.add_filter_modules
-    Liquid.Supervisor.start_link
+    Liquid.Filters.add_filter_modules()
+    Liquid.Supervisor.start_link()
   end
 
   def stop, do: {:ok, "stopped"}
@@ -37,19 +37,20 @@ defmodule Liquid do
   def filter_parser, do: ~r/(?:\||(?:\s*(?!(?:\|))(?:#{quoted_fragment()}|\S+)\s*)+)/
 
   defmodule List do
-    def even_elements([_,h|t]) do
+    def even_elements([_, h | t]) do
       [h] ++ even_elements(t)
     end
     def even_elements([]), do: []
   end
 
   defmodule Atomizer do
+    @moduledoc """
+    Safe use of String.to_string_atom/1
+    """
     def to_existing_atom(string) do
-      try do
-        String.to_existing_atom(string)
-      rescue
-        ArgumentError -> nil
-      end
+      String.to_existing_atom(string)
+    rescue
+      ArgumentError -> nil
     end
   end
 end
