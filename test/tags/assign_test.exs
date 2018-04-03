@@ -1,6 +1,5 @@
 defmodule Liquid.AssignTest do
   use ExUnit.Case
-  use ExUnit.Callbacks
 
   alias Liquid.Template
 
