@@ -30,6 +30,10 @@ defmodule Liquid.StrictParseTest do
     assert_syntax_error("TEST {%")
   end
 
+  test "invalid tag delimeter" do
+    assert_syntax_error("{% end %}")
+  end
+
   defp assert_syntax_error(markup) do
     assert_raise(SyntaxError, fn -> Template.parse(markup) end)
   end
