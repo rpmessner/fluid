@@ -1,10 +1,11 @@
-defmodule Liquid.ParsingQuirksTest do
+defmodule Liquid.StrictParseTest do
   use ExUnit.Case
 
   alias Liquid.{Template, SyntaxError}
 
   test "error on empty filter" do
     assert_syntax_error("{{|test}}")
+    assert_syntax_error("{{test |a|b|}}")
   end
 
   test "meaningless parens error" do

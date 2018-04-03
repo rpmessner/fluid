@@ -32,5 +32,4 @@ defmodule Liquid.AssignTest do
     {:ok, result, _} = Template.render(template, assigns)
     assert result == expected
   end
-
 end
