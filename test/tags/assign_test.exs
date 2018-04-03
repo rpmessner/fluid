@@ -2,6 +2,8 @@ defmodule Liquid.AssignTest do
   use ExUnit.Case
   use ExUnit.Callbacks
 
+  alias Liquid.Template
+
   setup_all do
     Liquid.start
     on_exit fn -> Liquid.stop end
@@ -26,8 +28,8 @@ defmodule Liquid.AssignTest do
   end
 
   defp assert_result(expected, markup, assigns) do
-    template = Liquid.Template.parse(markup)
-    { :ok, result, _ } = Liquid.Template.render(template, assigns)
+    template = Template.parse(markup)
+    {:ok, result, _} = Template.render(template, assigns)
     assert result == expected
   end
 

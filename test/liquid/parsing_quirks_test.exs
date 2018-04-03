@@ -24,6 +24,11 @@ defmodule Liquid.ParsingQuirksTest do
   test "no close brackets" do
     assert_syntax_error("TEST {{")
   end
+
+  test "no close brackets percent" do
+    assert_syntax_error("TEST {%")
+  end
+
   defp assert_syntax_error(markup) do
     assert_raise(SyntaxError, fn -> Template.parse(markup) end)
   end
