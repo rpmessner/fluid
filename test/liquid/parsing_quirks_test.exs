@@ -16,6 +16,10 @@ defmodule Liquid.ParsingQuirksTest do
     markup = "true && false"
     assert_syntax_error("{% if #{markup} %} YES {% endif %}")
   end
+
+  test "single close brackets" do
+    assert_syntax_error("TEST {{method}")
+  end
   defp assert_syntax_error(markup) do
     assert_raise(SyntaxError, fn -> Template.parse(markup) end)
   end
