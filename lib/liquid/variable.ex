@@ -47,7 +47,7 @@ defmodule Liquid.Variable do
       [""]
     end
 
-    if hd(parsed_variable) == "|" or hd(Enum.reverse(parsed_variable)) == "!" do
+    if hd(parsed_variable) == "|" or hd(Enum.reverse(parsed_variable)) == "|" do
       raise Liquid.SyntaxError, message: "You cannot use an empty filter"
     end
 
