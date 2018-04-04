@@ -37,10 +37,8 @@ defmodule Liquid do
   def filter_parser, do: ~r/(?:\||(?:\s*(?!(?:\|))(?:#{quoted_fragment()}|\S+)\s*)+)/
 
   defmodule List do
-    def even_elements([_, h | t]) do
-      [h] ++ even_elements(t)
-    end
     def even_elements([]), do: []
+    def even_elements([_, h | t]), do: [h | even_elements(t)]
   end
 
   defmodule Atomizer do
