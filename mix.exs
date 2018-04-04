@@ -34,6 +34,7 @@ defmodule Liquid.Mixfile do
      {:benchfella, "~> 0.3.0", only: [:dev, :test]},
      {:timex, "~> 3.0"},
      {:excoveralls, "~> 0.8", only: :test},
+     {:poison, "~> 3.1", only: [:dev, :test]},
      {:ex_doc, ">= 0.0.0", only: :dev}]
   end
 
