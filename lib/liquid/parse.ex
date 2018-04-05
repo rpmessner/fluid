@@ -1,8 +1,5 @@
 defmodule Liquid.Parse do
-  alias Liquid.Template
-  alias Liquid.Variable
-  alias Liquid.Registers
-  alias Liquid.Block
+  alias Liquid.{Block, Registers, Template, Variable}
 
   def tokenize(<<string::binary>>) do
     list =
@@ -19,17 +16,14 @@ defmodule Liquid.Parse do
   end
 
   defp expressions_are_valid?(list) do
-    Enum.all?(list, fn expression ->
-      Regex.match?(Liquid.tag_or_variable(), expression) or
-        !Regex.match?(Liquid.tag_or_variable_incomplete(), expression)
-    end)
+    Enum.all?(list, &Regex.match?(Liquid.valid_expression(), &1))
   end
 
-  def parse("", %Template{}=template) do
+  def parse("", %Template{} = template) do
     %{template | root: %Liquid.Block{name: :document}}
   end
 
-  def parse(<<string::binary>>, %Template{}=template) do
+  def parse(<<string::binary>>, %Template{} = template) do
     tokens = string |> tokenize
     name = tokens |> hd
     tag_name = parse_tag_name(name)
@@ -38,11 +32,11 @@ defmodule Liquid.Parse do
     %{ template | root: root }
   end
 
-  def parse(%Block{name: :document}=block, [], accum, %Template{}=template) do
+  def parse(%Block{name: :document} = block, [], accum, %Template{} = template) do
     { %{ block | nodelist: accum }, template }
   end
 
-  def parse(%Block{name: :comment}=block, [h|t], accum, %Template{}=template) do
+  def parse(%Block{name: :comment} = block, [h|t], accum, %Template{} = template) do
     cond do
       Regex.match?(~r/{%\s*endcomment\s*%}/, h) ->
         { %{ block | nodelist: accum }, t, template }
@@ -63,7 +57,7 @@ defmodule Liquid.Parse do
     raise "No matching end for block {% #{to_string(name)} %}"
   end
 
-  def parse(%Block{name: name}=block, [h|t], accum, %Template{}=template) do
+  def parse(%Block{name: name} = block, [h|t], accum, %Template{} = template) do
     endblock = "end" <> to_string(name)
     cond do
       Regex.match?(~r/{%\s*#{endblock}\s*%}/, h) ->
