@@ -18,22 +18,14 @@ defmodule Liquid.StrictParseTest do
     assert_syntax_error("{% if #{markup} %} YES {% endif %}")
   end
 
-  @tag :skip
   test "single close brackets" do
     assert_syntax_error("TEST {{method}")
   end
 
-  @tag :skip
-  test "no close brackets" do
-    assert_syntax_error("TEST {{")
-  end
-
-  @tag :skip
   test "no close brackets percent" do
-    assert_syntax_error("TEST {%")
+    assert_syntax_error("TEST {% tag }")
   end
 
-  @tag :skip
   test "invalid tag delimeter" do
     assert_syntax_error("{% end %}")
   end

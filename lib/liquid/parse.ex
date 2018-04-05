@@ -5,10 +5,24 @@ defmodule Liquid.Parse do
   alias Liquid.Block
 
   def tokenize(<<string::binary>>) do
-    Liquid.template_parser
+    list =
+      Liquid.template_parser()
       |> Regex.split(string, on: :all_but_first, trim: true)
-      |> List.flatten
+      |> List.flatten()
       |> Enum.filter(&(&1 != ""))
+
+    unless expressions_are_valid?(list) do
+      raise Liquid.SyntaxError, message: "not match delimiters"
+    end
+
+    list
+  end
+
+  defp expressions_are_valid?(list) do
+    Enum.all?(list, fn expression ->
+      Regex.match?(Liquid.tag_or_variable(), expression) or
+        !Regex.match?(Liquid.tag_or_variable_incomplete(), expression)
+    end)
   end
 
   def parse("", %Template{}=template) do

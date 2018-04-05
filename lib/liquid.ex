@@ -24,6 +24,9 @@ defmodule Liquid do
 
   def any_starting_tag, do: "(){{()|(){%()"
 
+  def tag_or_variable, do: ~r/^{%.*%}$|^{{.*}}$/
+  def tag_or_variable_incomplete, do: ~r/^({{.*})|({.*}})$/
+
   def tokenizer, do: ~r/()#{tag_start()}.*?#{tag_end()}()|()#{variable_start()}.*?#{variable_end()}()/
   def parser, do: ~r/#{tag_start()}\s*(?<tag>.*?)\s*#{tag_end()}|#{variable_start()}\s*(?<variable>.*?)\s*#{variable_end()}/m
   def template_parser, do: ~r/#{partial_template_parser()}|#{any_starting_tag()}/ms
