@@ -15,4 +15,10 @@ defmodule Liquid.BlogTest do
 
     refute String.contains?(result, "This is a comment in a liquid template")
   end
+
+  test "parse a middle level complex bad formed template" do
+    markup = File.read!("./test/templates/blog/article_bad_formed.liquid")
+
+    assert_raise(Liquid.SyntaxError, fn -> Template.parse(markup) end)
+  end
 end
