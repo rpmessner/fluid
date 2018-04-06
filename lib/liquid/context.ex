@@ -15,9 +15,7 @@ defmodule Liquid.Context do
             extra_tags: %{}
 
   @doc """
-  it takes the context `Struct` and get the selectet key assosiated value
+  Takes the context struct and get the selected key assosiated value
   """
-  def registers(context, key) do
-    context.registers |> Map.get(key)
-  end
+  def registers(context, key), do: Map.get(context.registers, key)
 end
