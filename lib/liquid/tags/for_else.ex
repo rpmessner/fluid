@@ -4,11 +4,13 @@ defmodule Liquid.ForElse do
    Several useful variables are available to you within the loop.
 
    == Basic usage:
+    ```
       {% for item in collection %}
         {{ forloop.index }}: {{ item.name }}
       {% endfor %}
-
+    ```
    == Advanced usage:
+     ```
       {% for item in collection %}
         <div {% if forloop.first %}class="first"{% endif %}>
           Item {{ forloop.index }}: {{ item.name }}
@@ -16,34 +18,34 @@ defmodule Liquid.ForElse do
       {% else %}
         There is nothing in the collection.
       {% endfor %}
-
+     ```
    You can also define a limit and offset much like SQL.  Remember
    that offset starts at 0 for the first item.
-
+     ```
       {% for item in collection limit:5 offset:10 %}
         {{ item.name }}
       {% end %}
-
+     ```
     To reverse the for loop simply use {% for item in collection reversed %}
 
    == Available variables:
-
-   forloop.name:: 'item-collection'
-   forloop.length:: Length of the loop
-   forloop.index:: The current item's position in the collection;
-                   forloop.index starts at 1.
-                   This is helpful for non-programmers who start believe
-                   the first item in an array is 1, not 0.
-   forloop.index0:: The current item's position in the collection
-                    where the first item is 0
-   forloop.rindex:: Number of items remaining in the loop
-                    (length - index) where 1 is the last item.
-   forloop.rindex0:: Number of items remaining in the loop
-                     where 0 is the last item.
-   forloop.first:: Returns true if the item is the first item.
-   forloop.last:: Returns true if the item is the last item.
-   forloop.parentloop:: Provides access to the parent loop, if present.
-
+     ```
+       forloop.name:: 'item-collection'
+       forloop.length:: Length of the loop
+       forloop.index:: The current item's position in the collection;
+                       forloop.index starts at 1.
+                       This is helpful for non-programmers who start believe
+                       the first item in an array is 1, not 0.
+       forloop.index0:: The current item's position in the collection
+                        where the first item is 0
+       forloop.rindex:: Number of items remaining in the loop
+                        (length - index) where 1 is the last item.
+       forloop.rindex0:: Number of items remaining in the loop
+                         where 0 is the last item.
+       forloop.first:: Returns true if the item is the first item.
+       forloop.last:: Returns true if the item is the last item.
+       forloop.parentloop:: Provides access to the parent loop, if present.
+     ```
 """
   alias Liquid.Render
   alias Liquid.Block
@@ -51,13 +53,23 @@ defmodule Liquid.ForElse do
   alias Liquid.Context
   alias Liquid.Expression
   alias Liquid.RangeLookup
+
   defmodule Iterator do
+   @moduledoc """
+      Defines iteraction structs used by "For" in order to iterates over an list or collection.
+  """
     defstruct name: nil, collection: nil, item: nil, reversed: false,
                         limit: nil, offset: nil, forloop: %{}
   end
 
+ @doc """
+ Returns a regex for tag For expressions syntax validation
+ """
   def syntax, do: ~r/(\w+)\s+in\s+(#{Liquid.quoted_fragment}+)\s*(reversed)?/
 
+ @doc """
+ Implmements For parse operations
+ """
   def parse(%Block{nodelist: nodelist}=block, %Liquid.Template{}=t) do
     block = %{block | iterator: parse_iterator(block) }
     case Block.split(block) do
@@ -91,6 +103,9 @@ defmodule Liquid.ForElse do
     end)
   end
 
+ @doc """
+ Implmements For render operations
+ """
   def render(output, %Block{iterator: it}=block, %Context{}=context) do
     list = parse_collection(it.collection, context)
     list = if is_binary(list) and list != "", do: [list], else: list
@@ -117,6 +132,9 @@ defmodule Liquid.ForElse do
     RangeLookup.parse(range, context)
   end
 
+ @doc """
+ Helper function used by ForElse render implementations
+ """
   def each(output, _, [], %Block{}=block, %Context{}=context), do: { output, remember_limit(block, context) }
   def each(output, [prev, limit, offset], [h|t]=list, %Block{}=block, %Context{}=context ) do
     forloop = next_forloop(block.iterator, list)
@@ -190,32 +208,106 @@ defmodule Liquid.ForElse do
 end
 
 defmodule Liquid.Break do
+  @moduledoc """
+  break
+  Causes the loop to stop iterating when it encounters the break tag.
+  Input:
+  ```
+    {% for i in (1..5) %}
+      {% if i == 4 %}
+        {% break %}
+      {% else %}
+        {{ i }}
+      {% endif %}
+    {% endfor %}
+  ```
+  Output:
+  ```
+    1 2 3
+  ```
+  """
   alias Liquid.Tag, as: Tag
   alias Liquid.Context, as: Context
   alias Liquid.Template, as: Template
 
+
+  @doc """
+  Implementation of Break parse operations
+    ```
+    Liquid.Break.parse(%Tag{}, %Liquid.Template{})
+    {%Tag{}, %Liquid.Template{}}
+    ```
+  """
   def parse(%Tag{}=tag, %Template{}=template), do: { tag, template }
 
+  @doc """
+  Implementation of Break render operations
+  """
   def render(output, %Tag{}, %Context{}=context) do
     { output, %{context | break: true } }
   end
 end
 
 defmodule Liquid.Continue do
+  @moduledoc """
+  Causes the loop to skip the current iteration when it encounters the continue tag.
+  Input:
+  ```
+    {% for i in (1..5) %}
+    {% if i == 4 %}
+      {% continue %}
+    {% else %}
+      {{ i }}
+    {% endif %}
+    {% endfor %}
+  ```
+   Output:
+  ```
+    1 2 3  5
+  ```
+  """
   alias Liquid.Tag, as: Tag
   alias Liquid.Context, as: Context
 
+  @doc """
+  Implementation of Continue parse operations
+    ```
+    Liquid.Continue.parse(%Tag{}, %Liquid.Template{})
+    {%Tag{}, %Liquid.Template{}}
+    ```
+  """
   def parse(%Tag{}=tag, template), do: { tag, template }
 
+  @doc """
+  Implementation of Continue render operations
+   ```
+    Liquid.Continue.render(%Tag{}, %Liquid.Context{})
+    {%Tag{}, %Liquid.Context{continue: true}}
+    ```
+  """
   def render(output, %Tag{}, %Context{}=context) do
     { output, %{context | continue: true } }
   end
 end
 
 defmodule Liquid.IfChanged do
+  @moduledoc """
+Helper module to verifyes if Context.registers has changedchange before render or parse operations
+  """
   alias Liquid.{Template, Block}
 
+  @doc """
+  Identity function. Implementation of IFChanged issues to parse operations
+    ```
+    Liquid.IFChanged.parse(%Block{}, %Liquid.Template{})
+    {%Block{}, %Liquid.Template{}}
+    ```
+  """
   def parse(%Block{}=block, %Template{}=t), do: { block, t }
+
+  @doc """
+  Implementation of IFChanged render operations. Updates registers before render If Changed
+  """
   def render(output, %Block{nodelist: nodelist}, context) do
     case context.registers["changed"] do
       {l,r} when l != r -> Liquid.Render.render( output, nodelist, context)
