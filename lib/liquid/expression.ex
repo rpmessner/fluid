@@ -18,7 +18,8 @@ defmodule Liquid.Expression do
   }
 
   @doc """
-  This function takes a markup `(string)`, if the string is in the expression list transforms it in a valid expression, if not creates a variable struct `Liquid.Variable.create(markup)`
+  Takes a markup `(string)`, if the string is in the expression list transforms it in a valid expression,
+  if not it creates a variable struct `Liquid.Variable.create(markup)`
 
   ##Example
   ```
