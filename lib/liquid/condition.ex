@@ -44,8 +44,8 @@ defmodule Liquid.Condition do
     join(join, condition, right)
   end
 
-   def join(operator, condition, { _, _, _ }=right), do: join(operator, condition, right |> create)
-  def join(operator, condition, %Cond{}=right) do
+  def join(operator, condition, { _, _, _ } = right), do: join(operator, condition, create(right))
+  def join(operator, condition, %Cond{} = right) do
     %{right | child_condition: condition, child_operator: operator}
   end
 
