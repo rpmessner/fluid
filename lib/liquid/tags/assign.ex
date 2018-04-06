@@ -1,11 +1,11 @@
 defmodule Liquid.Assign do
   @moduledoc """
-     Assign sets a variable in a template.
+     Assign sets variables in a template.
 
     ```
       {% assign foo = 'monkey' %}
     ```
-  User can then use the variable later in the page.
+  User can then use the variables later in the page.
 
     ```
       {{ foo }}
