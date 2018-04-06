@@ -6,9 +6,21 @@ defmodule Liquid.Appointer do
                       "true" => true, "false" => false,
                       "blank" => :blank?, "empty" => :empty?}
 
+  @doc """
+  Returns a regex for integer special match
+  """
   def integer, do: ~r/^(-?\d+)$/
+  @doc """
+  Returns a regex for float special match
+  """
   def float, do: ~r/^(-?\d[\d\.]+)$/
+  @doc """
+  Returns a regex for quoted string special match
+  """
   def quoted_string, do: ~r/#{Liquid.quoted_string}/
+  @doc """
+  Returns a regex for start characters for quoted string special match
+  """
   def start_quoted_string, do: ~r/^#{Liquid.quoted_string}/
 
   @doc "Assigns context for Variable and filters"
@@ -20,6 +32,7 @@ defmodule Liquid.Appointer do
     {match(context, parts), filters |> assign_context(assigns)}
   end
 
+  @doc "Verify match Variable and filters data types and parts"
   def match(%{assigns: assigns} = context, [key | _] = parts) when is_binary(key) do
     case assigns do
       %{^key => _value} -> match(assigns, parts)
