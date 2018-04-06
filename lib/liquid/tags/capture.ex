@@ -1,12 +1,33 @@
 defmodule Liquid.Capture do
+  @moduledoc """
+    Capture stores the result of a block into a variable without rendering it inplace.
+    ```
+    {% capture heading %}
+      Monkeys!
+    {% endcapture %}
+      ...
+    <h1>{{ heading }}</h1>
+    ```
+  Capture is useful for saving content for use later in your template, such as in a sidebar or footer.
+  """
   alias Liquid.Block
   alias Liquid.Context
   alias Liquid.Template
 
+  @doc """
+  Implementation of Capture parse operations
+    ```
+    Liquid.Capture.parse(%Block{}, %Liquid.Template{})
+    {%{block | blank: true}, %Liquid.Template{} }
+    ```
+  """
   def parse(%Block{}=block, %Template{}=template) do
     {%{block | blank: true}, template }
   end
 
+  @doc """
+  Implementation of Capture render operations
+  """
   def render(output, %Block{markup: markup, nodelist: content}, %Context{}=context) do
     variable_name = Liquid.variable_parser |> Regex.run(markup) |> hd
     {block_output, context } = Liquid.Render.render([], content, context)

@@ -1,16 +1,73 @@
 defmodule Liquid.ElseIf do
+  @moduledoc """
+  Adds more conditions within an if or unless block.
+  Input:
+  ```
+    <!-- If customer.name = 'anonymous' -->
+    {% if customer.name == 'kevin' %}
+    Hey Kevin!
+    {% elsif customer.name == 'anonymous' %}
+    Hey Anonymous!
+    {% else %}
+    Hi Stranger!
+    {% endif %}
+  ```
+  Output:
+  ```
+    Hey Anonymous!
+  ```
+  """
+  @doc """
+  Identity function. Implementation of ElseIf parse operations
+    ```
+    Liquid.ElseIf.parse(%Liquid.Tag{}, %Liquid.Template{})
+    {%Liquid.Tag{}, %Liquid.Template{}}
+    ```
+  """
   def parse(%Liquid.Tag{} = tag, %Liquid.Template{} = t), do: {tag, t}
+
+
+  @doc """
+  Implementation of ElseIf render operations
+  """
   def render(_, _, _, _), do: raise "should never get here"
 end
 
 defmodule Liquid.Else do
+  @moduledoc """
+  Executes a block of code only if a certain condition is true. If this condition is false executes else block of code
+  Input:
+  ```
+    {% if product.title == 'Awesome Shoes' %}
+    These shoes are awesome!
+    {% else %}
+    These shoes are ugly!
+    {% endif %}
+  ```
+   Output:
+  ```
+     These shoes are ugly!
+  ```
+  """
+
+  @doc """
+  Identity function. Implementation of Else parse operations
+    ```
+    Liquid.Else.parse(%Liquid.Tag{}, %Liquid.Template{})
+    {%Liquid.Tag{}, %Liquid.Template{}}
+    ```
+  """
   def parse(%Liquid.Tag{} = tag, %Liquid.Template{} = t), do: {tag, t}
+
+  @doc """
+  Implementation of ElseIf render operations
+  """
   def render(_, _, _, _), do: raise "should never get here"
 end
 
 defmodule Liquid.IfElse do
   @moduledoc """
-   If is the conditional block
+   If is the conditional block. Exceutes a block of code only if a certain condition is true. If false executes Else block of code
    ```
      {% if user.admin %}
        Admin user!
@@ -22,11 +79,21 @@ defmodule Liquid.IfElse do
   """
   alias Liquid.{Block, Condition, Render, Tag, Template}
 
+  @doc """
+  Returns a regex for IF/Else expressions syntax validation
+  """
   def syntax, do: ~r/(#{Liquid.quoted_fragment})\s*([=!<>a-z_]+)?\s*(#{Liquid.quoted_fragment})?/
+
+  @doc """
+  Returns a regex for IF/Else expressions and operators validation
+  """
   def expressions_and_operators do
     ~r/(?:\b(?:\s?and\s?|\s?or\s?)\b|(?:\s*(?!\b(?:\s?and\s?|\s?or\s?)\b)(?:#{Liquid.quoted_fragment}|\S+)\s*)+)/
   end
 
+  @doc """
+  Implementation of If/Else parse operations
+  """
   def parse(%Block{} = block, %Template{} = t) do
     block = parse_conditions(block)
     case Block.split(block, [:else, :elsif]) do
@@ -42,6 +109,13 @@ defmodule Liquid.IfElse do
     end
   end
 
+  @doc """
+  Implementation of If/Else render operations
+    ```
+    Liquid.IFElse.parse(output, %Liquid.Tag{}, context)
+    {output, context}
+    ```
+  """
   def render(output, %Tag{}, context) do
     {output, context}
   end

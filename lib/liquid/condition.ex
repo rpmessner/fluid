@@ -1,4 +1,6 @@
 defmodule Liquid.Condition do
+  @moduledoc "A module to handle liquid conditional operators and its variables (left and right side of conditionals)"
+
   defstruct left: nil, operator: nil, right: nil,
               child_operator: nil, child_condition: nil
 
@@ -7,6 +9,7 @@ defmodule Liquid.Condition do
   alias Liquid.Condition, as: Cond
   alias Liquid.Variable, as: Vars
 
+  @doc "Create a list of conditional and vars including positioning of each element"
   def create([h|t]) do
     head = create(h)
     create(head, t)
@@ -41,7 +44,7 @@ defmodule Liquid.Condition do
     join(join, condition, right)
   end
 
-  def join(operator, condition, { _, _, _ }=right), do: join(operator, condition, right |> create)
+   def join(operator, condition, { _, _, _ }=right), do: join(operator, condition, right |> create)
   def join(operator, condition, %Cond{}=right) do
     %{right | child_condition: condition, child_operator: operator}
   end

@@ -2,6 +2,35 @@ defmodule Liquid.Cycle do
   @moduledoc """
   Implementation of `cycle` tag. Can be named or anonymous, rotates through pre-set values
   Cycle is usually used within a loop to alternate between values, like colors or DOM classes.
+    ```
+        {% for item in items %}
+        <div class="{% cycle 'red', 'green', 'blue' %}"> {{ item }} </div>
+        {% end %}
+    ```
+    ```
+        <div class="red"> Item one </div>
+        <div class="green"> Item two </div>
+        <div class="blue"> Item three </div>
+        <div class="red"> Item four </div>
+        <div class="green"> Item five</div>
+    ```
+    Loops through a group of strings and outputs them in the order that they were passed as parameters.
+  Each time cycle is called, the next string that was passed as a parameter is output.
+  cycle must be used within a for loop block.
+  Input:
+    ```
+      {% cycle 'one', 'two', 'three' %}
+      {% cycle 'one', 'two', 'three' %}
+      {% cycle 'one', 'two', 'three' %}
+      {% cycle 'one', 'two', 'three' %}
+    ```
+  Output:
+    ```
+      one
+      two
+      three
+      one
+    ```
   """
   alias Liquid.{Tag, Template, Context, Variable}
 
@@ -9,7 +38,7 @@ defmodule Liquid.Cycle do
 #  @except_colon_parser ~r/(?:[^:"']|"[^"]*"|'[^']*')+/
 
   @doc """
-  Sets up the cycle name and variables to cycle through
+    Implementation of Cycle parse operations. Sets up the cycle name and variables to cycle through
   """
   def parse(%Tag{markup: markup}=tag, %Template{}=template) do
     {name, values} = markup |> get_name_and_values
@@ -18,7 +47,7 @@ defmodule Liquid.Cycle do
   end
 
   @doc """
-  Returns a corresponding cycle value and increments the cycle counter
+  Implementation of Cycle render operations. Returns a corresponding cycle value and increments the cycle counter
   """
   def render(output, %Tag{parts: [name|values]}, %Context{}=context) do
     name = Variable.lookup(%Variable{parts: [], literal: name}, context)
