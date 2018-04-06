@@ -34,6 +34,7 @@ defmodule Liquid.RangeLookup do
   defp valid_range_value(value, fallback \\ 0)
 
   defp valid_range_value(value, fallback) when is_binary(value) do
+    # TODO: Delete if, never is false here because when check
     if is_binary(value) do
       case Integer.parse(value) do
         :error -> fallback
