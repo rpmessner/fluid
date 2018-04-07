@@ -26,7 +26,7 @@ defmodule Liquid.Expression do
   iex> Liquid.Expression.parse("true")
   true
 
-  iex(2)> Liquid.Expression.parse("hello")
+  iex> Liquid.Expression.parse("hello")
   %Liquid.Variable{filters: [], literal: nil, name: "hello", parts: ["hello"]}
   """
 

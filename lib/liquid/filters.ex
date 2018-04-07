@@ -20,9 +20,7 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.size("test")
     4
-
     """
-
     def size(input) when is_binary(input) do
       String.length(input)
     end
@@ -46,7 +44,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.downcase("Testy the Test")
     "testy the test"
-
     """
     @spec downcase(any) :: String.t()
     def downcase(input) do
@@ -61,9 +58,7 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.upcase("Testy the Test")
     "TESTY THE TEST"
-
     """
-
     def upcase(input) do
       input |> to_string |> String.upcase()
     end
@@ -76,9 +71,7 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.capitalize("testy the test")
     "Testy the test"
-
     """
-
     def capitalize(input) do
       input |> to_string |> String.capitalize()
     end
@@ -91,7 +84,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.first(["testy", "the", "test"])
     "testy"
-
     """
     def first(array) when is_list(array), do: array |> List.first()
 
@@ -103,7 +95,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.last(["testy", "the", "test"])
     "test"
-
     """
     def last(array) when is_list(array), do: array |> List.last()
 
@@ -115,9 +106,7 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.reverse(["testy", "the", "test"])
     ["test", "the", "testy"]
-
     """
-
     def reverse(array), do: array |> to_iterable |> Enum.reverse()
 
     @doc """
@@ -128,9 +117,7 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.sort(["do", "a", "sort", "by","clown"])
     ["a", "by", "clown", "do", "sort"]
-
     """
-
     def sort(array), do: array |> Enum.sort()
 
     def sort(array, key) when is_list(array) and is_map(hd(array)) do
@@ -149,9 +136,7 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.uniq(["pls", "pls", "remove", "remove","duplicates"])
     ["pls", "remove", "duplicates"]
-
     """
-
     def uniq(array) when is_list(array), do: array |> Enum.uniq()
 
     def uniq(_), do: raise("Called `uniq` with non-list parameter.")
@@ -174,7 +159,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.join(["1","2","3"], " and ")
     "1 and 2 and 3"
-
     """
     def join(array, separator \\ " ") do
       array |> to_iterable |> Enum.join(separator)
@@ -188,9 +172,7 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.map([%{:hallo=>"1", :hola=>"2"}], :hallo)
     "1"
-
     """
-
     def map(array, key) when is_list(array) do
       with mapped <- array |> Enum.map(fn arg -> arg[key] end) do
         case Enum.all?(mapped, &is_binary/1) do
@@ -212,9 +194,7 @@ defmodule Liquid.Filters do
 
     iex(2)> Liquid.Filters.Functions.plus("100","200")
     300
-
     """
-
     def plus(value, operand) when is_number(value) and is_number(operand) do
       value + operand
     end
@@ -237,7 +217,6 @@ defmodule Liquid.Filters do
 
     iex(2)> Liquid.Filters.Functions.plus("200","200")
     0
-
     """
     def minus(value, operand) when is_number(value) and is_number(operand) do
       value - operand
@@ -262,7 +241,6 @@ defmodule Liquid.Filters do
 
     iex(2)> Liquid.Filters.Functions.times("2","4")
     8
-
     """
 
     def times(value, operand) when is_integer(value) and is_integer(operand) do
@@ -293,7 +271,6 @@ defmodule Liquid.Filters do
 
     iex(2)> Liquid.Filters.Functions.divided_by("2","0")
     ** (ArithmeticError) divided by 0
-
     """
     def divided_by(input, operand) when is_number(input) do
       case {input, operand |> to_number} do
@@ -323,7 +300,6 @@ defmodule Liquid.Filters do
 
     iex(2)> Liquid.Filters.Functions.floor(11.22222222222,4)
     11.2222
-
     """
 
     def floor(input) when is_integer(input), do: input
@@ -347,7 +323,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.round(11.2)
     12
-
     """
     def ceil(input) when is_integer(input), do: input
 
@@ -376,7 +351,6 @@ defmodule Liquid.Filters do
 
     iex(2)> Liquid.Filters.Functions.round(11.6)
     12
-
     """
 
     def round(input) when is_integer(input), do: input
@@ -426,7 +400,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.abs(-17)
     17
-
     """
     def abs(input) when is_binary(input), do: input |> to_number |> abs
 
@@ -443,7 +416,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.modulo(31,4)
     3
-
     """
     def modulo(0, _), do: 0
 
@@ -464,7 +436,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.truncate("cut this please i need it",18)
     "cut this please..."
-
     """
     def truncate(input, l \\ 50, truncate_string \\ "...")
 
@@ -490,7 +461,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.truncate("cut this please i need it",3)
     "cut this please..."
-
     """
     def truncatewords(input, words \\ 15)
 
@@ -524,7 +494,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.replace("cut this please i need it","cut", "replace")
     "replace this please i need it"
-
     """
     def replace(string, from, to \\ "")
 
@@ -551,7 +520,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.replace_first("cut this please i need it cut it pls","cut", "replace")
     "replace this please i need it cut it pls"
-
     """
     def replace_first(string, from, to \\ "")
 
@@ -572,7 +540,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.remove("cut this please i need it cut it pls","cut")
     " this please i need it  it pls"
-
     """
     def remove(<<string::binary>>, <<remove::binary>>) do
       string |> String.replace(remove, "")
@@ -593,7 +560,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.append("this with"," this")
     "this with this"
-
     """
     def append(<<string::binary>>, <<operand::binary>>) do
       string <> operand
@@ -613,7 +579,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.prepend("this with","what is ")
     "what is this with"
-
     """
     def prepend(<<string::binary>>, <<addition::binary>>) do
       addition <> string
@@ -632,7 +597,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.strip("         this test is just for the strip        ")
     "this test is just for the strip"
-
     """
     def strip(<<string::binary>>) do
       string |> String.trim()
@@ -645,7 +609,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.lstrip("         this test is just for the strip     ")
     "this test is just for the strip     "
-
     """
     def lstrip(<<string::binary>>) do
       string |> String.trim_leading()
@@ -658,7 +621,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.rstrip("         this test is just for the strip     ")
     "         this test is just for the strip"
-
     """
     def rstrip(<<string::binary>>) do
       string |> String.trim_trailing()
@@ -671,7 +633,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.strip_newlines("this test \n is just \n  for the strip")
     "this test  is just   for the strip"
-
     """
     def strip_newlines(<<string::binary>>) do
       string |> String.replace(~r/\r?\n/, "")
@@ -684,7 +645,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.newline_to_br("this test \n is just \n  for the strip")
     "this test <br />\n is just <br />\n  for the strip"
-
     """
     def newline_to_br(<<string::binary>>) do
       string |> String.replace("\n", "<br />\n")
@@ -697,7 +657,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.split("this test is cool", " ")
     ["this", "test", "is", "cool"]
-
     """
     def split(<<string::binary>>, <<separator::binary>>) do
       String.split(string, separator)
@@ -713,7 +672,6 @@ defmodule Liquid.Filters do
 
     iex>  Liquid.Filters.Functions.slice("this test is cool", 5)
     "test is cool"
-
     """
     def slice(list, from, to) when is_list(list) do
       list |> Enum.slice(from, to)
@@ -754,7 +712,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.escape("Have you read 'James & the Giant Peach'?")
     "Have you read &#39;James &amp; the Giant Peach&#39;?"
-
     """
     def escape(input) when is_binary(input) do
       input |> HTML.html_escape()
@@ -769,7 +726,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.escape_once("1 < 2 & 3")
     "1 &lt; 2 &amp; 3"
-
     """
     def escape_once(input) when is_binary(input) do
       input |> HTML.html_escape_once()
@@ -782,7 +738,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.strip_html("Have <em>you</em> read <strong>Ulysses</strong>?")
     "Have you read Ulysses?"
-
     """
     def strip_html(nil), do: ""
 
@@ -801,7 +756,6 @@ defmodule Liquid.Filters do
 
     iex> Liquid.Filters.Functions.url_encode("john@test.com")
     "john%40test.com"
-
     """
 
     def url_encode(input) when is_binary(input) do
@@ -817,7 +771,6 @@ defmodule Liquid.Filters do
 
     iex>  Liquid.Filters.Functions.date("Mon Nov 19 9:45:0 1990")
     "1990-11-19 09:45:00"
-
     """
     def date(input, format \\ "%F %T")
 

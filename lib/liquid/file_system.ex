@@ -1,6 +1,8 @@
 defmodule Liquid.BlankFileSystem do
   @moduledoc """
-  Blank file system returns and error
+  A Liquid file system is a way to let your templates retrieve other templates for use with the include tag.
+  You can implement subclasses that retrieve templates from the database, from the file system using a different path structure, you can provide them as hard-coded inline strings, or any manner that you see fit.
+  You can add additional instance variables, arguments, or methods as needed.
   """
 
   def read_template_file(_root, _name, _context) do
@@ -10,13 +12,13 @@ end
 
 defmodule Liquid.LocalFileSystem do
   @moduledoc """
-  Creates the full paths for the local tamplates and reads a tamplate
+  This implements an abstract file system which retrieves template files, ie. with the template name prefixed with an underscore. The extension “.liquid” is also added.
+  For security reasons, template paths are only allowed to contain letters, numbers, and underscore.
   """
 
   @doc """
   Retuns ok when reads a tamplate file
   """
-
   def read_template_file(_root, _name, _context) do
     {:ok, ""}
   end
