@@ -1,6 +1,8 @@
 defmodule Liquid.FiltersTest do
   use ExUnit.Case
   use Timex
+  doctest Liquid.Filters.Functions
+
   alias Liquid.{Filters, Template, Variable}
   alias Liquid.Filters.Functions
 
