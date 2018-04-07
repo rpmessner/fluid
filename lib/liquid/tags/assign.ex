@@ -1,28 +1,23 @@
 defmodule Liquid.Assign do
   @moduledoc """
-     Assign sets variables in a template.
-
+  Assign sets variables in a template
     ```
       {% assign foo = 'monkey' %}
     ```
-  User can then use the variables later in the page.
-
+  User can then use the variables later in the page
     ```
       {{ foo }}
     ```
   """
   alias Liquid.{Context, Tag, Variable}
 
-  @doc """
-  Returns a regex for Assign expressions syntax validation
-  """
-  def syntax, do: ~r/([\w\-]+)\s*=\s*(.*)\s*/
+  defp syntax, do: ~r/([\w\-]+)\s*=\s*(.*)\s*/
 
   @doc """
-  Implementation of Assign parse operations
+  Implementation of `assign` parse operations
     ```
-    Liquid.Assign.parse(%Tag{}, %Liquid.Template{})
-    {%{Tag | blank: true}, %Liquid.Template{}}
+    Liquid.Assign.parse(%Liquid.Tag{}, %Liquid.Template{})
+    {%{%Liquid.Tag | blank: true}, %Liquid.Template{}}
     ```
   """
   def parse(%Tag{} = tag, %Liquid.Template{} = template), do: {%{tag | blank: true}, template}
