@@ -49,6 +49,7 @@ defmodule Liquid.Condition do
     %{right | child_condition: condition, child_operator: operator}
   end
 
+  @doc "Evaluates conditions due a given context"
   def evaluate(%Cond{}=condition), do: evaluate(condition, %Context{})
   def evaluate(%Cond{left: left, right: nil}=condition, %Context{}=context) do
     current = Vars.lookup(left, context)

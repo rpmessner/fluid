@@ -132,11 +132,8 @@ defmodule Liquid.ForElse do
     RangeLookup.parse(range, context)
   end
 
- @doc """
- Helper function used by ForElse render implementations
- """
-  def each(output, _, [], %Block{}=block, %Context{}=context), do: { output, remember_limit(block, context) }
-  def each(output, [prev, limit, offset], [h|t]=list, %Block{}=block, %Context{}=context ) do
+  defp each(output, _, [], %Block{}=block, %Context{}=context), do: { output, remember_limit(block, context) }
+  defp each(output, [prev, limit, offset], [h|t]=list, %Block{}=block, %Context{}=context ) do
     forloop = next_forloop(block.iterator, list)
     block   = %{ block | iterator: %{block.iterator | forloop: forloop }}
     assigns = context.assigns |> Map.put("forloop", forloop)
@@ -292,7 +289,7 @@ end
 
 defmodule Liquid.IfChanged do
   @moduledoc """
-Helper module to verifyes if Context.registers has changedchange before render or parse operations
+  Helper module to verifies whether Context.registers has changed before render or parse operations
   """
   alias Liquid.{Template, Block}
 

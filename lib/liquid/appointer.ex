@@ -32,7 +32,7 @@ defmodule Liquid.Appointer do
     {match(context, parts), filters |> assign_context(assigns)}
   end
 
-  @doc "Verify match Variable and filters data types and parts"
+  @doc "Verifies matches between Variable and filters, data types and parts"
   def match(%{assigns: assigns} = context, [key | _] = parts) when is_binary(key) do
     case assigns do
       %{^key => _value} -> match(assigns, parts)
