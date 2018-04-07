@@ -116,7 +116,7 @@ defmodule ConditionTest do
     condition = Condition.create({left, op, right})
     context = %Liquid.Context{assigns: assigns, presets: %{}}
     evaled = Condition.evaluate(condition, context)
-    unless !evaled, do: IO.puts("Evaluated true: #{left} #{op} #{right}")
-    assert !evaled
+    if evaled, do: IO.puts("Evaluated true: #{left} #{op} #{right}")
+    refute evaled
   end
 end

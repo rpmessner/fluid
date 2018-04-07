@@ -42,12 +42,12 @@ defmodule Liquid.RegexTest do
   end
 
   def assert_quoted_fragment(expected, markup) do
-    tokens = Regex.scan(~r/#{Liquid.quoted_fragment()}/, markup) |> List.flatten()
+    tokens = ~r/#{Liquid.quoted_fragment()}/ |> Regex.scan(markup) |> List.flatten()
     assert expected == tokens
   end
 
   def assert_variable(expected, markup) do
-    tokens = Regex.scan(Liquid.variable_parser(), markup) |> List.flatten()
+    tokens = Liquid.variable_parser() |> Regex.scan(markup) |> List.flatten()
     assert expected == tokens
   end
 end
