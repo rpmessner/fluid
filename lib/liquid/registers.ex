@@ -4,30 +4,30 @@ defmodule Liquid.Registers do
   Also allows add custom tags
   """
   @default_tags %{
-     continue:       {Liquid.Continue,  Liquid.Tag},
-     comment:        {Liquid.Comment,   Liquid.Block},
-     include:        {Liquid.Include,   Liquid.Tag},
-     assign:         {Liquid.Assign,    Liquid.Tag},
-     block:          {Liquid.Inherit,   Liquid.Block},
-     break:          {Liquid.Break,     Liquid.Tag},
-     elsif:          {Liquid.ElseIf,    Liquid.Tag},
-     else:           {Liquid.Else,      Liquid.Tag},
-     case:           {Liquid.Case,      Liquid.Block},
-     when:           {Liquid.When,      Liquid.Tag},
-     for:            {Liquid.ForElse,   Liquid.Block},
-     tablerow:       {Liquid.TableRow,  Liquid.Block},
-     ifchanged:      {Liquid.IfChanged, Liquid.Block},
-     if:             {Liquid.IfElse,    Liquid.Block},
-     unless:         {Liquid.Unless,    Liquid.Block},
-     raw:            {Liquid.Raw,       Liquid.Block},
-     increment:      {Liquid.Increment, Liquid.Tag},
-     decrement:      {Liquid.Decrement, Liquid.Tag},
-     cycle:          {Liquid.Cycle,     Liquid.Tag},
-     capture:        {Liquid.Capture,   Liquid.Block}
+    continue: {Liquid.Continue, Liquid.Tag},
+    comment: {Liquid.Comment, Liquid.Block},
+    include: {Liquid.Include, Liquid.Tag},
+    assign: {Liquid.Assign, Liquid.Tag},
+    block: {Liquid.Inherit, Liquid.Block},
+    break: {Liquid.Break, Liquid.Tag},
+    elsif: {Liquid.ElseIf, Liquid.Tag},
+    else: {Liquid.Else, Liquid.Tag},
+    case: {Liquid.Case, Liquid.Block},
+    when: {Liquid.When, Liquid.Tag},
+    for: {Liquid.ForElse, Liquid.Block},
+    tablerow: {Liquid.TableRow, Liquid.Block},
+    ifchanged: {Liquid.IfChanged, Liquid.Block},
+    if: {Liquid.IfElse, Liquid.Block},
+    unless: {Liquid.Unless, Liquid.Block},
+    raw: {Liquid.Raw, Liquid.Block},
+    increment: {Liquid.Increment, Liquid.Tag},
+    decrement: {Liquid.Decrement, Liquid.Tag},
+    cycle: {Liquid.Cycle, Liquid.Tag},
+    capture: {Liquid.Capture, Liquid.Block}
   }
 
   @doc """
-  Delete extra tags from Registers
+  Delete extra tags from Registers.
   """
   def clear do
     Application.put_env(:liquid, :extra_tags, %{})
@@ -39,6 +39,9 @@ defmodule Liquid.Registers do
     name |> String.to_atom() |> lookup(context)
   end
 
+  @doc """
+  It search for the valids tags on the register, even if it is a custom one.
+  """
   def lookup(name, context) when is_atom(name) do
     custom_tag =
       get_in(context, [:extra_tags, name]) ||
