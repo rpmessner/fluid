@@ -289,7 +289,7 @@ end
 
 defmodule Liquid.IfChanged do
   @moduledoc """
-  Helper module to verifyes whether Context.registers has changed before render or parse operations
+  Helper module to verifies whether Context.registers has changed before render or parse operations
   """
   alias Liquid.{Template, Block}
 
