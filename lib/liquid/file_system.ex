@@ -30,7 +30,8 @@ defmodule Liquid.LocalFileSystem do
   def full_path(root, template_path) do
     full_path =
       if Regex.match?(~r/\//, template_path) do
-        root |> Path.join(template_path |> Path.dirname())
+        root
+        |> Path.join(template_path |> Path.dirname())
         |> Path.join("_#{template_path |> Path.basename()}.liquid")
       else
         root |> Path.join("_#{template_path}.liquid")

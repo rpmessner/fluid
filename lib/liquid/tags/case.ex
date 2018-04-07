@@ -81,6 +81,7 @@ defmodule Liquid.When do
    Case initializes the switch statement, and When compares its values.
   """
   alias Liquid.{Tag, Template}
+
   @doc """
   Identity function. Implementation of When (sub-component of Case) parse operations
     ```

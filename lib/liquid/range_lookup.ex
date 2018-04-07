@@ -5,20 +5,29 @@ defmodule Liquid.RangeLookup do
   alias Liquid.Variable
   alias Liquid.Context
 
-  def parse(%RangeLookup{range_start: %Variable{} = range_start, range_end: %Variable{} = range_end}, %Context{} = context) do
+  def parse(
+        %RangeLookup{range_start: %Variable{} = range_start, range_end: %Variable{} = range_end},
+        %Context{} = context
+      ) do
     left = range_start |> Variable.lookup(context) |> valid_range_value
     right = range_end |> Variable.lookup(context) |> valid_range_value(left)
 
     Enum.to_list(left..right)
   end
 
-  def parse(%RangeLookup{range_start: range_start, range_end: %Variable{} = range_end}, %Context{} = context) do
+  def parse(
+        %RangeLookup{range_start: range_start, range_end: %Variable{} = range_end},
+        %Context{} = context
+      ) do
     right = range_end |> Variable.lookup(context) |> valid_range_value(range_start)
 
     Enum.to_list(range_start..right)
   end
 
-  def parse(%RangeLookup{range_start: %Variable{} = range_start, range_end: range_end}, %Context{} = context) do
+  def parse(
+        %RangeLookup{range_start: %Variable{} = range_start, range_end: range_end},
+        %Context{} = context
+      ) do
     left = range_start |> Variable.lookup(context) |> valid_range_value
 
     Enum.to_list(left..range_end)
@@ -54,8 +63,8 @@ defmodule Liquid.RangeLookup do
   end
 
   defp build_range(left, right) do
-    left = left |> to_string |> String.to_integer
-    right = right |> to_string |> String.to_integer
+    left = left |> to_string |> String.to_integer()
+    right = right |> to_string |> String.to_integer()
 
     Enum.to_list(left..right)
   end

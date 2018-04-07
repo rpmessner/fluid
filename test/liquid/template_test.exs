@@ -5,7 +5,7 @@ defmodule Liquid.TemplateTest do
   alias Liquid.Parse, as: Parse
 
   setup_all do
-    Liquid.start
+    Liquid.start()
     :ok
   end
 
@@ -17,15 +17,22 @@ defmodule Liquid.TemplateTest do
   test :tokenize_variables do
     assert ["{{funk}}"] == Parse.tokenize("{{funk}}")
     assert [" ", "{{funk}}", " "] == Parse.tokenize(" {{funk}} ")
-    assert [" ", "{{funk}}", " ", "{{so}}", " ", "{{brother}}", " "] == Parse.tokenize(" {{funk}} {{so}} {{brother}} ")
+
+    assert [" ", "{{funk}}", " ", "{{so}}", " ", "{{brother}}", " "] ==
+             Parse.tokenize(" {{funk}} {{so}} {{brother}} ")
+
     assert [" ", "{{  funk  }}", " "] == Parse.tokenize(" {{  funk  }} ")
   end
 
   test :tokenize_blocks do
     assert ["{%comment%}"] == Parse.tokenize("{%comment%}")
     assert [" ", "{%comment%}", " "] == Parse.tokenize(" {%comment%} ")
-    assert [" ", "{%comment%}", " ", "{%endcomment%}", " "] == Parse.tokenize(" {%comment%} {%endcomment%} ")
-    assert ["  ", "{% comment %}", " ", "{% endcomment %}", " "] == Parse.tokenize("  {% comment %} {% endcomment %} ")
+
+    assert [" ", "{%comment%}", " ", "{%endcomment%}", " "] ==
+             Parse.tokenize(" {%comment%} {%endcomment%} ")
+
+    assert ["  ", "{% comment %}", " ", "{% endcomment %}", " "] ==
+             Parse.tokenize("  {% comment %} {% endcomment %} ")
   end
 
   test :should_be_able_to_handle_nil_in_parse do
@@ -68,14 +75,21 @@ defmodule Liquid.TemplateTest do
   end
 
   test :template_assigns_squash_preset_assigns do
-    t = Template.parse("{% assign foo = 'from instance assigns' %}{{ foo }}", %{"foo" => "from preset assigns"})
+    t =
+      Template.parse("{% assign foo = 'from instance assigns' %}{{ foo }}", %{
+        "foo" => "from preset assigns"
+      })
+
     {:ok, rendered, _} = Template.render(t)
     assert "from instance assigns" == rendered
   end
 
   test "check if you can assign registers" do
     t = Template.parse("{{ foo }}")
-    {:ok, rendered, context} = Template.render(t, %{"foo" => "from assigns"}, [registers: %{test: "hallo"}])
+
+    {:ok, rendered, context} =
+      Template.render(t, %{"foo" => "from assigns"}, registers: %{test: "hallo"})
+
     assert "from assigns" == rendered
     assert %{test: "hallo"} == context.registers
   end

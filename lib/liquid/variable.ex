@@ -22,6 +22,7 @@ defmodule Liquid.Variable do
   """
   def lookup(%Variable{} = v, %Context{} = context) do
     {ret, filters} = Appointer.assign(v, context)
+
     try do
       filters |> Filters.filter(ret) |> apply_global_filter(context)
     rescue
@@ -32,20 +33,23 @@ defmodule Liquid.Variable do
   end
 
   defp apply_global_filter(input, %Context{global_filter: nil}), do: input
-  defp apply_global_filter(input, %Context{global_filter: global_filter}), do: global_filter.(input)
+
+  defp apply_global_filter(input, %Context{global_filter: global_filter}),
+    do: global_filter.(input)
 
   @doc """
   Parses the markup to a list of filters
   """
   def parse(markup) when is_binary(markup) do
-    parsed_variable = if markup != "" do
-      Liquid.filter_parser()
+    parsed_variable =
+      if markup != "" do
+        Liquid.filter_parser()
         |> Regex.scan(markup)
         |> List.flatten()
         |> Enum.map(&String.trim/1)
-    else
-      [""]
-    end
+      else
+        [""]
+      end
 
     if hd(parsed_variable) == "|" or hd(Enum.reverse(parsed_variable)) == "|" do
       raise Liquid.SyntaxError, message: "You cannot use an empty filter"
@@ -60,10 +64,12 @@ defmodule Liquid.Variable do
   defp parse_filters(filters) do
     for markup <- filters do
       [_, filter] = ~r/\s*(\w+)/ |> Regex.scan(markup) |> hd()
-      args = Liquid.filter_arguments()
-      |> Regex.scan(markup)
-      |> List.flatten()
-      |> Liquid.List.even_elements()
+
+      args =
+        Liquid.filter_arguments()
+        |> Regex.scan(markup)
+        |> List.flatten()
+        |> Liquid.List.even_elements()
 
       [String.to_atom(filter), args]
     end

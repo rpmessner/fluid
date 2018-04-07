@@ -38,7 +38,8 @@ defmodule Liquid.Include do
   end
 
   defp parse_attributes(markup) do
-    Liquid.tag_attributes() |> Regex.scan(markup)
+    Liquid.tag_attributes()
+    |> Regex.scan(markup)
     |> Enum.reduce(%{}, fn [_, key, val], coll ->
       Map.put(coll, key, val |> Variable.create())
     end)

@@ -9,7 +9,10 @@ defmodule Liquid.RawTest do
   end
 
   test :test_tag_in_raw do
-    assert_result("{% comment %} test {% endcomment %}", "{% raw %}{% comment %} test {% endcomment %}{% endraw %}")
+    assert_result(
+      "{% comment %} test {% endcomment %}",
+      "{% raw %}{% comment %} test {% endcomment %}{% endraw %}"
+    )
   end
 
   test :test_output_in_raw do
@@ -21,9 +24,19 @@ defmodule Liquid.RawTest do
     assert_result(" Foobar invalid %} ", "{% raw %} Foobar invalid %} {% endraw %}")
     assert_result(" Foobar {{ invalid ", "{% raw %} Foobar {{ invalid {% endraw %}")
     assert_result(" Foobar invalid }} ", "{% raw %} Foobar invalid }} {% endraw %}")
-    assert_result(" Foobar {% invalid {% {% endraw ", "{% raw %} Foobar {% invalid {% {% endraw {% endraw %}")
+
+    assert_result(
+      " Foobar {% invalid {% {% endraw ",
+      "{% raw %} Foobar {% invalid {% {% endraw {% endraw %}"
+    )
+
     assert_result(" Foobar {% {% {% ", "{% raw %} Foobar {% {% {% {% endraw %}")
-    assert_result(" test {% raw %} {% endraw %}", "{% raw %} test {% raw %} {% {% endraw %}endraw %}")
+
+    assert_result(
+      " test {% raw %} {% endraw %}",
+      "{% raw %} test {% raw %} {% {% endraw %}endraw %}"
+    )
+
     assert_result(" Foobar {{ invalid 1", "{% raw %} Foobar {{ invalid {% endraw %}{{ 1 }}")
   end
 

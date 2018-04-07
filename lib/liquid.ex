@@ -24,12 +24,22 @@ defmodule Liquid do
 
   def any_starting_tag, do: "(){{()|(){%()"
 
-  def invalid_expression, do: ~r/^{%.*}}$|^{{.*%}$|^{%.*([^}%]}|[^}%])$|^{{.*([^}%]}|[^}%])$|(^{{|^{%)/ms
+  def invalid_expression,
+    do: ~r/^{%.*}}$|^{{.*%}$|^{%.*([^}%]}|[^}%])$|^{{.*([^}%]}|[^}%])$|(^{{|^{%)/ms
 
-  def tokenizer, do: ~r/()#{tag_start()}.*?#{tag_end()}()|()#{variable_start()}.*?#{variable_end()}()/
-  def parser, do: ~r/#{tag_start()}\s*(?<tag>.*?)\s*#{tag_end()}|#{variable_start()}\s*(?<variable>.*?)\s*#{variable_end()}/m
+  def tokenizer,
+    do: ~r/()#{tag_start()}.*?#{tag_end()}()|()#{variable_start()}.*?#{variable_end()}()/
+
+  def parser,
+    do:
+      ~r/#{tag_start()}\s*(?<tag>.*?)\s*#{tag_end()}|#{variable_start()}\s*(?<variable>.*?)\s*#{
+        variable_end()
+      }/m
+
   def template_parser, do: ~r/#{partial_template_parser()}|#{any_starting_tag()}/ms
-  def partial_template_parser, do: "()#{tag_start()}.*?#{tag_end()}()|()#{variable_start()}.*?#{variable_incomplete_end()}()"
+
+  def partial_template_parser,
+    do: "()#{tag_start()}.*?#{tag_end()}()|()#{variable_start()}.*?#{variable_incomplete_end()}()"
 
   def quoted_string, do: "\"[^\"]*\"|'[^']*'"
   def quoted_fragment, do: "#{quoted_string()}|(?:[^\s,\|'\"]|#{quoted_string()})+"

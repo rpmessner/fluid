@@ -30,18 +30,18 @@ defmodule Liquid.Decrement do
     {%Liquid.Tag{}, %Liquid.Template{}}
     ```
   """
-  def parse(%Tag{}=tag, %Template{}=template) do
-    {tag, template }
+  def parse(%Tag{} = tag, %Template{} = template) do
+    {tag, template}
   end
 
   @doc """
   Implementation of Decrement render operations
   """
-  def render(output, %Tag{markup: markup}, %Context{}=context) do
+  def render(output, %Tag{markup: markup}, %Context{} = context) do
     variable = Variable.create(markup)
     value = Variable.lookup(variable, context) || 0
     result_assign = context.assigns |> Map.put(markup, value - 1)
-    context = %{context | assigns: result_assign }
-    { [value - 1] ++ output , context }
+    context = %{context | assigns: result_assign}
+    {[value - 1] ++ output, context}
   end
 end

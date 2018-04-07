@@ -20,7 +20,7 @@ defmodule Liquid.Unless do
   @doc """
   Implementation of Unless parse operations
   """
-  def parse(%Block{}=block, %Template{}=t) do
+  def parse(%Block{} = block, %Template{} = t) do
     IfElse.parse(block, t)
   end
 
@@ -32,10 +32,14 @@ defmodule Liquid.Unless do
     ```
   """
   def render(output, %Tag{}, context) do
-    { output, context }
+    {output, context}
   end
 
-  def render(output, %Block{condition: condition, nodelist: nodelist, elselist: elselist}, context) do
+  def render(
+        output,
+        %Block{condition: condition, nodelist: nodelist, elselist: elselist},
+        context
+      ) do
     condition = Condition.evaluate(condition, context)
     conditionlist = if condition, do: elselist, else: nodelist
     Render.render(output, conditionlist, context)

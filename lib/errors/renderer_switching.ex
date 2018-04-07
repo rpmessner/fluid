@@ -15,20 +15,26 @@ defmodule Liquid.RendererSwitching do
   @doc """
   Execute a lax render
   """
-  @callback lax(output :: any, element :: %Liquid.Block{} | %Liquid.Tag{}, %Liquid.Context{}) :: any
+  @callback lax(output :: any, element :: %Liquid.Block{} | %Liquid.Tag{}, %Liquid.Context{}) ::
+              any
 
   @doc """
   Execute a strict render
   """
-  @callback strict(output :: any, element :: %Liquid.Block{} | %Liquid.Tag{}, %Liquid.Context{}) :: any
+  @callback strict(output :: any, element :: %Liquid.Block{} | %Liquid.Tag{}, %Liquid.Context{}) ::
+              any
 
   @doc """
   Select the render based on the error_mode
   """
   def render_with_selected_renderer(output, elem, context, renderer) do
     case @error_mode do
-      :strict -> strict_render_with_error_context(output, elem, context, renderer)
-      :lax -> renderer.lax(output, elem, context)
+      :strict ->
+        strict_render_with_error_context(output, elem, context, renderer)
+
+      :lax ->
+        renderer.lax(output, elem, context)
+
       :warn ->
         try do
           strict_render_with_error_context(output, elem, context, renderer)

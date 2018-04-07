@@ -14,12 +14,15 @@ defmodule Liquid.Raw do
   ```
   """
   alias Liquid.{Block, Render, Template}
+
   @full_token_possibly_invalid ~r/\A(.*)#{Liquid.tag_start()}\s*(\w+)\s*(.*)?#{Liquid.tag_end()}\z/m
 
   @doc """
   Implementation of Raw parse operations
   """
-  def parse(%Block{name: name}, [], _, _), do: raise "No matching end for block {% #{to_string(name)} %}"
+  def parse(%Block{name: name}, [], _, _),
+    do: raise("No matching end for block {% #{to_string(name)} %}")
+
   def parse(%Block{name: name} = block, [h | t], accum, %Template{} = template) do
     if Regex.match?(@full_token_possibly_invalid, h) do
       block_delimiter = "end" <> to_string(name)

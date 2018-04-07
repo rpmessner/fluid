@@ -5,19 +5,22 @@ defmodule IfElseTagTest do
 
   setup_all do
     Liquid.start()
-    on_exit fn -> Liquid.stop() end
+    on_exit(fn -> Liquid.stop() end)
     :ok
   end
 
   test :if_block do
-    assert_result("  ",
-                  " {% if false %} this text should not go into the output {% endif %} ")
+    assert_result("  ", " {% if false %} this text should not go into the output {% endif %} ")
 
-    assert_result("  this text should go into the output  ",
-                  " {% if true %} this text should go into the output {% endif %} ")
+    assert_result(
+      "  this text should go into the output  ",
+      " {% if true %} this text should go into the output {% endif %} "
+    )
 
-    assert_result("  you rock ?",
-                  "{% if false %} you suck {% endif %} {% if true %} you rock {% endif %}?")
+    assert_result(
+      "  you rock ?",
+      "{% if false %} you suck {% endif %} {% if true %} you rock {% endif %}?"
+    )
   end
 
   test :if_else do
@@ -35,20 +38,51 @@ defmodule IfElseTagTest do
     assert_result(" YES ", "{% if a or b %} YES {% endif %}", %{"a" => true, "b" => false})
     assert_result(" YES ", "{% if a or b %} YES {% endif %}", %{"a" => false, "b" => true})
     assert_result("", "{% if a or b %} YES {% endif %}", %{"a" => false, "b" => false})
-    assert_result(" YES ", "{% if a or b or c %} YES {% endif %}", %{"a" => false, "b" => false, "c" => true})
-    assert_result("", "{% if a or b or c %} YES {% endif %}", %{"a" => false, "b" => false, "c" => false})
+
+    assert_result(" YES ", "{% if a or b or c %} YES {% endif %}", %{
+      "a" => false,
+      "b" => false,
+      "c" => true
+    })
+
+    assert_result("", "{% if a or b or c %} YES {% endif %}", %{
+      "a" => false,
+      "b" => false,
+      "c" => false
+    })
   end
 
   test :if_or_with_operators do
-    assert_result(" YES ", "{% if a == true or b == true %} YES {% endif %}", %{"a" => true, "b" => true})
-    assert_result(" YES ", "{% if a == true or b == false %} YES {% endif %}", %{"a" => true, "b" => true})
-    assert_result("", "{% if a == false or b == false %} YES {% endif %}", %{"a" => true, "b" => true})
+    assert_result(" YES ", "{% if a == true or b == true %} YES {% endif %}", %{
+      "a" => true,
+      "b" => true
+    })
+
+    assert_result(" YES ", "{% if a == true or b == false %} YES {% endif %}", %{
+      "a" => true,
+      "b" => true
+    })
+
+    assert_result("", "{% if a == false or b == false %} YES {% endif %}", %{
+      "a" => true,
+      "b" => true
+    })
   end
 
   test :comparison_of_strings_containing_and_or_or do
-    awful_markup = "a == 'and' and b == 'or' and c == 'foo and bar' and d == 'bar or baz' and e == 'foo' and foo and bar"
-    assigns = %{"a" => "and", "b" => "or", "c" => "foo and bar",
-                "d" => "bar or baz", "e" => "foo", "foo" => true, "bar" => true}
+    awful_markup =
+      "a == 'and' and b == 'or' and c == 'foo and bar' and d == 'bar or baz' and e == 'foo' and foo and bar"
+
+    assigns = %{
+      "a" => "and",
+      "b" => "or",
+      "c" => "foo and bar",
+      "d" => "bar or baz",
+      "e" => "foo",
+      "foo" => true,
+      "bar" => true
+    }
+
     assert_result(" YES ", "{% if #{awful_markup} %} YES {% endif %}", assigns)
   end
 
@@ -96,12 +130,27 @@ defmodule IfElseTagTest do
     assert_result(" YES ", "{% if var %} YES {% else %} NO {% endif %}", %{"var" => true})
     assert_result(" YES ", "{% if \"foo\" %} YES {% else %} NO {% endif %}", %{"var" => "text"})
 
-    assert_result(" YES ", "{% if foo.bar %} NO {% else %} YES {% endif %}", %{"foo" => %{"bar" => false}})
-    assert_result(" YES ", "{% if foo.bar %} YES {% else %} NO {% endif %}", %{"foo" => %{"bar" => true}})
-    assert_result(" YES ", "{% if foo.bar %} YES {% else %} NO {% endif %}", %{"foo" => %{"bar" => "text"}})
-    assert_result(" YES ", "{% if foo.bar %} NO {% else %} YES {% endif %}", %{"foo" => %{"notbar" => true}})
+    assert_result(" YES ", "{% if foo.bar %} NO {% else %} YES {% endif %}", %{
+      "foo" => %{"bar" => false}
+    })
+
+    assert_result(" YES ", "{% if foo.bar %} YES {% else %} NO {% endif %}", %{
+      "foo" => %{"bar" => true}
+    })
+
+    assert_result(" YES ", "{% if foo.bar %} YES {% else %} NO {% endif %}", %{
+      "foo" => %{"bar" => "text"}
+    })
+
+    assert_result(" YES ", "{% if foo.bar %} NO {% else %} YES {% endif %}", %{
+      "foo" => %{"notbar" => true}
+    })
+
     assert_result(" YES ", "{% if foo.bar %} NO {% else %} YES {% endif %}", %{"foo" => %{}})
-    assert_result(" YES ", "{% if foo.bar %} NO {% else %} YES {% endif %}", %{"notfoo" => %{"bar" => true}})
+
+    assert_result(" YES ", "{% if foo.bar %} NO {% else %} YES {% endif %}", %{
+      "notfoo" => %{"bar" => true}
+    })
   end
 
   test :nested_if do
@@ -110,10 +159,20 @@ defmodule IfElseTagTest do
     assert_result("", "{% if true %}{% if false %} NO {% endif %}{% endif %}")
     assert_result(" YES ", "{% if true %}{% if true %} YES {% endif %}{% endif %}")
 
-    assert_result(" YES ", "{% if true %}{% if true %} YES {% else %} NO {% endif %}{% else %} NO {% endif %}")
-    assert_result(" YES ", "{% if true %}{% if false %} NO {% else %} YES {% endif %}{% else %} NO {% endif %}")
-    assert_result(" YES ", "{% if false %}{% if true %} NO {% else %} NONO {% endif %}{% else %} YES {% endif %}")
+    assert_result(
+      " YES ",
+      "{% if true %}{% if true %} YES {% else %} NO {% endif %}{% else %} NO {% endif %}"
+    )
 
+    assert_result(
+      " YES ",
+      "{% if true %}{% if false %} NO {% else %} YES {% endif %}{% else %} NO {% endif %}"
+    )
+
+    assert_result(
+      " YES ",
+      "{% if false %}{% if true %} NO {% else %} NONO {% endif %}{% else %} YES {% endif %}"
+    )
   end
 
   test :comparisons_on_null do
@@ -149,7 +208,11 @@ defmodule IfElseTagTest do
   test :if_with_contains_condition do
     assert_result("yes", "{% if 'bob' contains 'o' %}yes{% endif %}")
     assert_result("no", "{% if 'bob' contains 'f' %}yes{% else %}no{% endif %}")
-    assert_result("yes", "{% if 'gnomeslab-and-or-liquid' contains 'gnomeslab-and-or-liquid' %}yes{% endif %}")
+
+    assert_result(
+      "yes",
+      "{% if 'gnomeslab-and-or-liquid' contains 'gnomeslab-and-or-liquid' %}yes{% endif %}"
+    )
   end
 
   defp assert_result(expected, markup, assigns \\ %{}) do

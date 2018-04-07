@@ -4,22 +4,25 @@ defmodule Liquid.AssignTest do
   alias Liquid.Template
 
   setup_all do
-    Liquid.start
-    on_exit fn -> Liquid.stop end
+    Liquid.start()
+    on_exit(fn -> Liquid.stop() end)
     :ok
   end
 
   test :assigned_variable do
-    assert_result(".foo.", "{% assign foo = values %}.{{ foo[0] }}.",
-                  %{"values" => ["foo", "bar", "baz"]})
+    assert_result(".foo.", "{% assign foo = values %}.{{ foo[0] }}.", %{
+      "values" => ["foo", "bar", "baz"]
+    })
 
-    assert_result(".bar.", "{% assign foo = values %}.{{ foo[1] }}.",
-                  %{"values" => ["foo", "bar", "baz"]})
+    assert_result(".bar.", "{% assign foo = values %}.{{ foo[1] }}.", %{
+      "values" => ["foo", "bar", "baz"]
+    })
   end
 
   test :assign_with_filter do
-    assert_result(".bar.", "{% assign foo = values | split: ',' %}.{{ foo[1] }}.",
-                  %{"values" => "foo,bar,baz"})
+    assert_result(".bar.", "{% assign foo = values | split: ',' %}.{{ foo[1] }}.", %{
+      "values" => "foo,bar,baz"
+    })
   end
 
   test "assign string to var and then show" do

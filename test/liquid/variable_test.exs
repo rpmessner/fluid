@@ -109,8 +109,8 @@ defmodule VariableResolutionTest do
   alias Liquid.Template, as: Template
 
   setup_all do
-    Liquid.start
-    on_exit fn -> Liquid.stop end
+    Liquid.start()
+    on_exit(fn -> Liquid.stop() end)
     :ok
   end
 

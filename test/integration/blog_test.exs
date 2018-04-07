@@ -4,11 +4,14 @@ defmodule Liquid.BlogTest do
 
   test "parse a middle level complex template" do
     markup = File.read!("./test/templates/blog/article.liquid")
-    data = "./test/templates/blog/blog.json"
+
+    data =
+      "./test/templates/blog/blog.json"
       |> File.read!()
       |> Poison.decode!()
 
-    result = markup
+    result =
+      markup
       |> Template.parse()
       |> Template.render(data)
       |> elem(1)
