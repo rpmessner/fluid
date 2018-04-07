@@ -22,13 +22,12 @@ defmodule Liquid.Expression do
   if not it creates a variable struct `Liquid.Variable.create(markup)`
 
   ##Example
-  ```
-  iex(1)> Liquid.Expression.parse("true")
+
+  iex> Liquid.Expression.parse("true")
   true
 
   iex(2)> Liquid.Expression.parse("hello")
   %Liquid.Variable{filters: [], literal: nil, name: "hello", parts: ["hello"]}
-  ```
   """
 
   def parse(markup) when markup in @literal_list, do: @literals[markup]
