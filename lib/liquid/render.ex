@@ -32,8 +32,8 @@ defmodule Liquid.Render do
   end
 
   def render(output, %Variable{} = variable, %Context{} = context) do
-    rendered = variable |> Variable.lookup(context) |> join_list()
-    {[rendered | output], context}
+    {rendered, context} = Variable.lookup(variable, context)
+    {[join_list(rendered) | output], context}
   end
 
   def render(output, %Tag{name: name} = tag, %Context{} = context) do

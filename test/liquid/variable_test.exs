@@ -63,7 +63,9 @@ defmodule Liquid.VariableTest do
     assert result == "Liquid error: divided by 0"
 
     Application.put_env(:liquid, :error_mode, :strict)
-    result = template |> Template.parse() |> Template.render() |> elem(1)
+    {:ok, result, context} = template |> Template.parse() |> Template.render()
+    assert Enum.count(context.template.errors) == 1
+    assert context.template.errors == [%ArithmeticError{message: "divided by 0"}]
     assert result == ""
     Application.delete_env(:liquid, :error_mode)
   end

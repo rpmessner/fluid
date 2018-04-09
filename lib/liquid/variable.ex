@@ -23,12 +23,28 @@ defmodule Liquid.Variable do
   def lookup(%Variable{} = v, %Context{} = context) do
     {ret, filters} = Appointer.assign(v, context)
 
-    try do
-      filters |> Filters.filter(ret) |> apply_global_filter(context)
+    result = try do
+      {:ok, filters |> Filters.filter(ret) |> apply_global_filter(context)}
     rescue
-      e in UndefinedFunctionError -> e.reason
-      e in ArgumentError -> e.message
-      e in ArithmeticError -> "Liquid error: #{e.message}"
+      e in UndefinedFunctionError -> {e, e.reason}
+      e in ArgumentError -> {e, e.message}
+      e in ArithmeticError -> {e, "Liquid error: #{e.message}"}
+    end
+
+    case result do
+      {:ok, text} -> {text, context}
+      {error, message} -> process_error(context, error, message)
+    end
+  end
+
+  defp process_error(%Context{template: template} = context, error, message) do
+    error_mode = Application.get_env(:liquid, :error_mode, :lax)
+
+    case error_mode do
+      :lax -> {message, context}
+      :strict ->
+        context = %{context | template: %{template | errors: template.errors ++ [error]}}
+        {nil, context}
     end
   end
 

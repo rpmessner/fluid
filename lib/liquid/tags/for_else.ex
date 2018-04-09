@@ -116,13 +116,13 @@ defmodule Liquid.ForElse do
   Implmements For render operations
   """
   def render(output, %Block{iterator: it} = block, %Context{} = context) do
-    list = parse_collection(it.collection, context)
+    {list, context} = parse_collection(it.collection, context)
     list = if is_binary(list) and list != "", do: [list], else: list
 
     if is_list(list) and !is_empty_list(list) do
       list = if it.reversed, do: Enum.reverse(list), else: list
-      limit = lookup_limit(it, context)
-      offset = lookup_offset(it, context)
+      {limit, context} = lookup_limit(it, context)
+      {offset, context} = lookup_offset(it, context)
       each(output, [make_ref(), limit, offset], list, block, context)
     else
       Render.render(output, block.elselist, context)
@@ -133,14 +133,14 @@ defmodule Liquid.ForElse do
   defp is_empty_list(value) when is_list(value), do: false
   defp is_empty_list(_value), do: false
 
-  defp parse_collection(list, _context) when is_list(list), do: list
+  defp parse_collection(list, context) when is_list(list), do: {list, context}
 
   defp parse_collection(%Variable{} = variable, context) do
     Variable.lookup(variable, context)
   end
 
   defp parse_collection(%RangeLookup{} = range, context) do
-    RangeLookup.parse(range, context)
+    {RangeLookup.parse(range, context), context}
   end
 
   defp each(output, _, [], %Block{} = block, %Context{} = context),
@@ -192,7 +192,8 @@ defmodule Liquid.ForElse do
   end
 
   defp remember_limit(%Block{iterator: %{name: name} = it}, %{offsets: offsets} = context) do
-    limit = lookup_limit(it, context) || 0
+    {rendered, context} = lookup_limit(it, context)
+    limit = rendered || 0
     remembered = Map.get(offsets, name, 0)
     %{context | offsets: offsets |> Map.put(name, remembered + limit)}
   end
@@ -207,8 +208,8 @@ defmodule Liquid.ForElse do
 
   defp lookup_offset(%Iterator{offset: %Variable{name: "continue"}, name: name}, %Context{
          offsets: offsets
-       }) do
-    Map.get(offsets, name, 0)
+       } = context) do
+    {Map.get(offsets, name, 0), context}
   end
 
   defp lookup_offset(%Iterator{offset: offset}, %Context{} = context),

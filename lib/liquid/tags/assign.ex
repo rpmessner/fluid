@@ -28,7 +28,7 @@ defmodule Liquid.Assign do
   def render(output, %Tag{markup: markup}, %Context{} = context) do
     [[_, to, from]] = syntax() |> Regex.scan(markup)
 
-    from_value =
+    {from_value, context} =
       from
       |> Variable.create()
       |> Variable.lookup(context)
