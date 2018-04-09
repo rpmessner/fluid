@@ -37,7 +37,8 @@ defmodule Liquid.Increment do
   """
   def render(output, %Tag{markup: markup}, %Context{} = context) do
     variable = Variable.create(markup)
-    value = Variable.lookup(variable, context) || 0
+    {rendered, context} = Variable.lookup(variable, context)
+    value = rendered || 0
     result_assign = context.assigns |> Map.put(markup, value + 1)
     context = %{context | assigns: result_assign}
     {[value] ++ output, context}

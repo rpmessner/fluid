@@ -1,13 +1,13 @@
 defmodule Liquid.Assign do
   @moduledoc """
   Assign sets variables in a template
-    ```
-      {% assign foo = 'monkey' %}
-    ```
+  ```
+    {% assign foo = 'monkey' %}
+  ```
   User can then use the variables later in the page
-    ```
-      {{ foo }}
-    ```
+  ```
+    {{ foo }}
+  ```
   """
   alias Liquid.{Context, Tag, Variable}
 
@@ -15,20 +15,17 @@ defmodule Liquid.Assign do
 
   @doc """
   Implementation of `assign` parse operations
-    ```
-    Liquid.Assign.parse(%Liquid.Tag{}, %Liquid.Template{})
-    {%{%Liquid.Tag | blank: true}, %Liquid.Template{}}
-    ```
   """
+  @spec parse(%Liquid.Tag{}, %Liquid.Template{}) :: {%Liquid.Tag{}, %Liquid.Template{}}
   def parse(%Tag{} = tag, %Liquid.Template{} = template), do: {%{tag | blank: true}, template}
 
   @doc """
-  Implementation of Assign render operations
+  Implementation of `assign` render operations
   """
   def render(output, %Tag{markup: markup}, %Context{} = context) do
     [[_, to, from]] = syntax() |> Regex.scan(markup)
 
-    from_value =
+    {from_value, context} =
       from
       |> Variable.create()
       |> Variable.lookup(context)

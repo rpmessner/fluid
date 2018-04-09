@@ -1,7 +1,7 @@
 defmodule ForElseTagTest do
   use ExUnit.Case
 
-  alias Liquid.Template, as: Template
+  alias Liquid.Template
 
   setup_all do
     Liquid.start()

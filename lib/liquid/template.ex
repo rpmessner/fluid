@@ -3,7 +3,7 @@ defmodule Liquid.Template do
   Main Liquid module, all further render and parse processing passes through it
   """
 
-  defstruct root: nil, presets: %{}, blocks: []
+  defstruct root: nil, presets: %{}, blocks: [], errors: []
   alias Liquid.{Context, Parse, Render, Template}
 
   @doc """

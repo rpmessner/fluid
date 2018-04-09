@@ -50,10 +50,11 @@ defmodule Liquid.Cycle do
   Implementation of Cycle render operations. Returns a corresponding cycle value and increments the cycle counter
   """
   def render(output, %Tag{parts: [name | values]}, %Context{} = context) do
-    name = Variable.lookup(%Variable{parts: [], literal: name}, context)
+    {name, context} = Variable.lookup(%Variable{parts: [], literal: name}, context)
     name = to_string(name) <> "_liquid_cycle"
-    index = Variable.lookup(%Variable{parts: [name], literal: nil}, context) || 0
-    value = values |> Enum.fetch!(index) |> get_value_from_context(context)
+    {rendered, context} = Variable.lookup(%Variable{parts: [name], literal: nil}, context)
+    index = rendered || 0
+    {value, context} = values |> Enum.fetch!(index) |> get_value_from_context(context)
     new_index = rem(index + 1, Enum.count(values))
     result_assign = context.assigns |> Map.put(name, new_index)
     {[value | output], %{context | assigns: result_assign}}
