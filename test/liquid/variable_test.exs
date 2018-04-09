@@ -2,6 +2,7 @@ defmodule Liquid.VariableTest do
   use ExUnit.Case
 
   alias Liquid.Variable, as: Var
+  alias Liquid.Template
 
   test :variable do
     v = Var.create("hello")
@@ -54,6 +55,17 @@ defmodule Liquid.VariableTest do
     v = Var.create("'2006-06-06' | date: \"%m/%d/%Y\"")
     assert "'2006-06-06'" == v.name
     assert [[:date, ["\"%m/%d/%Y\""]]] == v.filters
+  end
+
+  test "render error mode strict/lax" do
+    template = "{{ 16 | divided_by: 0 }}"
+    result = template |> Template.parse() |> Template.render() |> elem(1)
+    assert result == "Liquid error: divided by 0"
+
+    Application.put_env(:liquid, :error_mode, :strict)
+    result = template |> Template.parse() |> Template.render() |> elem(1)
+    assert result == ""
+    Application.delete_env(:liquid, :error_mode)
   end
 
   test :filters_without_whitespace do
