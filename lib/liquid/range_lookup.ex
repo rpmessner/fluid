@@ -1,6 +1,6 @@
 defmodule Liquid.RangeLookup do
   @moduledoc """
-  This module looks for ranges and parse it for the uses of the liquid sintax 
+  This module looks for ranges and parse it for the uses of the liquid syntax 
   """
   defstruct range_start: 0, range_end: 0
   alias Liquid.Expression
@@ -9,7 +9,7 @@ defmodule Liquid.RangeLookup do
   alias Liquid.Context
 
   @doc """
-  This is used to parse de ranges to our structure to render a correctly 
+  This is used to parse de ranges to our structure to render correctly 
   """
   def parse(
         %RangeLookup{range_start: %Variable{} = range_start, range_end: %Variable{} = range_end},

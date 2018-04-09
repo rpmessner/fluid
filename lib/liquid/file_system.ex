@@ -56,7 +56,7 @@ defmodule Liquid.FileSystem do
   """
 
   @doc """
-  Looks in the `env` for a file system and creates a full path according to the file system module, if the `env` returns nill, response with an error map: no file system defined
+  Looks in the `env` for a file system and creates a full path according to the file system module, if  `env` returns nill, response with an error map: no file system defined
   """
   def full_path(path) do
     case lookup() do

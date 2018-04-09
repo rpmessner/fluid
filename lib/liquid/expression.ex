@@ -1,6 +1,6 @@
 defmodule Liquid.Expression do
   @moduledoc """
-  This module transform strings to  expresions 
+  This module transform strings to expressions 
   """
   alias Liquid.Variable
   alias Liquid.RangeLookup

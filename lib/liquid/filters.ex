@@ -50,7 +50,7 @@ defmodule Liquid.Filters do
 
     @doc """
     Makes each character in a string uppercase.
-    It has no effect on strings which are already all lowercase.
+    It has no effect on strings which are already upercase.
 
     ## Examples
 

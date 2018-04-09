@@ -1,13 +1,13 @@
 defmodule Liquid.Variable do
   @moduledoc """
-    Module to create and lookup for Variables
+  Module to create and lookup for Variables
   """
 
   defstruct name: nil, literal: nil, filters: [], parts: []
   alias Liquid.{Appointer, Filters, Variable, Context}
 
   @doc """
-    resolves data from `Liquid.Variable.parse/1` and creates a variable struct
+  Resolves data from `Liquid.Variable.parse/1` and creates a variable struct
   """
   def create(markup) when is_binary(markup) do
     [name | filters] = markup |> parse()
