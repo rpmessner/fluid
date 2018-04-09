@@ -33,15 +33,15 @@ defmodule Liquid.Registers do
     Application.put_env(:liquid, :extra_tags, %{})
   end
 
+  @doc """
+  It search for the valids tags on the register, even if it is a custom one.
+  """
   def lookup(name, context \\ %{})
 
   def lookup(name, context) when is_binary(name) do
     name |> String.to_atom() |> lookup(context)
   end
 
-  @doc """
-  It search for the valids tags on the register, even if it is a custom one.
-  """
   def lookup(name, context) when is_atom(name) do
     custom_tag =
       get_in(context, [:extra_tags, name]) ||

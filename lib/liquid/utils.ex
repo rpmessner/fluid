@@ -30,6 +30,9 @@ defmodule Liquid.HTML do
 
   @escape_regex ~r/["><']|&(?!([a-zA-Z]+|(#\d+));)/
 
+  @doc """
+  Escapes the given HTML just once
+  """
   def html_escape_once(data) when is_binary(data) do
     Regex.replace(@escape_regex, data, fn v, _ -> @escapes_map[v] end)
   end

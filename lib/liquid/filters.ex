@@ -608,11 +608,6 @@ defmodule Liquid.Filters do
 
     @doc """
     Removes any newline characters (line breaks) from a string.
-
-    # ## Examples
-
-    #     iex> Liquid.Filters.Functions.strip_newlines("this test \n is just \n  for the strip")
-    #     "this test  is just   for the strip"
     """
     def strip_newlines(<<string::binary>>) do
       String.replace(string, ~r/\r?\n/, "")
@@ -620,11 +615,6 @@ defmodule Liquid.Filters do
 
     @doc """
     Replaces every newline (\n) with an HTML line break (<br>).
-
-    # ## Examples
-
-    #     iex> Liquid.Filters.Functions.newline_to_br("this test \n is just \n  for the strip")
-    #     "this test <br />\n is just <br />\n  for the strip"
     """
     def newline_to_br(<<string::binary>>) do
       String.replace(string, "\n", "<br />\n")
