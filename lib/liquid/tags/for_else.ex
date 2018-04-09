@@ -70,6 +70,7 @@ defmodule Liquid.ForElse do
   @doc """
   Implmements For parse operations
   """
+  @spec parse(nodelist :: %Block{}, t :: %Template{}) :: %Block{}
   def parse(%Block{nodelist: nodelist} = block, %Template{} = t) do
     block = %{block | iterator: parse_iterator(block)}
 
@@ -289,6 +290,7 @@ defmodule Liquid.Break do
   @doc """
   Implementation of Break render operations
   """
+  @spec render(List, %Tag{}, context :: %{}) :: {List, %{}}
   def render(output, %Tag{}, %Context{} = context) do
     {output, %{context | break: true}}
   end
@@ -342,13 +344,13 @@ defmodule Liquid.IfChanged do
   @doc """
   Implementation of parse to IfChanged tag
   """
-
   @spec parse(block :: %Block{}, template :: %Template{}) :: {%Block{}, %Template{}}
   def parse(%Block{} = block, %Template{} = t), do: {block, t}
 
   @doc """
   Implementation of IFChanged render operations. Updates registers before render If Changed
   """
+  @spec render(List, %Block{}, List) :: {List, List}
   def render(output, %Block{nodelist: nodelist}, context) do
     case context.registers["changed"] do
       {l, r} when l != r -> Liquid.Render.render(output, nodelist, context)

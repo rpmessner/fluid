@@ -65,7 +65,7 @@ defmodule Liquid.TableRow do
   @doc """
     Implementation of TableRaw parse operations. Parses and organises markup to set up iterator
   """
-  @spec parse(Liquid.Block, Liquid.Template) :: {Liquid.Block, Liquid.Template}
+  @spec parse(block :: Liquid.Block, t :: Liquid.Template) :: {Liquid.Block, Liquid.Template}
   def parse(%Block{nodelist: nodelist} = block, %Liquid.Template{} = t) do
     block = %{block | iterator: parse_iterator(block)}
 

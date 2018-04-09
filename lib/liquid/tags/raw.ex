@@ -50,6 +50,7 @@ defmodule Liquid.Raw do
   @doc """
   Implementation of Raw render operations
   """
+  @spec render(List, block :: %Block{}, List) :: %{}
   def render(output, %Block{} = block, context) do
     Render.render(output, block.nodelist, context)
   end

@@ -33,10 +33,9 @@ defmodule Liquid.Case do
 
   @doc """
   Implementation of Capture parse operations
-    ```
-    Liquid.Case.parse(%Block{markup: markup}, %Liquid.Template{})
-    ```
+
   """
+  @spec parse(b :: %Liquid.Block{}, t :: %Liquid.Template{}) :: {%Liquid.Block{}}
   def parse(%Block{markup: markup} = b, %Template{} = t) do
     [[_, name]] = syntax() |> Regex.scan(markup)
     {split(name |> Variable.create(), b.nodelist), t}
@@ -84,10 +83,7 @@ defmodule Liquid.When do
 
   @doc """
   Identity function. Implementation of When (sub-component of Case) parse operations
-    ```
-      Liquid.When.parse(%Tag{}, %Template{})
-      {%Tag{}, %Template{}}
-    ```
   """
+  @spec parse(tag :: %Tag{}, t :: %Template{}) :: {%Tag{}, %Template{}}
   def parse(%Tag{} = tag, %Template{} = t), do: {tag, t}
 end

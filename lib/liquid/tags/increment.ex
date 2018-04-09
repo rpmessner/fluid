@@ -23,11 +23,8 @@ defmodule Liquid.Increment do
 
   @doc """
   Identity function. Implementation of Increment parse operations
-    ```
-    Liquid.Increment.parse(%Liquid.Tag{}, %Liquid.Template{})
-    {%Liquid.Tag{}, %Liquid.Template{}}
-    ```
   """
+  @spec parse(tag :: %Tag{}, template :: %Template{}) :: {%Tag{}, %Template{}}
   def parse(%Tag{} = tag, %Template{} = template) do
     {tag, template}
   end
@@ -35,6 +32,7 @@ defmodule Liquid.Increment do
   @doc """
   Implementation of Increment render operations
   """
+  @spec render(List, %Tag{}, context :: %Context{}) :: {List, List}
   def render(output, %Tag{markup: markup}, %Context{} = context) do
     variable = Variable.create(markup)
     {rendered, context} = Variable.lookup(variable, context)

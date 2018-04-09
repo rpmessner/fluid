@@ -19,11 +19,8 @@ defmodule Liquid.ElseIf do
   """
   @doc """
   Identity function. Implementation of ElseIf parse operations
-    ```
-    Liquid.ElseIf.parse(%Liquid.Tag{}, %Liquid.Template{})
-    {%Liquid.Tag{}, %Liquid.Template{}}
-    ```
   """
+  @spec parse(tag :: %Liquid.Tag{}, t :: %Liquid.Template{}) :: {%Liquid.Tag{}, %Liquid.Template{}}
   def parse(%Liquid.Tag{} = tag, %Liquid.Template{} = t), do: {tag, t}
 
   @doc """
@@ -51,11 +48,8 @@ defmodule Liquid.Else do
 
   @doc """
   Identity function. Implementation of Else parse operations
-    ```
-    Liquid.Else.parse(%Liquid.Tag{}, %Liquid.Template{})
-    {%Liquid.Tag{}, %Liquid.Template{}}
-    ```
   """
+  @spec parse(tag :: %Liquid.Tag{}, t :: %Liquid.Template{}) :: {%Liquid.Tag{}, %Liquid.Template{}}
   def parse(%Liquid.Tag{} = tag, %Liquid.Template{} = t), do: {tag, t}
 
   @doc """
@@ -96,6 +90,7 @@ defmodule Liquid.IfElse do
   @doc """
   Implementation of If/Else parse operations
   """
+  @spec parse(block :: %Block{}, t :: %Template{}) :: {%Block{}, %Template{}}
   def parse(%Block{} = block, %Template{} = t) do
     block = parse_conditions(block)
 
@@ -125,11 +120,8 @@ defmodule Liquid.IfElse do
 
   @doc """
   Implementation of If/Else render operations
-    ```
-    Liquid.IFElse.parse(output, %Liquid.Tag{}, context)
-    {output, context}
-    ```
   """
+  @spec render(List, %{}, List) :: {List, List}
   def render(output, %Tag{}, context) do
     {output, context}
   end

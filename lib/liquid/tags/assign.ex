@@ -22,6 +22,7 @@ defmodule Liquid.Assign do
   @doc """
   Implementation of `assign` render operations
   """
+  @spec render(%{}, %Liquid.Tag{}, %Liquid.Context{}) :: {%{}, %Liquid.Context{}}
   def render(output, %Tag{markup: markup}, %Context{} = context) do
     [[_, to, from]] = syntax() |> Regex.scan(markup)
 
