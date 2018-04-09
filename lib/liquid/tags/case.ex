@@ -33,7 +33,6 @@ defmodule Liquid.Case do
 
   @doc """
   Implementation of Capture parse operations
-
   """
   @spec parse(b :: %Liquid.Block{}, t :: %Liquid.Template{}) :: {%Liquid.Block{}}
   def parse(%Block{markup: markup} = b, %Template{} = t) do

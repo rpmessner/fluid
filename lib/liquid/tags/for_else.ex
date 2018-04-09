@@ -3,13 +3,13 @@ defmodule Liquid.ForElse do
   Like in Shopify's liquid: "For" iterates over an array or collection.
   Several useful variables are available to you within the loop.
 
-  == Basic usage:
+  Basic usage:
   ```
     {% for item in collection %}
     {{ forloop.index }}: {{ item.name }}
     {% endfor %}
   ```
-  == Advanced usage:
+  Advanced usage:
   ```
     {% for item in collection %}
     <div {% if forloop.first %}class="first"{% endif %}>
@@ -28,7 +28,7 @@ defmodule Liquid.ForElse do
   ```
   To reverse the for loop simply use {% for item in collection reversed %}
 
-  == Available variables:
+  Available variables:
   ```
     forloop.name:: 'item-collection'
     forloop.length:: Length of the loop
@@ -51,7 +51,7 @@ defmodule Liquid.ForElse do
 
   defmodule Iterator do
     @moduledoc """
-    Defines iteraction structs used by "For" in order to iterates over an list or collection.
+    Defines iteraction structs used by 'For' in order to iterates over an list or collection.
     """
     defstruct name: nil,
               collection: nil,
@@ -68,7 +68,7 @@ defmodule Liquid.ForElse do
   def syntax, do: ~r/(\w+)\s+in\s+(#{Liquid.quoted_fragment()}+)\s*(reversed)?/
 
   @doc """
-  Implmements For parse operations
+  Implmements 'For' parse operations
   """
   @spec parse(nodelist :: %Block{}, t :: %Template{}) :: %Block{}
   def parse(%Block{nodelist: nodelist} = block, %Template{} = t) do
@@ -114,7 +114,7 @@ defmodule Liquid.ForElse do
   end
 
   @doc """
-  Implmements For render operations
+  Implements 'For' render operations
   """
   def render(output, %Block{iterator: it} = block, %Context{} = context) do
     {list, context} = parse_collection(it.collection, context)
@@ -282,13 +282,13 @@ defmodule Liquid.Break do
   alias Liquid.Template
 
   @doc """
-  Implementation of Break parse operations
+  Implementation of 'Break' parse operations
   """
   @spec parse(tag :: %Tag{}, template :: %Template{}) :: {%Tag{}, %Template{}}
   def parse(%Tag{} = tag, %Template{} = template), do: {tag, template}
 
   @doc """
-  Implementation of Break render operations
+  Implementation of 'Break' render operations
   """
   @spec render(List, %Tag{}, context :: %{}) :: {List, %{}}
   def render(output, %Tag{}, %Context{} = context) do
@@ -317,17 +317,13 @@ defmodule Liquid.Continue do
   alias Liquid.{Context, Tag, Template}
 
   @doc """
-  Implementation of Continue parse operations
+  Implementation of 'Continue' parse operations
   """
   @spec parse(tag :: %Tag{}, template :: %Template{}) :: {%Tag{}, %Template{}}
   def parse(%Tag{} = tag, template), do: {tag, template}
 
   @doc """
-  Implementation of Continue render operations
-  ```
-    Liquid.Continue.render(%Tag{}, %Liquid.Context{})
-    {%Tag{}, %Liquid.Context{continue: true}}
-    ```
+  Implementation of 'Continue' render operations
   """
   @spec render(output :: [], %Tag{}, context :: %Context{}) :: {[], %Context{}}
   def render(output, %Tag{}, %Context{} = context) do
@@ -342,13 +338,13 @@ defmodule Liquid.IfChanged do
   alias Liquid.{Template, Block}
 
   @doc """
-  Implementation of parse to IfChanged tag
+  Implementation of parse to 'IfChanged' tag
   """
   @spec parse(block :: %Block{}, template :: %Template{}) :: {%Block{}, %Template{}}
   def parse(%Block{} = block, %Template{} = t), do: {block, t}
 
   @doc """
-  Implementation of IFChanged render operations. Updates registers before render If Changed
+  Implementation of 'IFChanged' render operations. Updates registers before render If Changed
   """
   @spec render(List, %Block{}, List) :: {List, List}
   def render(output, %Block{nodelist: nodelist}, context) do

@@ -1,6 +1,6 @@
 defmodule Liquid.Assign do
   @moduledoc """
-  Assign sets variables in a template
+  Sets variables in a template
   ```
     {% assign foo = 'monkey' %}
   ```
