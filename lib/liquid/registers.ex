@@ -36,6 +36,7 @@ defmodule Liquid.Registers do
   @doc """
   It search for the valids tags on the register, even if it is a custom one.
   """
+  @spec lookup(name :: String.t(), context :: %{}) :: {}
   def lookup(name, context \\ %{})
 
   def lookup(name, context) when is_binary(name) do
@@ -60,6 +61,7 @@ defmodule Liquid.Registers do
   @doc """
   Add tag to Registers
   """
+  @spec register(name :: String.t(), module :: String.t(), type :: String.t()) :: %{}
   def register(name, module, type) do
     custom_tags =
       Map.merge(Application.get_env(:liquid, :extra_tags, %{}), %{

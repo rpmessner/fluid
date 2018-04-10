@@ -1,14 +1,15 @@
 defmodule Liquid.Variable do
   @moduledoc """
-    Module to create and lookup for Variables
+  Module to create and lookup for Variables
   """
 
   defstruct name: nil, literal: nil, filters: [], parts: []
   alias Liquid.{Appointer, Filters, Variable, Context}
 
   @doc """
-    resolves data from `Liquid.Variable.parse/1` and creates a variable struct
+  Resolves data from `Liquid.Variable.parse/1` and creates a variable struct
   """
+  @spec create(markup :: String.t()) :: %{}
   def create(markup) when is_binary(markup) do
     [name | filters] = markup |> parse()
     name = String.trim(name)
@@ -20,16 +21,19 @@ defmodule Liquid.Variable do
   @doc """
   Assigns context to variable and than applies all filters
   """
+  @spec lookup(v :: %Liquid.Variable{}, context :: %Liquid.Context{}) ::
+          {String.t(), %Liquid.Context{}}
   def lookup(%Variable{} = v, %Context{} = context) do
     {ret, filters} = Appointer.assign(v, context)
 
-    result = try do
-      {:ok, filters |> Filters.filter(ret) |> apply_global_filter(context)}
-    rescue
-      e in UndefinedFunctionError -> {e, e.reason}
-      e in ArgumentError -> {e, e.message}
-      e in ArithmeticError -> {e, "Liquid error: #{e.message}"}
-    end
+    result =
+      try do
+        {:ok, filters |> Filters.filter(ret) |> apply_global_filter(context)}
+      rescue
+        e in UndefinedFunctionError -> {e, e.reason}
+        e in ArgumentError -> {e, e.message}
+        e in ArithmeticError -> {e, "Liquid error: #{e.message}"}
+      end
 
     case result do
       {:ok, text} -> {text, context}
@@ -41,7 +45,9 @@ defmodule Liquid.Variable do
     error_mode = Application.get_env(:liquid, :error_mode, :lax)
 
     case error_mode do
-      :lax -> {message, context}
+      :lax ->
+        {message, context}
+
       :strict ->
         context = %{context | template: %{template | errors: template.errors ++ [error]}}
         {nil, context}
@@ -56,6 +62,7 @@ defmodule Liquid.Variable do
   @doc """
   Parses the markup to a list of filters
   """
+  @spec parse(markup :: String.t()) :: []
   def parse(markup) when is_binary(markup) do
     parsed_variable =
       if markup != "" do

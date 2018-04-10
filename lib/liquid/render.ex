@@ -49,7 +49,7 @@ defmodule Liquid.Render do
   end
 
   @doc """
-  Takes a list transforms it and ouputs a text from that list
+  Takes a list transforms it and outputs a text from that list
   """
   def to_text(list), do: list |> List.flatten() |> Enum.reverse() |> Enum.join()
 
