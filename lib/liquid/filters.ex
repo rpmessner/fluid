@@ -20,7 +20,7 @@ defmodule Liquid.Filters do
         iex> Liquid.Filters.Functions.size("test")
         4
     """
-    @spec size(any) :: integer
+    @spec size(any()) :: integer()
     def size(input) when is_binary(input) do
       String.length(input)
     end
@@ -44,7 +44,7 @@ defmodule Liquid.Filters do
         iex> Liquid.Filters.Functions.downcase("Testy the Test")
         "testy the test"
     """
-    @spec downcase(any) :: String.t()
+    @spec downcase(any()) :: String.t()
     def downcase(input) do
       input |> to_string |> String.downcase()
     end
@@ -58,7 +58,7 @@ defmodule Liquid.Filters do
         iex> Liquid.Filters.Functions.upcase("Testy the Test")
         "TESTY THE TEST"
     """
-    @spec upcase(any) :: String.t()
+    @spec upcase(any()) :: String.t()
     def upcase(input) do
       input |> to_string |> String.upcase()
     end
@@ -71,7 +71,7 @@ defmodule Liquid.Filters do
         iex> Liquid.Filters.Functions.capitalize("testy the test")
         "Testy the test"
     """
-    @spec capitalize(any) :: String.t()
+    @spec capitalize(any()) :: String.t()
     def capitalize(input) do
       input |> to_string |> String.capitalize()
     end
@@ -84,8 +84,8 @@ defmodule Liquid.Filters do
         iex> Liquid.Filters.Functions.first(["testy", "the", "test"])
         "testy"
     """
-    @spec first(array :: []) :: String.t()
-    def first(array) when is_list(array), do: array |> List.first()
+    @spec first(list :: list()) :: any()
+    def first(list) when is_list(list), do: list |> List.first()
 
     @doc """
     Returns the last item of an array.
@@ -95,8 +95,8 @@ defmodule Liquid.Filters do
         iex> Liquid.Filters.Functions.last(["testy", "the", "test"])
         "test"
     """
-    @spec last(array :: []) :: String.t()
-    def last(array) when is_list(array), do: array |> List.last()
+    @spec last(list :: list()) :: any()
+    def last(list) when is_list(list), do: list |> List.last()
 
     @doc """
     Reverses the order of the items in an array. reverse cannot reverse a string.

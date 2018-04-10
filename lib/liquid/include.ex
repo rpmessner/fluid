@@ -48,7 +48,7 @@ defmodule Liquid.Include do
   end
 
   @doc """
-  This function is used to reder  the results of the include tag.
+  Renders the results of the include tag.
   """
   @spec render(output :: String.t(), tag :: %Liquid.Tag{}, contex :: %Liquid.Context{}) ::
           {String.t(), %Liquid.Context{}}
@@ -77,7 +77,7 @@ defmodule Liquid.Include do
   defp build_presets(%Tag{} = tag, context) do
     tag.attributes
     |> Enum.reduce(%{}, fn {key, value}, coll ->
-      {value, context} = Variable.lookup(value, context)
+      {value, _} = Variable.lookup(value, context)
       Map.put(coll, key, value)
     end)
   end

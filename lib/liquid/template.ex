@@ -4,7 +4,7 @@ defmodule Liquid.Template do
   """
 
   defstruct root: nil, presets: %{}, blocks: [], errors: []
-  alias Liquid.{Block, Context, Parse, Render, Template}
+  alias Liquid.{Context, Parse, Render, Template}
 
   @doc """
   Function that renders passed template and context to string
