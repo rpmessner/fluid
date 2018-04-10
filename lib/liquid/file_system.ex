@@ -1,10 +1,10 @@
 defmodule Liquid.BlankFileSystem do
   @moduledoc """
   A Liquid file system is a way to let your templates retrieve other templates for use with the include tag.
-  You can implement subclasses that retrieve templates from the database, from the file system using a different path structure, you can provide them as hard-coded inline strings, or any manner that you see fit.
+  You can implement subclasses that retrieve templates from the database, from the file system using
+  a different path structure, you can provide them as hard-coded inline strings, or any manner that you see fit.
   You can add additional instance variables, arguments, or methods as needed.
   """
-  # @spec read_template_file(root :: String.t(), name :: String.t(), context :: %Liquid.Contex{}) ::{Atom.t(), String.t()}
   def read_template_file(_root, _name, _context) do
     {:error, "This liquid context does not allow includes."}
   end
@@ -12,22 +12,22 @@ end
 
 defmodule Liquid.LocalFileSystem do
   @moduledoc """
-  This implements an abstract file system which retrieves template files, ie. with the template name prefixed with an underscore. The extension “.liquid” is also added.
+  Implements an abstract file system which retrieves template files, ie. with the template name
+  prefixed with an underscore. The extension “.liquid” is also added.
   For security reasons, template paths are only allowed to contain letters, numbers, and underscore.
   """
 
   @doc """
   Retuns ok when reads a tamplate file
   """
-  # @spec read_template_file(root :: String.t(), name :: String.t(), context :: %Liquid.Contex{}) :: {Atom.t(), String.t()}
   def read_template_file(_root, _name, _context) do
     {:ok, ""}
   end
 
   @doc """
-  This function creates a full path, joining the root and the template path, also creates a error if you use a wrong template name or path 
+  Creates a full path, joining the root and the template path, also creates a error if you use a wrong template name or path
   """
-  @spec full_path(root :: String.t(), template_path :: String.t()) :: {Atom.t(), String.t()}
+  @spec full_path(root :: String.t(), template_path :: String.t()) :: {:ok | :error, String.t()}
   def full_path(root, template_path) do
     full_path =
       if Regex.match?(~r/\//, template_path) do
@@ -57,7 +57,8 @@ defmodule Liquid.FileSystem do
   """
 
   @doc """
-  Looks in the `env` for a file system and creates a full path according to the file system module, if  `env` returns nill, response with an error map: no file system defined
+  Looks in the `env` for a file system and creates a full path according to the file system module,
+  if  `env` returns nill, response with an error map: no file system defined
   """
   @spec full_path(path :: String.t()) :: {Atom.t(), String.t()} | nil
   def full_path(path) do
@@ -68,7 +69,8 @@ defmodule Liquid.FileSystem do
   end
 
   @doc """
-  Looks in the `env` for a  file system and reads the template according to the file system module, if the `env` returns nill, response with an error map: no file system defined
+  Looks in the `env` for a  file system and reads the template according to the file system module,
+  if the `env` returns nill, response with an error map: no file system defined
   """
   @spec read_template_file(path :: String.t(), options :: []) :: {Atom.t(), String.t()} | nil
   def read_template_file(path, options \\ []) do
@@ -87,7 +89,8 @@ defmodule Liquid.FileSystem do
   end
 
   @doc """
-  Gets from the `env` the module(file system module) and the root path, to read the template and determine the file system(according to the file system module)
+  Gets from the `env` the module(file system module) and the root path, to read the template and
+  determine the file system(according to the file system module)
   """
 
   def lookup do
