@@ -34,7 +34,7 @@ defmodule Liquid.Decrement do
   @doc """
   Implementation of Decrement render operations
   """
-  @spec render(%{}, %Tag{}, %Context{}) :: {List, %Context{}}
+  @spec render(list(), %Tag{}, %Context{}) :: {list(), %Context{}}
   def render(output, %Tag{markup: markup}, %Context{} = context) do
     variable = Variable.create(markup)
     {rendered, context} = Variable.lookup(variable, context)

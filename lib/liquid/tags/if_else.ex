@@ -18,7 +18,7 @@ defmodule Liquid.ElseIf do
   ```
   """
   @doc """
-  Identity function. Implementation of 'ElseIf' parse operations
+  Implementation of 'ElseIf' parse operations
   """
   @spec parse(tag :: %Liquid.Tag{}, t :: %Liquid.Template{}) :: {%Liquid.Tag{}, %Liquid.Template{}}
   def parse(%Liquid.Tag{} = tag, %Liquid.Template{} = t), do: {tag, t}
@@ -70,7 +70,7 @@ defmodule Liquid.IfElse do
       There are {% if count < 5 %} less {% else %} more {% endif %} items than you need.
   ```
   """
-  alias Liquid.{Block, Condition, Render, Tag, Template}
+  alias Liquid.{Block, Condition, Context, Render, Tag, Template}
 
   @doc """
   Returns a regex for IF/Else expressions syntax validation
@@ -121,7 +121,7 @@ defmodule Liquid.IfElse do
   @doc """
   Implementation of 'If/Else' render operations
   """
-  @spec render(List, %{}, List) :: {List, List}
+  @spec render(list(), %Tag{}, %Context{}) :: {list(), %Context{}}
   def render(output, %Tag{}, context) do
     {output, context}
   end

@@ -37,16 +37,11 @@ defmodule Liquid.TableRow do
     </table>
     ```
   """
-  alias Liquid.Render
-  alias Liquid.Block
-  alias Liquid.Variable
-  alias Liquid.Context
-  alias Liquid.Expression
-  alias Liquid.RangeLookup
+  alias Liquid.{Block, Context, Expression, RangeLookup, Render, Template, Variable}
 
   defmodule Iterator do
     @moduledoc """
-        Defines iteraction structs used by 'TableRow' in order to iterates over an list or collection.
+    Defines iteraction structs used by 'TableRow' in order to iterates over an list or collection.
     """
     defstruct name: nil,
               collection: nil,
@@ -63,9 +58,9 @@ defmodule Liquid.TableRow do
   def syntax, do: ~r/(\w+)\s+in\s+(#{Liquid.quoted_fragment()}+)/
 
   @doc """
-    Implementation of 'TableRaw' parse operations. Parses and organises markup to set up iterator
+  Implementation of 'TableRaw' parse operations. Parses and organises markup to set up iterator
   """
-  @spec parse(block :: Liquid.Block, t :: Liquid.Template) :: {Liquid.Block, Liquid.Template}
+  @spec parse(block :: %Block{}, t :: %Template{}) :: {%Block{}, %Template{}}
   def parse(%Block{nodelist: nodelist} = block, %Liquid.Template{} = t) do
     block = %{block | iterator: parse_iterator(block)}
 
@@ -113,7 +108,7 @@ defmodule Liquid.TableRow do
   Implementation of 'Raw' render operations. Iterates through pre-set data and appends it to rendered output list
   Adds the HTML table rows and cols depending on the initial `cols` parameter
   """
-  @spec render(list, Liquid.Block, Liquid.Context) :: {list, Liquid.Context}
+  @spec render(list(), %Block{}, %Context{}) :: {list(), %Context{}}
   def render(output, %Block{iterator: it} = block, %Context{} = context) do
     {list, context} = parse_collection(it.collection, context)
     list = if is_binary(list) and list != "", do: [list], else: list

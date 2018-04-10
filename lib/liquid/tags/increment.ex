@@ -22,7 +22,7 @@ defmodule Liquid.Increment do
   alias Liquid.Variable
 
   @doc """
-  Identity function. Implementation of 'Increment' parse operations
+  Implementation of 'Increment' parse operations
   """
   @spec parse(tag :: %Tag{}, template :: %Template{}) :: {%Tag{}, %Template{}}
   def parse(%Tag{} = tag, %Template{} = template) do
@@ -32,7 +32,7 @@ defmodule Liquid.Increment do
   @doc """
   Implementation of 'Increment' render operations
   """
-  @spec render(List, %Tag{}, context :: %Context{}) :: {List, List}
+  @spec render(list(), %Tag{}, context :: %Context{}) :: {list(), %Context{}}
   def render(output, %Tag{markup: markup}, %Context{} = context) do
     variable = Variable.create(markup)
     {rendered, context} = Variable.lookup(variable, context)

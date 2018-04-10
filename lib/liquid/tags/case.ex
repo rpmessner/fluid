@@ -34,7 +34,7 @@ defmodule Liquid.Case do
   @doc """
   Implementation of Capture parse operations
   """
-  @spec parse(b :: %Liquid.Block{}, t :: %Liquid.Template{}) :: {%Liquid.Block{}}
+  @spec parse(b :: %Block{}, t :: %Template{}) :: {%Block{}, %Template{}}
   def parse(%Block{markup: markup} = b, %Template{} = t) do
     [[_, name]] = syntax() |> Regex.scan(markup)
     {split(name |> Variable.create(), b.nodelist), t}
@@ -44,7 +44,7 @@ defmodule Liquid.Case do
 
   defp split(%Variable{} = v, [h | t]) when is_binary(h), do: split(v, t)
 
-  defp split(%Variable{} = _, [%Liquid.Tag{name: :else} | t]), do: t
+  defp split(%Variable{}, [%Liquid.Tag{name: :else} | t]), do: t
 
   defp split(%Variable{} = v, [%Liquid.Tag{name: :when, markup: markup} | t]) do
     {nodelist, t} = Block.split(t, [:when, :else])

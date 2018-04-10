@@ -64,7 +64,7 @@ defmodule Liquid.Appointer do
   @doc """
   Makes `Variable.parts` or literals from the given markup
   """
-  @spec parse_name(String.t()) :: %{}
+  @spec parse_name(String.t()) :: map()
   def parse_name(name) do
     value =
       cond do

@@ -1,26 +1,21 @@
 defmodule Liquid.Unless do
   @moduledoc """
-  Is a conditional just like 'if' but works on the inverse logic.
+  Conditional just like 'if' but works on the inverse logic.
   Input:
   ```
-       {% unless x < 0 %} x is greater than zero {% endunless %}
+    {% unless x < 0 %} x is greater than zero {% endunless %}
   ```
   Output:
   ```
-  x is greater than zero
+    x is greater than zero
   ```
   """
-  alias Liquid.IfElse
-  alias Liquid.Block
-  alias Liquid.Template
-  alias Liquid.Condition
-  alias Liquid.Tag
-  alias Liquid.Render
+  alias Liquid.{Block, Condition, Context, IfElse, Render, Tag, Template}
 
   @doc """
   Implementation of 'Unless' parse operations
   """
-  @spec parse(block :: %Block{}, t :: %Template{}) :: %{}
+  @spec parse(block :: %Block{}, t :: %Template{}) :: {%Block{}, %Template{}}
   def parse(%Block{} = block, %Template{} = t) do
     IfElse.parse(block, t)
   end
@@ -28,7 +23,7 @@ defmodule Liquid.Unless do
   @doc """
   Implementation of 'Unless' render operations
   """
-  @spec render(List, %Tag{}, List) :: {List, List}
+  @spec render(list(), %Tag{}, %Context{}) :: {list(), %Context{}}
   def render(output, %Tag{}, context) do
     {output, context}
   end

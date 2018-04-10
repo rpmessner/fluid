@@ -51,7 +51,7 @@ defmodule Liquid.ForElse do
 
   defmodule Iterator do
     @moduledoc """
-    Defines iteraction structs used by 'For' in order to iterates over an list or collection.
+    Defines Iterator struct used by 'For' in order to iterates over an list or collection
     """
     defstruct name: nil,
               collection: nil,
@@ -70,7 +70,7 @@ defmodule Liquid.ForElse do
   @doc """
   Implmements 'For' parse operations
   """
-  @spec parse(nodelist :: %Block{}, t :: %Template{}) :: %Block{}
+  @spec parse(nodelist :: %Block{}, t :: %Template{}) :: {%Block{}, %Template{}}
   def parse(%Block{nodelist: nodelist} = block, %Template{} = t) do
     block = %{block | iterator: parse_iterator(block)}
 
