@@ -7,6 +7,7 @@ defmodule Liquid.Tag do
   @doc """
   Create a new tag struct
   """
+  @spec create(markup :: String.t()) :: %Liquid.Tag{}
   def create(markup) do
     destructure [name, rest], String.split(markup, " ", parts: 2)
     %Liquid.Tag{name: String.to_atom(name), markup: rest}

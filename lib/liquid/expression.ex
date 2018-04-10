@@ -29,7 +29,7 @@ defmodule Liquid.Expression do
   iex> Liquid.Expression.parse("hello")
   %Liquid.Variable{filters: [], literal: nil, name: "hello", parts: ["hello"]}
   """
-
+  @spec parse(any) :: String.t() | %Liquid.Variable{}
   def parse(markup) when markup in @literal_list, do: @literals[markup]
 
   def parse(markup) do

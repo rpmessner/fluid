@@ -11,6 +11,7 @@ defmodule Liquid.RangeLookup do
   @doc """
   This is used to parse de ranges to our structure to render correctly 
   """
+  @spec parse(%Liquid.RangeLookup{}, context :: %Liquid.Context{}) :: []
   def parse(
         %RangeLookup{range_start: %Variable{} = range_start, range_end: %Variable{} = range_end},
         %Context{} = context
