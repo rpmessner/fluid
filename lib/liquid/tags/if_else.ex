@@ -18,16 +18,13 @@ defmodule Liquid.ElseIf do
   ```
   """
   @doc """
-  Identity function. Implementation of ElseIf parse operations
-    ```
-    Liquid.ElseIf.parse(%Liquid.Tag{}, %Liquid.Template{})
-    {%Liquid.Tag{}, %Liquid.Template{}}
-    ```
+  Identity function. Implementation of 'ElseIf' parse operations
   """
+  @spec parse(tag :: %Liquid.Tag{}, t :: %Liquid.Template{}) :: {%Liquid.Tag{}, %Liquid.Template{}}
   def parse(%Liquid.Tag{} = tag, %Liquid.Template{} = t), do: {tag, t}
 
   @doc """
-  Implementation of ElseIf render operations
+  Implementation of 'ElseIf' render operations
   """
   def render(_, _, _, _), do: raise("should never get here")
 end
@@ -50,16 +47,13 @@ defmodule Liquid.Else do
   """
 
   @doc """
-  Identity function. Implementation of Else parse operations
-    ```
-    Liquid.Else.parse(%Liquid.Tag{}, %Liquid.Template{})
-    {%Liquid.Tag{}, %Liquid.Template{}}
-    ```
+  Identity function. Implementation of 'Else' parse operations
   """
+  @spec parse(tag :: %Liquid.Tag{}, t :: %Liquid.Template{}) :: {%Liquid.Tag{}, %Liquid.Template{}}
   def parse(%Liquid.Tag{} = tag, %Liquid.Template{} = t), do: {tag, t}
 
   @doc """
-  Implementation of ElseIf render operations
+  Implementation of 'ElseIf' render operations
   """
   def render(_, _, _, _), do: raise("should never get here")
 end
@@ -94,8 +88,9 @@ defmodule Liquid.IfElse do
   end
 
   @doc """
-  Implementation of If/Else parse operations
+  Implementation of 'If/Else' parse operations
   """
+  @spec parse(block :: %Block{}, t :: %Template{}) :: {%Block{}, %Template{}}
   def parse(%Block{} = block, %Template{} = t) do
     block = parse_conditions(block)
 
@@ -124,12 +119,9 @@ defmodule Liquid.IfElse do
   end
 
   @doc """
-  Implementation of If/Else render operations
-    ```
-    Liquid.IFElse.parse(output, %Liquid.Tag{}, context)
-    {output, context}
-    ```
+  Implementation of 'If/Else' render operations
   """
+  @spec render(List, %{}, List) :: {List, List}
   def render(output, %Tag{}, context) do
     {output, context}
   end

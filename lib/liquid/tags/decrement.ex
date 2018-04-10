@@ -25,11 +25,8 @@ defmodule Liquid.Decrement do
 
   @doc """
   Identity function. Implementation of Decrement parse operations
-    ```
-    Liquid.Decrement.parse(%Liquid.Tag{}, %Liquid.Template{})
-    {%Liquid.Tag{}, %Liquid.Template{}}
-    ```
   """
+  @spec parse(tag :: %Tag{}, template :: %Template{}) :: {%Tag{}, %Template{}}
   def parse(%Tag{} = tag, %Template{} = template) do
     {tag, template}
   end
@@ -37,6 +34,7 @@ defmodule Liquid.Decrement do
   @doc """
   Implementation of Decrement render operations
   """
+  @spec render(%{}, %Tag{}, %Context{}) :: {List, %Context{}}
   def render(output, %Tag{markup: markup}, %Context{} = context) do
     variable = Variable.create(markup)
     {rendered, context} = Variable.lookup(variable, context)
