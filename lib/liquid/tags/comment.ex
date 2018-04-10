@@ -15,20 +15,14 @@ defmodule Liquid.Comment do
 
   @doc """
   Implementation of Comment parse operations
-    ```
-    Liquid.Comment.parse(%Block{}, %Liquid.Template{})
-    {%{block | blank: true, strict: false}, %Liquid.Template{}}
-    ```
   """
+  @spec parse(block :: %Liquid.Block{}, template :: %Liquid.Template{}) :: {%Liquid.Block{}, %Liquid.Template{}}
   def parse(%Liquid.Block{} = block, %Liquid.Template{} = template),
     do: {%{block | blank: true, strict: false}, template}
 
   @doc """
   Implementation of Comment render operations
-  ```
-    Liquid.Comment.render(output, %Liquid.Block{}, context)
-    {output, context}
-    ```
   """
+  @spec render(List, %Liquid.Block{}, List) :: {List, List}
   def render(output, %Liquid.Block{}, context), do: {output, context}
 end

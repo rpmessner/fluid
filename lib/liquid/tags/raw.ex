@@ -1,6 +1,6 @@
 defmodule Liquid.Raw do
   @moduledoc """
-  Raw temporarily disables tag processing. This is useful for generating content (eg, Mustache, Handlebars) which uses conflicting syntax.
+  Temporarily disables tag processing. This is useful for generating content (eg, Mustache, Handlebars) which uses conflicting syntax.
   Input:
   ```
     {% raw %}
@@ -18,7 +18,7 @@ defmodule Liquid.Raw do
   @full_token_possibly_invalid ~r/\A(.*)#{Liquid.tag_start()}\s*(\w+)\s*(.*)?#{Liquid.tag_end()}\z/m
 
   @doc """
-  Implementation of Raw parse operations
+  Implementation of 'Raw' parse operations
   """
   def parse(%Block{name: name}, [], _, _),
     do: raise("No matching end for block {% #{to_string(name)} %}")
@@ -48,8 +48,9 @@ defmodule Liquid.Raw do
   end
 
   @doc """
-  Implementation of Raw render operations
+  Implementation of 'Raw' render operations
   """
+  @spec render(List, block :: %Block{}, List) :: %{}
   def render(output, %Block{} = block, context) do
     Render.render(output, block.nodelist, context)
   end

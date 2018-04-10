@@ -40,6 +40,7 @@ defmodule Liquid.Cycle do
   @doc """
     Implementation of Cycle parse operations. Sets up the cycle name and variables to cycle through
   """
+  @spec parse(tag :: %Tag{}, template :: %Template{}) :: {%Tag{}, %Template{}}
   def parse(%Tag{markup: markup} = tag, %Template{} = template) do
     {name, values} = markup |> get_name_and_values
     tag = %{tag | parts: [name | values]}
@@ -49,6 +50,7 @@ defmodule Liquid.Cycle do
   @doc """
   Implementation of Cycle render operations. Returns a corresponding cycle value and increments the cycle counter
   """
+  @spec render(list(), %Tag{}, %Context{}) :: {list(), %Context{}}
   def render(output, %Tag{parts: [name | values]}, %Context{} = context) do
     {name, context} = Variable.lookup(%Variable{parts: [], literal: name}, context)
     name = to_string(name) <> "_liquid_cycle"
@@ -56,7 +58,7 @@ defmodule Liquid.Cycle do
     index = rendered || 0
     {value, context} = values |> Enum.fetch!(index) |> get_value_from_context(context)
     new_index = rem(index + 1, Enum.count(values))
-    result_assign = context.assigns |> Map.put(name, new_index)
+    result_assign = Map.put(context.assigns, name, new_index)
     {[value | output], %{context | assigns: result_assign}}
   end
 
