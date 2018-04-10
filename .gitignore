@@ -1,3 +1,7 @@
 /ebin
 /deps
+/_build
+/.idea
+/bench/snapshots
 erl_crash.dump
+/cover
